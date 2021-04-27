@@ -49,6 +49,15 @@ task('+pub', async () => {
   });
 });
 
+task('+pub:prod', async () => {
+  const cmd = 'npm publish --registry https://registry.npmjs.org --access=public';
+
+  await exec(cmd, {
+    stderr: process.stderr,
+    stdout: process.stdout,
+  });
+});
+
 task('+build:dev', async () => {
   const env = {
     DEBUG: 'frm:*',
@@ -83,5 +92,6 @@ task('+build:prod', async () => {
 
 task('build', series('clean', 'lint', '+build:dev'));
 task('pub', series('clean', 'lint', '+build:dev', '+pub'));
+task('pub:prod', series('clean', 'lint', '+build:prod', '+pub:prod'));
 task('build:dev', series('clean', 'lint', '+build:dev'));
 task('build:prod', series('clean', 'lint', '+build:prod'));

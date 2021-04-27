@@ -5,8 +5,7 @@
   "scripts": {
     "script": "DEBUG=frm:* ts-node -r tsconfig-paths/register --files --project=./tsconfig.json ./src/fast-maker.ts",
     "clean": "just clean",
-    "prepub:prod": "npm run build",
-    "pub:prod": "npm publish --registry https://registry.npmjs.org --access=public",
+    "pub:prod": "just pub:prod",
     "pub": "just pub",
     "tsc": "just tsc",
     "build:prod": "just build:prod",
