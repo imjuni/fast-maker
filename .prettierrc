@@ -1,0 +1,21 @@
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 120,
+  "arrowParens": "always",
+  "parser": "typescript",
+  "overrides": [
+    {
+      "files": "*.md",
+      "options": {
+        "parser": "markdown"
+      }
+    },
+    {
+      "files": ".tjsclirc",
+      "options": {
+        "parser": "json5"
+      }
+    }
+  ]
+}
