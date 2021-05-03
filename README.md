@@ -35,18 +35,14 @@ fast-maker -a <your handler directory> -t <your tsconfig file> -o <output direct
 | --path-output | -o | output directory |
 | prefix-api | N/A | API handler route prefix, ex> /api/<directory structure route path> |
 | prefix-page | N/A | Next.js page prefetch handler route prefix, ex> /page/<directory structure route path>  |
-
 | template-api-import-all | N/A | If you use wrapper function for api handler, describe import statement in this option. This option present all(async, sync wrapper function) case import statement |
 | template-api-import-async | N/A | If you use wrapper function for api handler, describe import statement in this option. This option present async wrapper function case import statement |
 | template-api-import-sync | N/A | If you use wrapper function for api handler, describe import statement in this option. This option present sync wrapper function case import statement |
-
 | template-api-wrapper-async | N/A | name of async wrapper function  |
 | template-api-wrapper-sync | N/A | name of sync wrapper function |
-
 | template-page-import-all | N/A | If you use wrapper function for page prefetch handler, describe import statement in this option. This option present all(async, sync wrapper function) case import statement |
 | template-page-import-async | N/A | If you use wrapper function for page prefetch handler, describe import statement in this option. This option present async wrapper function case import statement |
 | template-page-import-sync | N/A | If you use wrapper function for page prefetch handler, describe import statement in this option. This option present sync wrapper function case import statement |
-
 | template-page-wrapper-async | N/A | name of async wrapper function |
 | template-page-wrapper-sync | N/A | name of sync wrapper function |
 
