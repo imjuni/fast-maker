@@ -1,6 +1,6 @@
 {
   "name": "fast-maker",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "create route file on specific directory",
   "scripts": {
     "script": "DEBUG=frm:* ts-node -r tsconfig-paths/register --files --project=./tsconfig.json ./src/fast-maker.ts",
@@ -45,6 +45,7 @@
     "@types/luxon": "^1.26.4",
     "@types/node": "14.14.41",
     "@types/prettier": "2.2.3",
+    "@types/url-join": "^4.0.0",
     "@types/uuid": "^8.3.0",
     "@types/yargs": "^16.0.1",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
@@ -97,6 +98,7 @@
     "ts-node": "^9.1.1",
     "tslib": "2.2.0",
     "typescript": "^4.2.4",
+    "url-join": "^4.0.1",
     "uuid": "^8.3.2",
     "yargs": "^16.2.0"
   }

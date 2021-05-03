@@ -27,6 +27,17 @@ const JSC_IOption: JSONSchema7 = {
       },
       required: ['api', 'output', 'tsconfig'],
     },
+    prefix: {
+      type: 'object',
+      properties: {
+        api: {
+          type: 'string',
+        },
+        page: {
+          type: 'string',
+        },
+      },
+    },
     template: {
       type: 'object',
       properties: {

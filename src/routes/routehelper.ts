@@ -16,6 +16,10 @@ export function removeStartsSlash(value: string): string {
   return value.startsWith('/') ? value.slice(1, value.length) : value;
 }
 
+export function addStartsSlash(value: string): string {
+  return value.startsWith('/') ? value : `/${value}`;
+}
+
 export const getMethod = (
   filename: string,
 ): Extract<keyof FastifyInstance, 'get' | 'post' | 'put' | 'options' | 'patch' | 'head' | 'delete'> => {
@@ -61,6 +65,7 @@ async function getHandlerFile(handlersPath?: string): Promise<string[]> {
       path.resolve(handlersPath, '**', 'interface'),
       path.resolve(handlersPath, '**', 'interfaces'),
       path.resolve(handlersPath, '**', '*.d.ts'),
+      path.resolve(handlersPath, '**', 'JSC_*'),
     ];
 
     const result = await fastGlob(tsfileGlobs, { ignore: ignoreFileGlobs });

@@ -3,22 +3,23 @@ import {
   getArrowFunctionWithModifier,
   getDeclarationNodeText,
   getFunctionDeclarationWithModifier,
+  getText,
   isExportStatement,
 } from '@compilers/compilerhelper';
 import { exists } from '@modules/exists';
+import { IOption } from '@modules/IOption';
 import ll from '@modules/ll';
 import { TResolvedEither } from '@modules/typehelper';
 import { fpGetRoutePath } from '@routes/generator';
-import { getMethod, removeStartsSlash } from '@routes/routehelper';
+import { getMethod } from '@routes/routehelper';
 import { getDefaultVariableName, getOptionsVariableName } from '@tools/generator';
 import { getHash } from '@tools/hash';
+import { FastifyInstance } from 'fastify';
 import * as TEI from 'fp-ts/Either';
 import * as TFU from 'fp-ts/function';
-import { invert, isEmpty, isFalse, isNotEmpty, isTrue, TResolvePromise } from 'my-easy-fp';
+import { isEmpty, isFalse, isNotEmpty, isTrue, TResolvePromise } from 'my-easy-fp';
 import * as path from 'path';
 import typescript from 'typescript';
-import { IOption } from '@modules/IOption';
-import { FastifyInstance } from 'fastify';
 
 const log = ll(__filename);
 
@@ -152,8 +153,8 @@ const fpGetImportStatementSourceText = (argsFrom: {
         return `import { default as ${getDefaultVariableName({
           filename,
           hash: args.hash,
-        })}, options as options_${getOptionsVariableName({ filename, hash: args.hash })} } from './${path.relative(
-          args.base,
+        })}, options as ${getOptionsVariableName({ filename, hash: args.hash })} } from './${path.relative(
+          path.resolve(args.base),
           path.join(path.dirname(args.filename), path.basename(args.filename, '.ts')),
         )}'`;
       },
@@ -164,7 +165,7 @@ const fpGetImportStatementSourceText = (argsFrom: {
           filename,
           hash: args.hash,
         })} } from './${path.relative(
-          args.base,
+          path.resolve(args.base),
           path.join(path.dirname(args.filename), path.basename(args.filename, '.ts')),
         )}'`;
       },
@@ -311,7 +312,8 @@ const fpGetRouteSourceText = (argsFrom: {
     TEI.fold(
       // api 라우팅
       (args) => {
-        const routePath = fpGetRoutePath({ filename: args.filename });
+        const relativeFileename = path.relative(args.option.path.api, args.filename);
+        const routePath = fpGetRoutePath({ isAPI: args.isAPI, option: args.option, filename: relativeFileename });
         const method = getMethod(args.filename);
         const filename = path.basename(args.filename, '.ts');
         const optionsName = getOptionsVariableName({ filename, hash: args.hash });
@@ -335,7 +337,8 @@ const fpGetRouteSourceText = (argsFrom: {
       },
       // render 라우팅
       (args) => {
-        const routePath = fpGetRoutePath({ filename: args.filename });
+        const relativeFileename = path.relative(args.option.path.page ?? '', args.filename);
+        const routePath = fpGetRoutePath({ isAPI: args.isAPI, option: args.option, filename: relativeFileename });
         const filename = path.basename(args.filename, '.ts');
         const method = getMethod(args.filename);
         const optionsName = getOptionsVariableName({ filename, hash: args.hash });
@@ -376,12 +379,12 @@ export function getSourceText(args: { filename: string; option: IOption; program
   const dirname = path.dirname(args.filename);
 
   const isAPI = isFalse(isNotEmpty(args.option.path.page) && dirname.indexOf(args.option.path.page) >= 0);
-  const base = path.join(args.option.path.output);
+  const base = args.option.path.output;
   const hash = getHash(args.filename);
 
   const variables = statements
     .map((statement) =>
-      statement.declarationList.declarations.find((declaration) => declaration.name?.getText() === 'options'),
+      statement.declarationList.declarations.find((declaration) => getText(declaration.name) === 'options'),
     )
     .flatMap((statement) => statement)
     .filter((statement): statement is typescript.VariableDeclaration => isNotEmpty(statement));

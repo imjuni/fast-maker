@@ -8,6 +8,9 @@ export interface IFastMakerYargsParameter {
   o: string;
   'path-output': string;
 
+  'prefix-api': string;
+  'prefix-page': string;
+
   'template-api-import-all': string;
   'template-api-import-async': string;
   'template-api-import-sync': string;

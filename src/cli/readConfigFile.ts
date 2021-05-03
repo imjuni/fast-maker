@@ -25,10 +25,9 @@ export default async function readConfigFile(configFilePath: string): Promise<IO
   }
 
   const optionFromConfigFile: IOption = {
+    ...rawConfig,
     path: rawPath,
   };
-
-  optionFromConfigFile.template = rawConfig.template;
 
   const ajv = new Ajv();
   const validate = ajv.compile(JSC_IOption);

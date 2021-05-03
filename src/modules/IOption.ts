@@ -21,6 +21,11 @@ export interface IOption {
     tsconfig: string;
   };
 
+  prefix?: {
+    api?: string;
+    page?: string;
+  };
+
   /**
    * template of route.ts
    */

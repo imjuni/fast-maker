@@ -175,7 +175,7 @@ export function getArrowFunctionWithModifier(
   const keyword = extractArrowFunctionModifier({ statement, symbols });
 
   // log(
-  //   '>> keyword: ',
+  //   '>>> keyword: ',
   //   statement,
   //   statement.kind,
   //   getModifierArray(statement.modifiers)
