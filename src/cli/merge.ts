@@ -1,11 +1,10 @@
 import { exists } from '@modules/exists';
 import { IOption } from '@modules/IOption';
-import ll from '@modules/ll';
 import mergewith from 'lodash.mergewith';
 import { isEmpty, isFalse } from 'my-easy-fp';
-import { isPlainObject } from 'is-plain-object';
 
-const log = ll(__filename);
+// import ll from '@modules/ll';
+// const log = ll(__filename);
 
 export default async function merge(
   optionFromConfigFile: IOption | undefined,

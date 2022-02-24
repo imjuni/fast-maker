@@ -8,7 +8,7 @@ import urljoin from 'url-join';
 
 const log = ll(__filename);
 
-export const fpGetRoutePath = (argsFrom: { filename: string; option: IOption; isAPI: boolean }) =>
+const fpGetRoutePath = (argsFrom: { filename: string; option: IOption; isAPI: boolean }) =>
   TFU.pipe(
     argsFrom,
     (args) => ({
@@ -30,7 +30,7 @@ export const fpGetRoutePath = (argsFrom: { filename: string; option: IOption; is
         .split(path.sep)
         .filter((endpoint) => endpoint !== '')
         .map((endpoint) => {
-          const reg = new RegExp(`(\\[|)([0-9a-zA-Z]+)(\\]|)(\\.ts|)`, 'gm');
+          const reg = new RegExp(`(\\[|)([0-9a-zA-Z]+)(\\]|)(\\.ts|)`, 'gm'); // eslint-disable-line
           const matched = reg.exec(endpoint);
 
           if (matched === null) {
@@ -67,3 +67,5 @@ export const fpGetRoutePath = (argsFrom: { filename: string; option: IOption; is
       return { ...args, filename: addStartsSlash(joined) };
     },
   );
+
+export default fpGetRoutePath;

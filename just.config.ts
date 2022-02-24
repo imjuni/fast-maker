@@ -1,5 +1,4 @@
-// import { readFileSync } from 'fs';
-// import { argv, logger, option, task } from 'just-scripts';
+/* eslint-disable import/no-extraneous-dependencies */
 import { logger, option, series, task } from 'just-scripts';
 import { exec } from 'just-scripts-utils';
 
@@ -64,7 +63,7 @@ task('+build:dev', async () => {
     NODE_ENV: 'production',
   };
 
-  const cmd = `${getEnvironmentPrefix(env)} webpack --config webpack.config.dev.js`;
+  const cmd = `cross-env ${getEnvironmentPrefix(env)} webpack --config webpack.config.dev.js`;
 
   logger.info('Script Build: ', cmd);
 
@@ -80,7 +79,7 @@ task('+build:prod', async () => {
     NODE_ENV: 'production',
   };
 
-  const cmd = `${getEnvironmentPrefix(env)} webpack --config webpack.config.prod.js`;
+  const cmd = `cross-env ${getEnvironmentPrefix(env)} webpack --config webpack.config.prod.js`;
 
   logger.info('Script Build: ', cmd);
 

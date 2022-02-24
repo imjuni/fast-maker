@@ -1,12 +1,12 @@
 import { exists } from '@modules/exists';
-import ll from '@modules/ll';
 import fastGlob from 'fast-glob';
 import { FastifyInstance } from 'fastify';
 import { isEmpty, isFalse } from 'my-easy-fp';
 import path from 'path';
 import * as uuid from 'uuid';
 
-const log = ll(__filename);
+// import ll from '@modules/ll';
+// const log = ll(__filename);
 
 export function removeEndsSlash(value: string): string {
   return value.endsWith('/') ? value.slice(0, value.length - 1) : value;

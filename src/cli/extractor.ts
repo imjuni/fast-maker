@@ -1,5 +1,5 @@
 import { IOption } from '@modules/IOption';
-import { isEmpty, isNotEmpty } from 'my-easy-fp';
+import { isNotEmpty } from 'my-easy-fp';
 import { Arguments } from 'yargs';
 import { IFastMakerYargsParameter } from './IFastMakerYargsParameter';
 

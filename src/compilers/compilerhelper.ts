@@ -7,11 +7,12 @@ const log = ll(__filename);
 export function getText(node: typescript.Node): string {
   try {
     if ('escapedText' in node) {
-      return getTypeScriptString(node['escapedText']); // eslint-disable-line
+      const escapedText: typescript.__String = (node as any).escapedText as any;
+      return getTypeScriptString(escapedText); // eslint-disable-line
     }
 
     if ('getText' in node) {
-      return node['getText'](); // eslint-disable-line
+      return node.getText();
     }
 
     return '';
@@ -31,7 +32,9 @@ export function getTypeScriptString(value?: typescript.__String): string {
     }
 
     return String(value);
-  } catch (err) {
+  } catch (catched) {
+    const err = catched instanceof Error ? catched : new Error('unknown error raised');
+
     log(err.message);
     log(err.stack);
 
@@ -48,6 +51,7 @@ export function isExportStatement(node: typescript.VariableStatement): boolean {
     return false;
   }
 
+  // eslint-disable-next-line
   for (const modifier of node.modifiers) {
     if (modifier.kind === typescript.SyntaxKind.ExportKeyword) {
       return true;
@@ -65,9 +69,7 @@ export function getModifierArray(modifiers: typescript.ModifiersArray | undefine
   return modifiers.map((modifier) => modifier);
 }
 
-export function getFunctionDeclarationWithModifier(
-  node: typescript.Node,
-):
+export function getFunctionDeclarationWithModifier(node: typescript.Node):
   | {
       type: 'async' | 'sync';
       statement: typescript.Node;
@@ -129,7 +131,7 @@ export function extractArrowFunctionModifier({
     return undefined;
   }
 
-  const initializer = declaration.initializer;
+  const { initializer } = declaration;
 
   if (isEmpty(initializer)) {
     return undefined;
@@ -197,17 +199,17 @@ export function getArrowFunctionWithModifier(
   return { type: 'sync', statement: keyword.statement };
 }
 
-export function getDeclarationNodeText(node: typescript.VariableDeclaration): string | undefined {
+export function getIdentifierNodeText(node: typescript.Identifier): string | undefined {
   try {
-    return getIdentifierNodeText(castNode<typescript.Identifier>(node.name));
+    return getTypeScriptString(node.escapedText);
   } catch {
     return undefined;
   }
 }
 
-export function getIdentifierNodeText(node: typescript.Identifier): string | undefined {
+export function getDeclarationNodeText(node: typescript.VariableDeclaration): string | undefined {
   try {
-    return getTypeScriptString(node.escapedText);
+    return getIdentifierNodeText(castNode<typescript.Identifier>(node.name));
   } catch {
     return undefined;
   }

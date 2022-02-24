@@ -7,6 +7,7 @@ import {
   getTypeScriptConfig,
   getTypeScriptProgram,
 } from '@compilers/generator';
+import { IOption } from '@modules/IOption';
 import ll from '@modules/ll';
 import { getRouteFiles } from '@routes/routehelper';
 import chalk from 'chalk';
@@ -17,7 +18,6 @@ import * as fs from 'fs';
 import { isFalse } from 'my-easy-fp';
 import * as path from 'path';
 import prettier from 'prettier';
-import { IOption } from '@modules/IOption';
 
 const log = ll(__filename);
 
@@ -31,7 +31,7 @@ function getTsconfigPath(tsconfigPath: string) {
   return path.join(tsconfigPath, 'tsconfig.json');
 }
 
-export async function generator(option: IOption) {
+export default async function generator(option: IOption) {
   try {
     const cwd = path.resolve(process.cwd());
     const tsconfigPath = getTsconfigPath(option.path.tsconfig);
@@ -133,7 +133,9 @@ ${routePageStatements}
     log(prettiered);
 
     await fs.promises.writeFile(path.resolve(option.path.output, 'route.ts'), prettiered);
-  } catch (err) {
+  } catch (catched) {
+    const err = catched instanceof Error ? catched : new Error('unknown error raised');
+
     log(err.message);
     log(err.stack);
   }

@@ -1,6 +1,6 @@
 import { JSONSchema7 } from 'json-schema';
 
-// eslint-disable-next-line camelcase
+// eslint-disable-next-line
 const JSC_IOption: JSONSchema7 = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   type: 'object',

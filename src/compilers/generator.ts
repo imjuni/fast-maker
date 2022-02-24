@@ -10,10 +10,10 @@ import { exists } from '@modules/exists';
 import { IOption } from '@modules/IOption';
 import ll from '@modules/ll';
 import { TResolvedEither } from '@modules/typehelper';
-import { fpGetRoutePath } from '@routes/generator';
+import fpGetRoutePath from '@routes/generator';
 import { getMethod } from '@routes/routehelper';
 import { getDefaultVariableName, getOptionsVariableName } from '@tools/generator';
-import { getHash } from '@tools/hash';
+import getHash from '@tools/hash';
 import { FastifyInstance } from 'fastify';
 import * as TEI from 'fp-ts/Either';
 import * as TFU from 'fp-ts/function';
@@ -41,11 +41,16 @@ export async function getTypeScriptConfig({
       ? path.resolve(tsconfigPathFrom)
       : path.resolve(tsconfigInCliPath);
 
-    const tsconfigPath = (await exists(tsconfigResolved))
-      ? tsconfigResolved
-      : (await exists(tsconfigInCliPath))
-      ? path.join(cliPath, tsconfigResolved)
-      : undefined;
+    const tsconfigPath = await (async () => {
+      if (await exists(tsconfigResolved)) {
+        return tsconfigResolved;
+      }
+
+      if (await exists(tsconfigInCliPath)) {
+        return path.join(cliPath, tsconfigResolved);
+      }
+      return undefined;
+    })();
 
     log('tsconfig path: ', tsconfigPath);
 
@@ -71,7 +76,9 @@ export async function getTypeScriptConfig({
     log('tsconfig filenames: ', tsconfig.fileNames.length);
 
     return TEI.right(tsconfig);
-  } catch (err) {
+  } catch (catched) {
+    const err = catched instanceof Error ? catched : new Error('unknown error raised');
+
     return TEI.left(err);
   }
 }
@@ -108,7 +115,9 @@ export async function getTypeScriptProgram({
     }
 
     return TEI.right({ program, filenames });
-  } catch (err) {
+  } catch (catched) {
+    const err = catched instanceof Error ? catched : new Error('unknown error raised');
+
     return TEI.left(err);
   }
 }
@@ -126,6 +135,8 @@ export function getVariableStatement({ source }: { source: typescript.Node }): t
           statements.push(statement);
         }
 
+        break;
+      default:
         break;
     }
 
@@ -176,11 +187,7 @@ const fpGetImportStatementSourceText = (argsFrom: {
  * 파일에 선언된 http handler를 가져온다. async/sync 구분을 하고 function, arrow function을 구분한다
  * @param source 타입스크립트 소스 파일
  */
-function getHandleFunction({
-  source,
-}: {
-  source: typescript.Node;
-}): Array<{
+function getHandleFunction({ source }: { source: typescript.Node }): Array<{
   type: 'async' | 'sync';
   statement: typescript.Node;
 }> {
@@ -227,6 +234,8 @@ function getHandleFunction({
           statements.push(arrowFunctionStatement);
         }
 
+        break;
+      default:
         break;
     }
 

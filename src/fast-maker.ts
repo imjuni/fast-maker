@@ -1,14 +1,14 @@
 import builder from '@cli/builder';
 import extractor from '@cli/extractor';
 import { IFastMakerYargsParameter } from '@cli/IFastMakerYargsParameter';
+import merge from '@cli/merge';
 import readConfigFile from '@cli/readConfigFile';
 import { IOption } from '@modules/IOption';
 import ll from '@modules/ll';
 import chalk from 'chalk';
 import path from 'path';
-import { Arguments, Argv, default as yargsAnyType } from 'yargs';
-import { generator } from './generator';
-import merge from '@cli/merge';
+import yargsAnyType, { Arguments, Argv } from 'yargs';
+import generator from './generator';
 
 const log = ll(__filename);
 const version = '0.0.1';
@@ -20,7 +20,7 @@ const version = '0.0.1';
 // eslint-disable-next-line
 const yargs: Argv<IFastMakerYargsParameter> = yargsAnyType as any;
 
-const argv = yargs(process.argv.slice(2))
+yargs(process.argv.slice(2))
   .command<IFastMakerYargsParameter>({
     aliases: '$0 [cwds...]',
     command: 'generate [cwds...]',
@@ -40,16 +40,13 @@ const argv = yargs(process.argv.slice(2))
         const option = await merge(optionFromConfigFile, optionFromCliParameter);
 
         await generator(option);
+      } catch (catched) {
+        const err = catched instanceof Error ? catched : new Error('unknown error raised');
 
-        return true;
-      } catch (err) {
         console.log(chalk.redBright('Error: ', err.message));
         log(err.stack);
-        return false;
       }
     },
   })
   .version(version, 'version', 'display version information')
-  .help().argv;
-
-log(argv);
+  .help();

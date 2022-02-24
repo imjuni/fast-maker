@@ -12,6 +12,7 @@ export const removeBracket = (filenameFrom: string): string =>
             return filename;
           }
 
+          // eslint-disable-next-line
           const [_all, _start, vanillaFilename] = matched;
           return vanillaFilename ?? '';
         }),
