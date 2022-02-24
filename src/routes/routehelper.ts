@@ -1,12 +1,12 @@
 import { exists } from '@modules/exists';
+import ll from '@modules/ll';
 import fastGlob from 'fast-glob';
 import { FastifyInstance } from 'fastify';
 import { isEmpty, isFalse } from 'my-easy-fp';
 import path from 'path';
 import * as uuid from 'uuid';
 
-// import ll from '@modules/ll';
-// const log = ll(__filename);
+const log = ll(__filename);
 
 export function removeEndsSlash(value: string): string {
   return value.endsWith('/') ? value.slice(0, value.length - 1) : value;
@@ -18,6 +18,20 @@ export function removeStartsSlash(value: string): string {
 
 export function addStartsSlash(value: string): string {
   return value.startsWith('/') ? value : `/${value}`;
+}
+
+export function replaceSepToPosix(targetPath: string): string {
+  if (path.sep !== '/') {
+    const replaced = path.posix.join(...targetPath.split(path.sep));
+
+    if (targetPath.startsWith(path.sep)) {
+      return `${path.posix.sep}${replaced}`;
+    }
+
+    return replaced;
+  }
+
+  return targetPath;
 }
 
 export const getMethod = (
@@ -60,12 +74,12 @@ async function getHandlerFile(handlersPath?: string): Promise<string[]> {
       return [];
     }
 
-    const tsfileGlobs = path.resolve(handlersPath, '**', '*.ts');
+    const tsfileGlobs = replaceSepToPosix(path.resolve(handlersPath, '**', '*.ts'));
     const ignoreFileGlobs = [
-      path.resolve(handlersPath, '**', 'interface'),
-      path.resolve(handlersPath, '**', 'interfaces'),
-      path.resolve(handlersPath, '**', '*.d.ts'),
-      path.resolve(handlersPath, '**', 'JSC_*'),
+      replaceSepToPosix(path.resolve(handlersPath, '**', 'interface')),
+      replaceSepToPosix(path.resolve(handlersPath, '**', 'interfaces')),
+      replaceSepToPosix(path.resolve(handlersPath, '**', '*.d.ts')),
+      replaceSepToPosix(path.resolve(handlersPath, '**', 'JSC_*')),
     ];
 
     const result = await fastGlob(tsfileGlobs, { ignore: ignoreFileGlobs });
@@ -77,6 +91,8 @@ async function getHandlerFile(handlersPath?: string): Promise<string[]> {
 }
 
 export async function getRouteFiles({ apiPath, pagePath }: { apiPath: string; pagePath?: string }) {
+  log('path: ', 'api - ', apiPath, 'page - ', pagePath);
+
   const [getAPIs, postAPIs, putAPIs, deleteAPIs, getPages] = await Promise.all([
     getHandlerFile(path.join(apiPath, 'get')),
     getHandlerFile(path.join(apiPath, 'post')),
@@ -84,6 +100,8 @@ export async function getRouteFiles({ apiPath, pagePath }: { apiPath: string; pa
     getHandlerFile(path.join(apiPath, 'delete')),
     getHandlerFile(path.join(pagePath ?? uuid.v4(), 'get')),
   ]);
+
+  log('files: ', getPages);
 
   return {
     get: getAPIs,

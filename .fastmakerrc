@@ -1,0 +1,20 @@
+{
+  "path": {
+    "api": "./example/handlers",
+    "output": "./example/handlers",
+    "tsconfig": "./example/tsconfig.json"
+  },
+  "template": {
+    "api": {
+      "import": {
+        "all": "import { wrap, syncWrap } from '@services/route/wrap';",
+        "async": "import { wrap } from '@services/route//wrap';",
+        "sync": "import { syncWrap } from '@services/route/wrap';"
+      },
+      "wrapper": {
+        "async": "wrap",
+        "sync": "syncWrap"
+      }
+    }
+  }
+}
