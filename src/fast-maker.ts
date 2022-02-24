@@ -16,11 +16,10 @@ const version = '0.0.1';
 // Yargs default type using object type(= {}). But object type cause error that
 // fast-maker cli option interface type. So we make concrete type yargs instance
 // make using by any type.
-
-// eslint-disable-next-line
 const yargs: Argv<IFastMakerYargsParameter> = yargsAnyType as any;
 
-yargs(process.argv.slice(2))
+// eslint-disable-next-line
+const argv = yargs(process.argv.slice(2))
   .command<IFastMakerYargsParameter>({
     aliases: '$0 [cwds...]',
     command: 'generate [cwds...]',
@@ -49,4 +48,6 @@ yargs(process.argv.slice(2))
     },
   })
   .version(version, 'version', 'display version information')
-  .help();
+  .help().argv;
+
+log('argv: ', argv);

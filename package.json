@@ -1,6 +1,6 @@
 {
   "name": "fast-maker",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "create route file on specific directory",
   "scripts": {
     "script": "DEBUG=frm:* ts-node -r tsconfig-paths/register --files --project=./tsconfig.json ./src/fast-maker.ts",
