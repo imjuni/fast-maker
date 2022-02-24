@@ -30,7 +30,7 @@ const fpGetRoutePath = (argsFrom: { filename: string; option: IOption; isAPI: bo
         .split(path.sep)
         .filter((endpoint) => endpoint !== '')
         .map((endpoint) => {
-          const reg = new RegExp(`(\\[|)([0-9a-zA-Z]+)(\\]|)(\\.ts|)`, 'gm'); // eslint-disable-line
+          const reg = new RegExp(`(\\[|)([\-_0-9a-zA-Z]+)(\\]|)(\\.ts|)`, 'gm'); // eslint-disable-line
           const matched = reg.exec(endpoint);
 
           if (matched === null) {
