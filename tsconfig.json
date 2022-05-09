@@ -1,11 +1,28 @@
 {
+  "extends": "@tsconfig/node14/tsconfig.json",
+  // Most ts-node options can be specified here using their programmatic names.
+  "ts-node": {
+    // It is faster to skip typechecking.
+    // Remove if you want ts-node to do typechecking.
+    "transpileOnly": true,
+
+    "files": true,
+
+    "require": ["tsconfig-paths/register"],
+
+    "compilerOptions": {
+      // compilerOptions specified here will override those declared below,
+      // but *only* in ts-node.  Useful if you want ts-node and tsc to use
+      // different options with a single tsconfig.json.
+    }
+  },
   "compilerOptions": {
     /* Basic Options */
-    "target": "es2021", /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017','ES2018' or 'ESNEXT'. */
-    "module": "commonjs", /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
-    "lib": [
-      "es2021",
-    ],                             /* Specify library files to be included in the compilation. */
+    // "target": "es2021", /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017','ES2018' or 'ESNEXT'. */
+    // "module": "commonjs", /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
+    // "lib": [
+    //   "es2021",
+    // ],                             /* Specify library files to be included in the compilation. */
     // "allowJs": true,                       /* Allow javascript files to be compiled. */
     // "checkJs": true,                       /* Report errors in .js files. */
     // "jsx": "preserve",                     /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */
@@ -40,10 +57,13 @@
     "baseUrl": ".", /* Base directory to resolve non-absolute module names. */
     "paths": {
       "@cli/*": ["src/cli/*"],
-      "@compilers/*": ["src/compilers/*"],
-      "@modules/*": ["src/modules/*"],
-      "@routes/*": ["src/routes/*"],
-      "@tools/*": ["src/tools/*"],
+      "@testenv/*": ["src/testenv/*"],
+      "@compiler/*": ["src/compiler/*"],
+      "@generator/*": ["src/generator/*"],
+      "@module/*": ["src/module/*"],
+      "@route/*": ["src/route/*"],
+      "@tool/*": ["src/tool/*"],
+      "@xstate/*": ["src/xstate/*"],
     },                           /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                       /* List of folders to include type definitions from. */
@@ -61,6 +81,11 @@
     // "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */
   },
   "exclude": [
-    "example/**"
+    "example/**/*",
+    "dist/**/*",
+    ".eslintrc.js",
+    "just.config.ts",
+    "jest.config.cjs",
+    "jest.setup.cjs"
   ]
 }

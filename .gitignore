@@ -66,3 +66,6 @@ artifact/
 
 # vscode 
 .vscode
+
+# Example
+example/handlers/route.ts

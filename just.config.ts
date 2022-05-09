@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { logger, option, series, task } from 'just-scripts';
 import { exec } from 'just-scripts-utils';
+import * as uuid from 'uuid';
 
 option('env', { default: { env: 'develop' } });
 
@@ -11,6 +12,13 @@ function getEnvironmentPrefix(env: Record<string, string | boolean>): string {
 
   return envPrefix;
 }
+
+task('uid', () => {
+  const created = uuid.v4();
+
+  console.log(created.toUpperCase());
+  console.log(created.replace(/-/g, '').toUpperCase());
+});
 
 task('clean', async () => {
   const cmd = 'rimraf dist artifact';

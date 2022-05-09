@@ -1,142 +1,281 @@
-/* eslint max-len: ["error", { "code": 130, "ignoreStrings": true, "ignoreComments": true }] */
-
-import {
-  getAPIWrapImport,
-  getPageWrapImport,
-  getStatement,
-  getTypeScriptConfig,
-  getTypeScriptProgram,
-} from '@compilers/generator';
-import { IOption } from '@modules/IOption';
-import ll from '@modules/ll';
-import { getRouteFiles } from '@routes/routehelper';
+import IImportConfiguration from '@compiler/interface/IImportConfiguration';
+import IReason from '@compiler/interface/IReason';
+import THandlerNode, { IHandlerStatement, IOptionStatement } from '@compiler/interface/THandlerNode';
+import getHandlerWithOption from '@compiler/navigate/getHandlerWithOption';
+import getTypeScriptConfig from '@compiler/tool/getTypeScriptConfig';
+import getTypeScriptProject from '@compiler/tool/getTypeScriptProject';
+import dedupeImportConfiguration from '@generator/dedupeImportConfiguration';
+import importCodeGenerator from '@generator/importCodeGenerator';
+import prettierProcessing from '@generator/prettierProcessing';
+import routeCodeGenerator from '@generator/routeCodeGenerator';
+import { IOption } from '@module/IOption';
+import { CliUx } from '@oclif/core';
+import getRouteFiles from '@route/getRouteFiles';
+import IRouteConfiguration from '@route/interface/IRouteConfiguration';
+import IRouteHandler from '@route/interface/IRouteHandler';
+import getHash from '@tool/getHash';
+import type { IContextRequestHandlerAnalysisMachine as IAnalysisMachineContext } from '@xstate/RequestHandlerAnalysisMachine';
+import requestHandlerAnalysisMachine from '@xstate/RequestHandlerAnalysisMachine';
 import chalk from 'chalk';
-import * as TEI from 'fp-ts/Either';
-import * as TFU from 'fp-ts/function';
-import * as TTE from 'fp-ts/TaskEither';
-import * as fs from 'fs';
-import { isFalse } from 'my-easy-fp';
-import * as path from 'path';
-import prettier from 'prettier';
+import consola from 'consola';
+import { isEmpty, isNotEmpty } from 'my-easy-fp';
+import { fail, isFail, pass, PassFailEither } from 'my-only-either';
+import path from 'path';
+import { interpret } from 'xstate';
 
-const log = ll(__filename);
+export default async function generator(
+  option: IOption,
+): Promise<PassFailEither<Error, { code: string; reasons: IReason[] }>> {
+  const customBar = CliUx.ux.progress({
+    format: 'PROGRESS | {bar} | {value}/{total} Files',
+    barCompleteChar: '\u25A0',
+    barIncompleteChar: ' ',
+    stopOnComplete: true,
+  });
 
-function getTsconfigPath(tsconfigPath: string) {
-  const basename = path.basename(tsconfigPath);
-
-  if (basename === 'tsconfig.json') {
-    return tsconfigPath;
-  }
-
-  return path.join(tsconfigPath, 'tsconfig.json');
-}
-
-export default async function generator(option: IOption) {
   try {
-    const cwd = path.resolve(process.cwd());
-    const tsconfigPath = getTsconfigPath(option.path.tsconfig);
+    const typeScriptConfigEither = await getTypeScriptConfig({ tsconfigPath: option.project });
 
-    const files = await getRouteFiles({ apiPath: option.path.api, pagePath: option.path.page });
-
-    log('files: ', files);
-
-    const program = await TFU.pipe(
-      () => getTypeScriptConfig({ tsconfigPath }),
-      TTE.chain((args) => () => getTypeScriptProgram({ tsconfig: args, ignores: [] })),
-    )();
-
-    if (TEI.isLeft(program)) {
-      console.log(chalk`{red Error occured} from TypeScript config read or parsing`);
-      process.exit(0);
+    if (isFail(typeScriptConfigEither)) {
+      throw typeScriptConfigEither.fail;
     }
 
-    const gets = files.get.map((filename) => getStatement({ filename, option, program: program.right.program }));
-    const posts = files.post.map((filename) => getStatement({ filename, option, program: program.right.program }));
-    const puts = files.put.map((filename) => getStatement({ filename, option, program: program.right.program }));
-    const deletes = files.delete.map((filename) => getStatement({ filename, option, program: program.right.program }));
-    const pages = files.pages.map((filename) => getStatement({ filename, option, program: program.right.program }));
+    CliUx.ux.action.status = `load tsconfig.json: ${option.project}`;
+    CliUx.ux.wait(300);
+    CliUx.ux.action.status = 'typescript handler source loading, ...';
 
-    const asyncCount = [...gets, ...posts, ...puts, ...deletes, ...pages]
-      .map((route) => route.routeSourceText)
-      .filter((routeSourceText) => routeSourceText.type === 'api' && routeSourceText.async).length;
+    const typeScriptProjectEither = await getTypeScriptProject(option.project);
 
-    const syncCount = [...gets, ...posts, ...puts, ...deletes, ...pages]
-      .map((route) => route.routeSourceText)
-      .filter((routeSourceText) => routeSourceText.type === 'api' && isFalse(routeSourceText.async)).length;
-
-    const asyncPageCount = [...pages]
-      .map((route) => route.routeSourceText)
-      .filter((routeSourceText) => routeSourceText.type === 'pages' && routeSourceText.async).length;
-
-    const syncPageCount = [...pages]
-      .map((route) => route.routeSourceText)
-      .filter((routeSourceText) => routeSourceText.type === 'pages' && isFalse(routeSourceText.async)).length;
-
-    const importStatements = [...gets, ...posts, ...puts, ...deletes, ...pages]
-      .map((imported) => imported.importSourceText)
-      .join('\n');
-
-    const routeAPIStatements = [...gets, ...posts, ...puts, ...deletes]
-      .map((imported) => imported.routeSourceText.content)
-      .join('\n');
-    const routePageStatements = [...pages].map((imported) => imported.routeSourceText.content).join('\n');
-
-    const fileContent = `import { FastifyInstance } from 'fastify';
-import { IncomingMessage, Server, ServerResponse } from 'http';${getAPIWrapImport({
-      option,
-      asyncCount,
-      syncCount,
-    })}${getPageWrapImport({ option, asyncCount: asyncPageCount, syncCount: syncPageCount })}${importStatements}
-
-    ${
-      routeAPIStatements !== ''
-        ? `// ----------------------------------------------------------------------------------------------------
-    // Generated server route function start
-    export function server(server: FastifyInstance<Server, IncomingMessage, ServerResponse>): void {
-    ${routeAPIStatements}
-    }
-    // Generated server route function start
-    // ----------------------------------------------------------------------------------------------------`
-        : ''
+    if (isFail(typeScriptProjectEither)) {
+      throw typeScriptProjectEither.fail;
     }
 
-    ${
-      routePageStatements !== ''
-        ? `// ----------------------------------------------------------------------------------------------------
-// Generated client route function start
-export function client(
-  server: FastifyInstance<Server, IncomingMessage, ServerResponse>, 
-  nextHandle: (req: IncomingMessage, res: ServerResponse, parsedUrl?: UrlWithParsedQuery) => Promise<void>
-): void {
-${routePageStatements}
-}
-// Generated client route function start
-// ----------------------------------------------------------------------------------------------------`
-        : ''
-    }`;
+    CliUx.ux.action.status = 'typescript handler source complete, ...';
 
-    const prettierOption = await prettier.resolveConfig(cwd);
+    const project = typeScriptProjectEither.pass;
+    const reasons: IReason[] = [];
+    const routeFiles = await getRouteFiles(option.path.handler);
+    const routeFileRecord = routeFiles.reduce<Record<string, IRouteHandler>>((aggregation, routeFile) => {
+      return { ...aggregation, [routeFile.filename]: routeFile };
+    }, {});
 
-    const prettiered = prettier.format(
-      fileContent,
-      prettierOption === null
-        ? {
-            singleQuote: true,
-            trailingComma: 'all',
-            printWidth: 120,
-            arrowParens: 'always',
-            parser: 'typescript',
-          }
-        : prettierOption,
+    customBar.start(routeFiles.length, 0);
+
+    const filterUsingTsProjectConfig = routeFiles.reduce<{ uniqueness: IRouteHandler[]; notFound: IRouteHandler[] }>(
+      (aggregation, routeFile) => {
+        const source = typeScriptProjectEither.pass.getSourceFile(routeFile.filename);
+
+        if (isNotEmpty(source)) {
+          return { ...aggregation, uniqueness: [...aggregation.uniqueness, routeFile] };
+        }
+
+        return { ...aggregation, notFound: [...aggregation.notFound, routeFile] };
+      },
+      { uniqueness: [], notFound: [] },
     );
 
-    log(prettiered);
+    reasons.push(
+      ...filterUsingTsProjectConfig.notFound.map((notFoundRouteFile) => {
+        const reason: IReason = {
+          type: 'error',
+          message: `Cannot found source file in typescript project: ${notFoundRouteFile.filename}`,
+          filePath: notFoundRouteFile.filename,
+        };
 
-    await fs.promises.writeFile(path.resolve(option.path.output, 'route.ts'), prettiered);
+        return reason;
+      }),
+    );
+
+    const routeNodeRecords = filterUsingTsProjectConfig.uniqueness.reduce<Record<string, THandlerNode[]>>(
+      (aggregation, routeFile) => {
+        const source = project.getSourceFile(routeFile.filename);
+
+        // 앞서 source가 빈 경우는 notFound로 분류해서 아래 코드는 실행될 일이 없다,
+        // In normalcase, throw not reached
+        if (isEmpty(source)) {
+          throw new Error(`Source-code is empty: ${routeFile.filename}`);
+        }
+
+        const nodes = getHandlerWithOption(source);
+        return { ...aggregation, [routeFile.filename]: nodes };
+      },
+      {},
+    );
+
+    const discriminateExistHandler = Object.entries(routeNodeRecords).reduce<{
+      haveHandler: Array<{ filename: string; nodes: THandlerNode[] }>;
+      notHandler: Array<{ filename: string; nodes: THandlerNode[] }>;
+    }>(
+      (aggregation, entry) => {
+        const [filename, handlerNodes] = entry;
+        const routeHandler = handlerNodes.find((node): node is IHandlerStatement => node.kind === 'handler');
+
+        if (isNotEmpty(routeHandler)) {
+          return { ...aggregation, haveHandler: [...aggregation.haveHandler, { filename, nodes: handlerNodes }] };
+        }
+
+        return { ...aggregation, notHandler: [...aggregation.notHandler, { filename, nodes: handlerNodes }] };
+      },
+      {
+        haveHandler: [],
+        notHandler: [],
+      },
+    );
+
+    reasons.push(
+      ...discriminateExistHandler.notHandler.map((nodeHandler) => {
+        const reason: IReason = {
+          type: 'error',
+          message: `Cannot found handler function in source: ${nodeHandler.filename}`,
+          filePath: nodeHandler.filename,
+        };
+
+        return reason;
+      }),
+    );
+
+    const discriminateDuplicateRoutePath = discriminateExistHandler.haveHandler.reduce<{
+      uniquenessRecord: Record<string, { filename: string; nodes: THandlerNode[] }>;
+      uniqueness: Array<{ filename: string; nodes: THandlerNode[] }>;
+      duplication: Array<{ filename: string; nodes: THandlerNode[] }>;
+    }>(
+      (aggregation, handlerNode) => {
+        const routeFile = routeFileRecord[handlerNode.filename];
+        const key = `[${routeFile.method}] ${routeFile.routePath}`;
+
+        if (isEmpty(aggregation.uniquenessRecord[key])) {
+          return {
+            ...aggregation,
+            uniquenessRecord: { ...aggregation.uniquenessRecord, [key]: handlerNode },
+            uniqueness: [...aggregation.uniqueness, handlerNode],
+          };
+        }
+
+        const reason: IReason = {
+          type: 'error',
+          message: `Found duplicated routePath(${chalk.red(key)}): ${handlerNode.filename}`,
+          filePath: handlerNode.filename,
+        };
+
+        reasons.push(reason);
+
+        return {
+          ...aggregation,
+          duplication: [...aggregation.duplication, handlerNode],
+        };
+      },
+      {
+        uniquenessRecord: {},
+        uniqueness: [],
+        duplication: [],
+      },
+    );
+
+    const rawRoutesAnalysised = await Promise.all(
+      discriminateDuplicateRoutePath.uniqueness.map(async (handlerNode) => {
+        const source = project.getSourceFile(handlerNode.filename);
+
+        if (isEmpty(source)) {
+          throw new Error(`Source-code is empty: ${handlerNode.filename}`);
+        }
+
+        const relativePath = path.relative(option.path.output, source.getFilePath().toString());
+        const hash = getHash(relativePath);
+        const routeHandler = handlerNode.nodes.find((node): node is IHandlerStatement => node.kind === 'handler');
+        const routeOption = handlerNode.nodes.find((node): node is IOptionStatement => node.kind === 'option');
+
+        if (isEmpty(routeHandler)) {
+          throw new Error(`Cannot found route handler function: ${source.getFilePath().toString()}`);
+        }
+
+        const routeFile = routeFileRecord[handlerNode.filename];
+
+        const machine = requestHandlerAnalysisMachine({
+          project,
+          source,
+          hash,
+          routeHandler: routeFile,
+          handler: routeHandler,
+          routeOption,
+          option,
+        });
+
+        const service = interpret(machine);
+
+        const basicRouteInfo = await new Promise<Pick<IAnalysisMachineContext, 'importBox' | 'routeBox' | 'messages'>>(
+          (resolve) => {
+            service.onDone((data) => resolve(data.data));
+            service.start();
+          },
+        );
+
+        customBar.increment();
+
+        return basicRouteInfo;
+      }),
+    );
+
+    const routesAnalysised = rawRoutesAnalysised.reduce<{
+      importBox: IAnalysisMachineContext['importBox'][];
+      routeBox: IAnalysisMachineContext['routeBox'][];
+      reasons: IAnalysisMachineContext['messages'][];
+    }>(
+      (aggregated, current) => {
+        return {
+          importBox: [...aggregated.importBox, current.importBox],
+          routeBox: [...aggregated.routeBox, current.routeBox],
+          reasons: [...aggregated.reasons, current.messages],
+        };
+      },
+      {
+        importBox: [],
+        routeBox: [],
+        reasons: [],
+      },
+    );
+
+    const importConfigurations = dedupeImportConfiguration(
+      routesAnalysised.importBox.reduce<IImportConfiguration[]>((source, target) => {
+        return source.concat(Object.values(target));
+      }, []),
+    );
+
+    const routeConfigurations = routesAnalysised.routeBox.reduce<IRouteConfiguration[]>((source, target) => {
+      return source.concat(Object.values(target));
+    }, []);
+
+    const importCodes = importCodeGenerator({ importConfigurations, option });
+    const routeCodes = routeCodeGenerator({ routeConfigurations, option });
+
+    reasons.push(...routesAnalysised.reasons.flatMap((reason) => reason));
+
+    const finalCode = [
+      `import { FastifyInstance } from 'fastify';`,
+      ...importCodes,
+      '\n',
+      `export default function routing(fastify: FastifyInstance): void {`,
+      ...routeCodes,
+      `}`,
+    ];
+
+    const prettfiedEither = await prettierProcessing({ code: finalCode.join('\n') });
+
+    consola.debug('--------------------------------------------------------');
+    consola.debug(prettfiedEither);
+    consola.debug('--------------------------------------------------------');
+
+    if (isFail(prettfiedEither)) {
+      throw prettfiedEither.fail;
+    }
+
+    customBar.update(routeFiles.length);
+
+    return pass({ code: prettfiedEither.pass, reasons });
   } catch (catched) {
     const err = catched instanceof Error ? catched : new Error('unknown error raised');
 
-    log(err.message);
-    log(err.stack);
+    return fail(err);
+  } finally {
+    customBar.stop();
   }
 }

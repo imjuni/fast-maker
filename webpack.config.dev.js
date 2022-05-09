@@ -2,7 +2,7 @@
 
 const webpack = require('webpack');
 const path = require('path');
-const tsconfigPathsWebpackPlugin = require('tsconfig-paths-webpack-plugin');
+const TsconfigPathsWebpackPlugin = require('tsconfig-paths-webpack-plugin');
 const webpackNodeExternals = require('webpack-node-externals');
 
 const distPath = path.resolve(path.join(__dirname, 'dist'));
@@ -20,15 +20,8 @@ const config = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     modules: [path.resolve(__dirname, 'src'), 'node_modules'],
-    alias: {
-      '@cli': path.resolve(__dirname, 'src/cli'),
-      '@compilers': path.resolve(__dirname, 'src/compilers'),
-      '@modules': path.resolve(__dirname, 'server/modules'),
-      '@routes': path.resolve(__dirname, 'src/routes'),
-      '@tools': path.resolve(__dirname, 'src/tools'),
-    },
     plugins: [
-      new tsconfigPathsWebpackPlugin({
+      new TsconfigPathsWebpackPlugin({
         configFile: 'tsconfig.json',
       }),
     ],

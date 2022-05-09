@@ -13,14 +13,38 @@ module.exports = {
   ignorePatterns: ['__test__/*', '__tests__/*'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: './tsconfig.json',
+    project: './tsconfig.eslint.json',
   },
   plugins: ['@typescript-eslint', '@typescript-eslint/tslint', 'prettier'],
   rules: {
-    '@typescript-eslint/indent': 'off',
-    'max-len': ['error', { code: 120 }],
     'prettier/prettier': 'error',
+    'max-len': [
+      'error',
+      {
+        ignoreUrls: true,
+        ignoreStrings: true,
+        ignoreTemplateLiterals: true,
+        ignoreComments: true,
+        ignoreTrailingComments: true,
+        code: 120,
+      },
+    ],
     'no-console': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        varsIgnorePattern: '^_.+$',
+        argsIgnorePattern: '^_.+$',
+      },
+    ],
+    // '@typescript-eslint/naming-convention': [
+    //   'error',
+    //   {
+    //     selector: 'variable',
+    //     modifiers: ['destructured'],
+    //     format: null,
+    //   },
+    // ],
   },
   settings: {},
 };

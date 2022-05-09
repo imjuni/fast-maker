@@ -18,10 +18,10 @@
 
   // formatContent
   format: "import { JSONSchema7 } from 'json-schema';\\n\
-\\n\
-// eslint-disable-next-line camelcase\\n\
-const JSC_%{{TYPE_NAME}}%: JSONSchema7 = %{{SCHEMA_JSON_CONTENT}}%;\\n\
-\\n\
-// eslint-disable-next-line camelcase\\n\
-export default JSC_%{{TYPE_NAME}}%;",
+  \\n\
+  // eslint-disable-next-line @typescript-eslint/naming-convention\\n\
+  const JSC_%{{TYPE_NAME}}%: JSONSchema7 = %{{SCHEMA_JSON_CONTENT}}%;\\n\
+  \\n\
+  // eslint-disable-next-line @typescript-eslint/naming-convention\\n\
+  export default JSC_%{{TYPE_NAME}}%;",
 }
