@@ -28,6 +28,9 @@ export default function preLoadConfig() {
       v: rawConfig.verbose,
       verbose: rawConfig.verbose,
 
+      d: rawConfig.verbose ?? false,
+      debugLog: rawConfig.verbose ?? false,
+
       h: rawConfig.path?.handler,
       handler: rawConfig.path?.handler,
 

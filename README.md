@@ -34,6 +34,7 @@ fast-maker
 | --project | required | -p | tsconfig path |
 | --output | | -o | route.ts file generate on output directory. Default value is route handler directory(--handler option passed) |
 | --verbose | | -v | verbose message display |
+| --debugLog | | -d | generate debug log file |
 | --config | | -c | configuration file load given directory |
 
 # Constraints
@@ -150,7 +151,7 @@ You can use .fastmakerrc file for configuration. fast-maker use jsonc parser for
 {
   "project": "./server/tsconfig.json",
   "path": {
-    "api": "./server/handlers/api",
+    "handler": "./server/handlers/api",
     "output": "./server/handlers"
   }
 }

@@ -13,4 +13,7 @@ export interface IFastMakerYargsParameter {
 
   o: string;
   output: string;
+
+  d: boolean;
+  debugLog: boolean;
 }

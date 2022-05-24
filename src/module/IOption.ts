@@ -3,8 +3,8 @@ export interface IOption {
    * path of the tsconfig file. Because fast-maker use typescript compiler api.
    */
   project: string;
-
   verbose?: boolean;
+  debugLog?: boolean;
 
   path: {
     /**

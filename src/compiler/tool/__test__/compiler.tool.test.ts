@@ -30,6 +30,8 @@ describe('compiler-tool', () => {
         project: share.projectPath,
         v: false,
         verbose: false,
+        d: false,
+        debugLog: false,
         p: share.projectPath,
         h: env.handlerPath,
         handler: env.handlerPath,

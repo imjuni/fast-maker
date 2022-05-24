@@ -18,10 +18,13 @@ import type { IContextRequestHandlerAnalysisMachine as IAnalysisMachineContext }
 import requestHandlerAnalysisMachine from '@xstate/RequestHandlerAnalysisMachine';
 import chalk from 'chalk';
 import consola from 'consola';
-import { isEmpty, isNotEmpty } from 'my-easy-fp';
+import fs from 'fs';
+import { isEmpty, isFalse, isNotEmpty } from 'my-easy-fp';
 import { fail, isFail, pass, PassFailEither } from 'my-only-either';
 import path from 'path';
 import { interpret } from 'xstate';
+import fastSafeStringify from 'fast-safe-stringify';
+import * as tsm from 'ts-morph';
 
 export default async function generator(
   option: IOption,
@@ -32,6 +35,8 @@ export default async function generator(
     barIncompleteChar: ' ',
     stopOnComplete: true,
   });
+
+  const logObject: Record<string, any> = {};
 
   try {
     const typeScriptConfigEither = await getTypeScriptConfig({ tsconfigPath: option.project });
@@ -59,6 +64,9 @@ export default async function generator(
       return { ...aggregation, [routeFile.filename]: routeFile };
     }, {});
 
+    logObject.config = option;
+    logObject.routeFiles = routeFiles;
+
     customBar.start(routeFiles.length, 0);
 
     const filterUsingTsProjectConfig = routeFiles.reduce<{ uniqueness: IRouteHandler[]; notFound: IRouteHandler[] }>(
@@ -73,6 +81,9 @@ export default async function generator(
       },
       { uniqueness: [], notFound: [] },
     );
+
+    logObject.routeFileUniqueness = filterUsingTsProjectConfig.uniqueness;
+    logObject.routeFileNotInSource = filterUsingTsProjectConfig.notFound;
 
     reasons.push(
       ...filterUsingTsProjectConfig.notFound.map((notFoundRouteFile) => {
@@ -134,6 +145,8 @@ export default async function generator(
       }),
     );
 
+    logObject.notHandler = discriminateExistHandler.notHandler;
+
     const discriminateDuplicateRoutePath = discriminateExistHandler.haveHandler.reduce<{
       uniquenessRecord: Record<string, { filename: string; nodes: THandlerNode[] }>;
       uniqueness: Array<{ filename: string; nodes: THandlerNode[] }>;
@@ -170,6 +183,11 @@ export default async function generator(
         duplication: [],
       },
     );
+
+    logObject.duplicateRoutePath = {
+      uniqueness: discriminateDuplicateRoutePath.uniqueness,
+      duplication: discriminateDuplicateRoutePath.duplication,
+    };
 
     const rawRoutesAnalysised = await Promise.all(
       discriminateDuplicateRoutePath.uniqueness.map(async (handlerNode) => {
@@ -244,10 +262,16 @@ export default async function generator(
       return source.concat(Object.values(target));
     }, []);
 
+    logObject.importConfigurations = importConfigurations;
+    logObject.routeConfigurations = importConfigurations;
+
     const importCodes = importCodeGenerator({ importConfigurations, option });
     const routeCodes = routeCodeGenerator({ routeConfigurations, option });
 
     reasons.push(...routesAnalysised.reasons.flatMap((reason) => reason));
+
+    logObject.importCodes = importCodes;
+    logObject.routeCodes = routeCodes;
 
     const finalCode = [
       `import { FastifyInstance } from 'fastify';`,
@@ -257,6 +281,30 @@ export default async function generator(
       ...routeCodes,
       `}`,
     ];
+
+    logObject.finalCode = importCodes;
+
+    if ((isNotEmpty(option.debugLog) && isFalse(option.debugLog)) || routeConfigurations.length <= 0) {
+      CliUx.ux.action.status = 'Cannot generate route path!';
+      await fs.promises.writeFile(
+        'fast-maker.debug.info.log',
+        fastSafeStringify(
+          logObject,
+          (_key, value) => {
+            if (value === '[Circular]') {
+              return undefined;
+            }
+
+            if (value instanceof tsm.Node) {
+              return undefined;
+            }
+
+            return value;
+          },
+          2,
+        ),
+      );
+    }
 
     const prettfiedEither = await prettierProcessing({ code: finalCode.join('\n') });
 
@@ -273,6 +321,13 @@ export default async function generator(
     return pass({ code: prettfiedEither.pass, reasons });
   } catch (catched) {
     const err = catched instanceof Error ? catched : new Error('unknown error raised');
+
+    logObject.err = {
+      message: err.message,
+      stack: err.stack ?? '',
+    };
+
+    await fs.promises.writeFile('fast-maker.debug.info.log', fastSafeStringify(logObject));
 
     return fail(err);
   } finally {
