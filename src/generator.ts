@@ -46,7 +46,7 @@ export default async function generator(
     }
 
     CliUx.ux.action.status = `load tsconfig.json: ${option.project}`;
-    CliUx.ux.wait(300);
+    await CliUx.ux.wait(300);
     CliUx.ux.action.status = 'typescript handler source loading, ...';
 
     const typeScriptProjectEither = await getTypeScriptProject(option.project);

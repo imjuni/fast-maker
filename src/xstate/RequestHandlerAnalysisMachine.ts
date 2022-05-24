@@ -17,7 +17,7 @@ import IRouteHandler from '@route/interface/IRouteHandler';
 import appendPostfixHash from '@tool/appendPostfixHash';
 import castFunctionNode from '@xstate/tool/castFunctionNode';
 import consola from 'consola';
-import { isEmpty, isNotEmpty } from 'my-easy-fp';
+import { isEmpty, isFalse, isNotEmpty } from 'my-easy-fp';
 import * as path from 'path';
 import * as tsm from 'ts-morph';
 import { assign, createMachine } from 'xstate';
@@ -355,53 +355,83 @@ const requestHandlerAnalysisMachine = (
           const typeReferenceNodes = getTypeReferences(parameter);
           const result = validateTypeReferences({ source, typeReferenceNodes });
 
-          const notExportClassReasons = result.classes.exported.map((nonExportNode) => {
-            const startPos = nonExportNode.getStart(false);
-            const lineAndCharacter = context.source.getLineAndColumnAtPos(startPos);
+          const notExportClassReasons = result.classes.total
+            .filter((classNode) => {
+              return isFalse(
+                result.classes.exported
+                  .map((exportedClassNode) => exportedClassNode.getText())
+                  .includes(classNode.getText()),
+              );
+            })
+            .map((nonExportNode) => {
+              const startPos = nonExportNode.getStart(false);
+              const lineAndCharacter = context.source.getLineAndColumnAtPos(startPos);
 
-            const reason: IReason = {
-              type: 'error',
-              filePath: context.source.getFilePath().toString(),
-              source: context.source,
-              node: next.handler.node,
-              lineAndCharacter: { line: lineAndCharacter.line, character: lineAndCharacter.column },
-              message: `not export class: ${node.getType().getText()}`,
-            };
+              const reason: IReason = {
+                type: 'error',
+                filePath: context.source.getFilePath().toString(),
+                source: context.source,
+                node: next.handler.node,
+                lineAndCharacter: { line: lineAndCharacter.line, character: lineAndCharacter.column },
+                message: `not export class: ${
+                  nonExportNode.getType().getSymbol()?.getEscapedName() ?? node.getType().getText()
+                }`,
+              };
 
-            return reason;
-          });
+              return reason;
+            });
 
-          const notExportInterfaceReasons = result.interfaces.exported.map((nonExportNode) => {
-            const startPos = nonExportNode.getStart(false);
-            const lineAndCharacter = context.source.getLineAndColumnAtPos(startPos);
+          const notExportInterfaceReasons = result.interfaces.total
+            .filter((interfaceNode) => {
+              return isFalse(
+                result.interfaces.exported
+                  .map((exportedClassNode) => exportedClassNode.getText())
+                  .includes(interfaceNode.getText()),
+              );
+            })
+            .map((nonExportNode) => {
+              const startPos = nonExportNode.getStart(false);
+              const lineAndCharacter = context.source.getLineAndColumnAtPos(startPos);
 
-            const reason: IReason = {
-              type: 'error',
-              filePath: context.source.getFilePath().toString(),
-              source: context.source,
-              node: next.handler.node,
-              lineAndCharacter: { line: lineAndCharacter.line, character: lineAndCharacter.column },
-              message: `not export interface: ${node.getType().getText()}`,
-            };
+              const reason: IReason = {
+                type: 'error',
+                filePath: context.source.getFilePath().toString(),
+                source: context.source,
+                node: next.handler.node,
+                lineAndCharacter: { line: lineAndCharacter.line, character: lineAndCharacter.column },
+                message: `not export interface: ${
+                  nonExportNode.getType().getSymbol()?.getEscapedName() ?? node.getType().getText()
+                }`,
+              };
 
-            return reason;
-          });
+              return reason;
+            });
 
-          const notExportTypeAliasReasons = result.typeAliases.exported.map((nonExportNode) => {
-            const startPos = nonExportNode.getStart(false);
-            const lineAndCharacter = context.source.getLineAndColumnAtPos(startPos);
+          const notExportTypeAliasReasons = result.typeAliases.total
+            .filter((typeAliasNode) => {
+              return isFalse(
+                result.typeAliases.exported
+                  .map((exportedClassNode) => exportedClassNode.getText())
+                  .includes(typeAliasNode.getText()),
+              );
+            })
+            .map((nonExportNode) => {
+              const startPos = nonExportNode.getStart(false);
+              const lineAndCharacter = context.source.getLineAndColumnAtPos(startPos);
 
-            const reason: IReason = {
-              type: 'error',
-              filePath: context.source.getFilePath().toString(),
-              source: context.source,
-              node: next.handler.node,
-              lineAndCharacter: { line: lineAndCharacter.line, character: lineAndCharacter.column },
-              message: `not export type alias: ${node.getType().getText()}`,
-            };
+              const reason: IReason = {
+                type: 'error',
+                filePath: context.source.getFilePath().toString(),
+                source: context.source,
+                node: next.handler.node,
+                lineAndCharacter: { line: lineAndCharacter.line, character: lineAndCharacter.column },
+                message: `not export type alias: ${
+                  nonExportNode.getType().getSymbol()?.getEscapedName() ?? node.getType().getText()
+                }`,
+              };
 
-            return reason;
-          });
+              return reason;
+            });
 
           next.messages.push(
             ...notExportClassReasons.concat(notExportInterfaceReasons).concat(notExportTypeAliasReasons),
