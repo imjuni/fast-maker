@@ -1,3 +1,4 @@
+import IGetModuleInImports from '@compiler/interface/IGetModuleInImports';
 import { IOption } from '@module/IOption';
 import appendPostfixHash from '@tool/appendPostfixHash';
 import getHash from '@tool/getHash';
@@ -11,18 +12,6 @@ interface IGetResolvedModuleParam {
   source: tsm.SourceFile;
   option: IOption;
   typeReferenceNodes: tsm.TypeReferenceNode[];
-}
-
-export interface IGetResolvedModuleInImportsReturn {
-  isExternalLibraryImport: boolean;
-  importAt: string;
-  exportFrom: string;
-  hash: string;
-  importDeclarations: Array<{
-    isDefaultExport: boolean;
-    importModuleNameFrom: string;
-    importModuleNameTo: string;
-  }>;
 }
 
 function getNamedBindingName(bindings: ReturnType<tsm.ImportClause['getNamedBindings']>) {
@@ -45,7 +34,7 @@ export default function getResolvedModuleInImports({
   source,
   option,
   typeReferenceNodes,
-}: IGetResolvedModuleParam): IGetResolvedModuleInImportsReturn[] {
+}: IGetResolvedModuleParam): IGetModuleInImports[] {
   const typeNames = typeReferenceNodes.map((node) => node.getTypeName());
   const textTypeNames = typeNames.map((typeName) => typeName.getText());
 
@@ -77,7 +66,7 @@ export default function getResolvedModuleInImports({
 
   consola.debug(typeNameWithImportDeclarations);
 
-  const nonDedupeResolutions = typeNameWithImportDeclarations.map<IGetResolvedModuleInImportsReturn>(
+  const nonDedupeResolutions = typeNameWithImportDeclarations.map<IGetModuleInImports>(
     (typeNameWithImportDeclaration) => {
       const importClause = typeNameWithImportDeclaration.importDeclaration.getImportClauseOrThrow();
       const defaultImport = importClause.getDefaultImport();
@@ -126,121 +115,38 @@ export default function getResolvedModuleInImports({
     },
   );
 
-  const resolutionRecord = nonDedupeResolutions.reduce<Record<string, IGetResolvedModuleInImportsReturn>>(
-    (aggregation, current) => {
-      if (isNotEmpty(aggregation[current.exportFrom])) {
-        const concatedImportDeclarations: IGetResolvedModuleInImportsReturn['importDeclarations'] = [
-          ...current.importDeclarations,
-          ...aggregation[current.exportFrom].importDeclarations,
-        ];
+  const resolutionRecord = nonDedupeResolutions.reduce<Record<string, IGetModuleInImports>>((aggregation, current) => {
+    if (isNotEmpty(aggregation[current.exportFrom])) {
+      const concatedImportDeclarations: IGetModuleInImports['importDeclarations'] = [
+        ...current.importDeclarations,
+        ...aggregation[current.exportFrom].importDeclarations,
+      ];
 
-        concatedImportDeclarations.sort((left, right) => {
-          if (left.isDefaultExport) {
-            return 1;
-          }
+      concatedImportDeclarations.sort((left, right) => {
+        if (left.isDefaultExport) {
+          return 1;
+        }
 
-          if (right.isDefaultExport) {
-            return -1;
-          }
+        if (right.isDefaultExport) {
+          return -1;
+        }
 
-          return left.importModuleNameTo.localeCompare(right.importModuleNameTo);
-        });
+        return left.importModuleNameTo.localeCompare(right.importModuleNameTo);
+      });
 
-        return {
-          ...aggregation,
-          [current.exportFrom]: {
-            ...aggregation[current.exportFrom],
-            importDeclarations: concatedImportDeclarations,
-          },
-        };
-      }
+      return {
+        ...aggregation,
+        [current.exportFrom]: {
+          ...aggregation[current.exportFrom],
+          importDeclarations: concatedImportDeclarations,
+        },
+      };
+    }
 
-      return { ...aggregation, [current.exportFrom]: current };
-    },
-    {},
-  );
+    return { ...aggregation, [current.exportFrom]: current };
+  }, {});
 
   const resolutions = Object.values(resolutionRecord);
 
   return resolutions;
 }
-
-/*
-export default function getResolvedModuleInImports({ source, node }: IGetResolvedModuleParam) {
-  const importDeclarations = source.getImportDeclarations();
-
-  const findedNodes = [
-    source
-      .getImportDeclarations()
-      .filter((importDeclaration) => {
-        try {
-          const importClauseNode = importDeclaration.getImportClause();
-          if (isEmpty(importClauseNode)) {
-            return false;
-          }
-
-          // named export 를 가져온 것
-          const namedBindings = importClauseNode.getNamedBindings();
-          // const findedBindeding = (namedBindings?.elements ?? []).find((element) => {
-          //   return getText(element.name) === getText(node.typeName);
-          // });
-
-          return isNotEmpty(findedBindeding);
-        } catch (catched) {
-          const err = catched instanceof Error ? catched : new Error('unknown error raised');
-          consola.debug(err);
-          return false;
-        }
-      })
-      .map<{ node: tsm.StringLiteralLike; bindingType: TBindingType }>((filteredNode) => {
-        return { node: filteredNode, bindingType: 'Named' };
-      }),
-    source.imports
-      .filter((stringLiteral) => {
-        try {
-          const importDeclaration = castNode<tsm.ImportDeclaration>(
-            stringLiteral.parent,
-            tsm.SyntaxKind.ImportDeclaration,
-          );
-
-          if (isEmpty(importDeclaration.importClause)) {
-            return false;
-          }
-
-          if (
-            isNotEmpty(importDeclaration.importClause) &&
-            isEmpty(importDeclaration.importClause.namedBindings) &&
-            isNotEmpty(importDeclaration.importClause.name) &&
-            getText(importDeclaration.importClause.name) === getText(node.typeName)
-          ) {
-            // default export 를 가져온 것
-            return true;
-          }
-
-          return false;
-        } catch (catched) {
-          const err = catched instanceof Error ? catched : new Error('unknown error raised');
-          consola.debug(err);
-          return false;
-        }
-      })
-      .map<{ node: tsm.StringLiteralLike; bindingType: TBindingType }>((filteredNode) => {
-        return { node: filteredNode, bindingType: 'Non-Named' };
-      }),
-  ].flatMap((nodes) => nodes);
-  const [finded] = findedNodes;
-
-  if (isEmpty(finded)) {
-    return undefined;
-  }
-
-  const importPath = getTextFromStringLiteral(finded.node);
-  const resolved = source.resolvedModules?.get(importPath, undefined);
-
-  if (isEmpty(resolved)) {
-    return resolved;
-  }
-
-  return { ...resolved, type: finded.bindingType };
-}
-*/

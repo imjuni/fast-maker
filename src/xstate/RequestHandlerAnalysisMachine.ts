@@ -1,10 +1,11 @@
 import IImportConfiguration from '@compiler/interface/IImportConfiguration';
 import IReason from '@compiler/interface/IReason';
 import { IHandlerStatement, IOptionStatement } from '@compiler/interface/THandlerNode';
-import getLocalExportStatementImport from '@compiler/navigate/getLocalExportStatementImport';
 import getPropertySignatures from '@compiler/navigate/getPropertySignatures';
+import getLocalModuleInImports from '@compiler/tool/getLocalModuleInImport';
 import getResolvedModuleInImports from '@compiler/tool/getResolvedModuleInImports';
 import getTypeReferences from '@compiler/tool/getTypeReferences';
+import getTypeSymbolText from '@compiler/tool/getTypeSymbolText';
 import replaceTypeReferenceInTypeLiteral from '@compiler/tool/replaceTypeReferenceInTypeLiteral';
 import validatePropertySignature from '@compiler/validation/validatePropertySignature';
 import validateTypeReferences from '@compiler/validation/validateTypeReference';
@@ -16,12 +17,12 @@ import IRouteConfiguration from '@route/interface/IRouteConfiguration';
 import IRouteHandler from '@route/interface/IRouteHandler';
 import appendPostfixHash from '@tool/appendPostfixHash';
 import castFunctionNode from '@xstate/tool/castFunctionNode';
+import chalk from 'chalk';
 import consola from 'consola';
 import { isEmpty, isFalse, isNotEmpty } from 'my-easy-fp';
 import * as path from 'path';
 import * as tsm from 'ts-morph';
 import { assign, createMachine } from 'xstate';
-import chalk from 'chalk';
 
 export interface IContextRequestHandlerAnalysisMachine {
   project: tsm.Project;
@@ -298,7 +299,14 @@ const requestHandlerAnalysisMachine = (
 
           const routeFileImportConfiguration: IImportConfiguration = {
             hash: next.hash,
-            namedBindings: isNotEmpty(next.routeOption) ? [`option as ${appendPostfixHash('option', next.hash)}`] : [],
+            namedBindings: isNotEmpty(next.routeOption)
+              ? [
+                  {
+                    name: 'option',
+                    alias: `${appendPostfixHash('option', next.hash)}`,
+                  },
+                ]
+              : [],
             nonNamedBinding:
               next.handler.name === 'anonymous function'
                 ? appendPostfixHash(
@@ -480,7 +488,14 @@ const requestHandlerAnalysisMachine = (
 
           const routeFileImportConfiguration: IImportConfiguration = {
             hash: next.hash,
-            namedBindings: isNotEmpty(next.routeOption) ? [`option as ${appendPostfixHash('option', next.hash)}`] : [],
+            namedBindings: isNotEmpty(next.routeOption)
+              ? [
+                  {
+                    name: 'option',
+                    alias: `${appendPostfixHash('option', next.hash)}`,
+                  },
+                ]
+              : [],
             nonNamedBinding:
               next.handler.name === 'anonymous function'
                 ? appendPostfixHash(
@@ -491,8 +506,6 @@ const requestHandlerAnalysisMachine = (
             importFile: next.source.getFilePath().toString(),
             source: next.source,
           };
-
-          const nextImportBox = { ...next.importBox, [sourceFilePath]: routeFileImportConfiguration };
 
           const routeConfiguration: IRouteConfiguration = {
             hash: next.hash,
@@ -513,7 +526,16 @@ const requestHandlerAnalysisMachine = (
             typeReferenceNodes,
           });
 
-          replaceTypeReferenceInTypeLiteral({ resolutions, typeReferenceNodes: everyTypeReferenceNodes });
+          const localResolutions = getLocalModuleInImports({
+            source: context.source,
+            option: context.option,
+            typeReferenceNodes,
+          });
+
+          replaceTypeReferenceInTypeLiteral({
+            resolutions: [...resolutions, ...localResolutions],
+            typeReferenceNodes: everyTypeReferenceNodes,
+          });
 
           routeConfiguration.typeArgument = context.useFastifyRequest
             ? (() => {
@@ -523,42 +545,33 @@ const requestHandlerAnalysisMachine = (
                     : [parameter.getType()];
                   // https://github.com/dsherret/ts-morph/issues/202
                   // symbol을 호출하고 declaration을 호출해서 declaration에서 text를 얻어낸다
-                  const symbol = newTypeArgument.getSymbol();
-                  const aliasSymbol = newTypeArgument.getAliasSymbol();
 
-                  if (isNotEmpty(symbol)) {
-                    const [declarationNode] = symbol.getDeclarations();
-                    return declarationNode.getText();
-                  }
-
-                  if (isNotEmpty(aliasSymbol)) {
-                    return aliasSymbol.getEscapedName();
-                  }
-
-                  consola.debug('Symbol 못찾는 오류 발생!');
-                  return '';
+                  const text = getTypeSymbolText(newTypeArgument);
+                  return text;
                 }
 
                 return typeArgument.getSymbolOrThrow().getEscapedName();
               })()
             : parameter.getTypeNodeOrThrow().getFullText().trim();
 
-          const localDeclarations = getLocalExportStatementImport({
+          const localDeclarations = getImportConfigurationFromResolutions({
             source: next.source,
-            hash: next.hash,
-            typeReferenceNodes,
+            resolutions: localResolutions,
           });
+
+          const localImportConfigurations = dedupeImportConfiguration([
+            routeFileImportConfiguration,
+            ...localDeclarations,
+          ]);
 
           const externalDeclarations = getImportConfigurationFromResolutions({
             source: next.source,
-            hash: next.hash,
             resolutions,
           });
 
           const importConfigurations = dedupeImportConfiguration([
-            ...localDeclarations,
+            ...localImportConfigurations,
             ...externalDeclarations,
-            ...Object.values(nextImportBox),
           ]);
 
           const record = importConfigurations.reduce<Record<string, IImportConfiguration>>(

@@ -22,20 +22,20 @@ export default function preLoadConfig() {
     const configBuf = fs.readFileSync(configFilePath);
     const rawConfig: Partial<IOption> = parse(configBuf.toString());
     const option: Partial<IFastMakerYargsParameter> = {
-      p: rawConfig.project,
-      project: rawConfig.project,
+      p: argv.p ?? argv.project ?? rawConfig.project,
+      project: argv.p ?? argv.project ?? rawConfig.project,
 
-      v: rawConfig.verbose,
-      verbose: rawConfig.verbose,
+      v: argv.v ?? argv.verbose ?? rawConfig.verbose,
+      verbose: argv.v ?? argv.verbose ?? rawConfig.verbose,
 
-      d: rawConfig.verbose ?? false,
-      debugLog: rawConfig.verbose ?? false,
+      d: argv.d ?? argv.debugLog ?? rawConfig.debugLog ?? false,
+      debugLog: argv.d ?? argv.debugLog ?? rawConfig.debugLog ?? false,
 
-      h: rawConfig.path?.handler,
-      handler: rawConfig.path?.handler,
+      h: argv.h ?? argv.handler ?? rawConfig.path?.handler,
+      handler: argv.h ?? argv.handler ?? rawConfig.path?.handler,
 
-      o: rawConfig.path?.output ?? rawConfig.path?.handler,
-      output: rawConfig.path?.output ?? rawConfig.path?.handler,
+      o: argv.o ?? argv.output ?? rawConfig.path?.output ?? rawConfig.path?.handler,
+      output: argv.o ?? argv.output ?? rawConfig.path?.output ?? rawConfig.path?.handler,
     };
 
     return option;

@@ -1,55 +1,44 @@
-import type { IGetResolvedModuleInImportsReturn } from '@compiler/tool/getResolvedModuleInImports';
+import IGetModuleInImports from '@compiler/interface/IGetModuleInImports';
 import consola from 'consola';
 import { isEmpty } from 'my-easy-fp';
 import * as tsm from 'ts-morph';
 
 interface IReplaceTypeReferenceInTypeLiteralParam {
-  resolutions: IGetResolvedModuleInImportsReturn[];
+  resolutions: IGetModuleInImports[];
   typeReferenceNodes: tsm.TypeReferenceNode[];
 }
 export default function replaceTypeReferenceInTypeLiteral({
   resolutions,
   typeReferenceNodes,
 }: IReplaceTypeReferenceInTypeLiteralParam) {
-  const filteredResolutions = resolutions.filter((resolution) => {
-    return resolution.importDeclarations.some((importDeclaration) => importDeclaration.isDefaultExport);
-  });
-
-  const resolutionWithTypeReferenceNodePairs = filteredResolutions
+  const resolutionWithTypeReferenceNodePairs = resolutions
     .map((resolution) => typeReferenceNodes.map((typeReferenceNode) => ({ resolution, typeReferenceNode })))
-    .flatMap((resolutionWithTypeReferenceNodePair) => resolutionWithTypeReferenceNodePair);
-
-  consola.debug('목표는: ', resolutionWithTypeReferenceNodePairs.length);
-
-  resolutionWithTypeReferenceNodePairs
+    .flatMap((resolutionWithTypeReferenceNodePair) => resolutionWithTypeReferenceNodePair)
     .filter((resolutionWithTypeReferenceNodePair) => {
       const { resolution, typeReferenceNode } = resolutionWithTypeReferenceNodePair;
 
-      const defaultImportDeclaration = resolution.importDeclarations.find(
-        (importDeclaration) => importDeclaration.isDefaultExport,
+      const moduleNames = resolution.importDeclarations.map(
+        (importDeclaration) => importDeclaration.importModuleNameFrom,
       );
 
-      if (isEmpty(defaultImportDeclaration)) {
+      if (isEmpty(moduleNames) || moduleNames.length <= 0) {
         return false;
       }
 
-      return defaultImportDeclaration.importModuleNameFrom === typeReferenceNode.getText();
-    })
-    .forEach((resolutionWithTypeReferenceNodePair) => {
-      const { resolution, typeReferenceNode } = resolutionWithTypeReferenceNodePair;
-
-      const defaultImportDeclaration = resolution.importDeclarations.find(
-        (importDeclaration) => importDeclaration.isDefaultExport,
-      );
-
-      if (isEmpty(defaultImportDeclaration)) {
-        return false;
-      }
-
-      if (typeReferenceNode.getTypeName().getText() === defaultImportDeclaration.importModuleNameFrom.trim()) {
-        typeReferenceNode.replaceWithText(defaultImportDeclaration.importModuleNameTo);
-      }
-
-      return true;
+      return moduleNames.includes(typeReferenceNode.getText());
     });
+
+  consola.debug('목표는: ', resolutionWithTypeReferenceNodePairs.length);
+
+  resolutionWithTypeReferenceNodePairs.forEach((resolutionWithTypeReferenceNodePair) => {
+    const { resolution, typeReferenceNode } = resolutionWithTypeReferenceNodePair;
+
+    resolution.importDeclarations.forEach((importDeclaration) => {
+      if (typeReferenceNode.getTypeName().getText() === importDeclaration.importModuleNameFrom.trim()) {
+        typeReferenceNode.replaceWithText(importDeclaration.importModuleNameTo);
+      }
+    });
+
+    return true;
+  });
 }

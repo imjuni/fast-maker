@@ -9,7 +9,10 @@ export default interface IImportConfiguration {
   /**
    * namedBinding 이름 목록
    */
-  namedBindings: string[];
+  namedBindings: Array<{
+    name: string;
+    alias: string;
+  }>;
 
   /**
    * binding 이름

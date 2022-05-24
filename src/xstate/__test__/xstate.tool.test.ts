@@ -124,26 +124,26 @@ describe('statemachine-test', () => {
     const expectation = {
       importBox: {
         [replaceSepToPosix(path.join(env.examplePath, '/handlers/get/interface/IReqPokeHello.ts'))]: {
-          hash: 'PE1DwRqh4vUUIJhlS5Ews8vPigisJ6Hw',
+          hash: 'SynyPSafLHaoobLmnZXzP70l78QG5PfE',
           namedBindings: [],
           nonNamedBinding: 'IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE',
           importFile: replaceSepToPosix(path.join(env.examplePath, '/handlers/get/interface/IReqPokeHello.ts')),
         },
         [replaceSepToPosix(path.join(env.examplePath, '/interface/TAbnormalPresident.ts'))]: {
-          hash: 'PE1DwRqh4vUUIJhlS5Ews8vPigisJ6Hw',
+          hash: 'DS8Pg2MYm5AsqoJVltiuqlOctGQfT78w',
           namedBindings: [],
           nonNamedBinding: 'TAbnormalPresident_DS8Pg2MYm5AsqoJVltiuqlOctGQfT78w',
           importFile: replaceSepToPosix(path.join(env.examplePath, '/interface/TAbnormalPresident.ts')),
         },
         [replaceSepToPosix(path.join(env.examplePath, '/interface/ICompany.ts'))]: {
-          hash: 'PE1DwRqh4vUUIJhlS5Ews8vPigisJ6Hw',
+          hash: '6bwarMss36QHeqUXTVMxB9uAjEjVZOL1',
           namedBindings: [],
           nonNamedBinding: 'ICompany_6bwarMss36QHeqUXTVMxB9uAjEjVZOL1',
           importFile: replaceSepToPosix(path.join(env.examplePath, '/interface/ICompany.ts')),
         },
         [replaceSepToPosix(path.join(env.examplePath, '/interface/IAbility.ts'))]: {
-          hash: 'PE1DwRqh4vUUIJhlS5Ews8vPigisJ6Hw',
-          namedBindings: ['IAbility'],
+          hash: 'FaJPXXq2KiAC6EVDBL3aeh4ER262pWhl',
+          namedBindings: [{ name: 'IAbility', alias: 'IAbility' }],
           nonNamedBinding: undefined,
           importFile: replaceSepToPosix(path.join(env.examplePath, '/interface/IAbility.ts')),
         },
@@ -246,14 +246,14 @@ describe('statemachine-test', () => {
     const expectation = {
       importBox: {
         [replaceSepToPosix(path.join(env.examplePath, 'handlers/get/interface/IReqPokeHello.ts'))]: {
-          hash: 'um2VlboH9kiovJ4hoCH9ZVv6n3cm3OrV',
+          hash: 'SynyPSafLHaoobLmnZXzP70l78QG5PfE',
           namedBindings: [],
           nonNamedBinding: 'IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE',
           importFile: replaceSepToPosix(path.join(env.examplePath, 'handlers/get/interface/IReqPokeHello.ts')),
         },
         [replaceSepToPosix(path.join(env.examplePath, 'handlers/get/justice/world.ts'))]: {
           hash: 'um2VlboH9kiovJ4hoCH9ZVv6n3cm3OrV',
-          namedBindings: ['option as option_um2VlboH9kiovJ4hoCH9ZVv6n3cm3OrV'],
+          namedBindings: [{ alias: 'option_um2VlboH9kiovJ4hoCH9ZVv6n3cm3OrV', name: 'option' }],
           nonNamedBinding: 'world_um2VlboH9kiovJ4hoCH9ZVv6n3cm3OrV',
           importFile: replaceSepToPosix(path.join(env.examplePath, 'handlers/get/justice/world.ts')),
         },

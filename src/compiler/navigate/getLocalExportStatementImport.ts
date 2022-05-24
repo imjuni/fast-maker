@@ -1,4 +1,5 @@
 import IImportConfiguration from '@compiler/interface/IImportConfiguration';
+import getTypeSymbolText from '@compiler/tool/getTypeSymbolText';
 import { isNotEmpty } from 'my-easy-fp';
 import * as tsm from 'ts-morph';
 
@@ -33,19 +34,35 @@ export default function getLocalExportStatementImport({
 
   const importCodeBases = [
     matchAndExportedInTypeAliases.map((typeAlias) => {
+      const nodeName = getTypeSymbolText(typeAlias.getType(), (node) =>
+        node.getType().getSymbolOrThrow().getEscapedName(),
+      );
       const importCodeBase: IImportConfiguration = {
         hash,
-        namedBindings: [typeAlias.getType().getText()],
+        namedBindings: [
+          {
+            name: nodeName,
+            alias: nodeName,
+          },
+        ],
         importFile: source.getFilePath().toString(),
         source,
       };
 
       return importCodeBase;
     }),
-    matchAndExportedInterfaces.map((typeAlias) => {
+    matchAndExportedInterfaces.map((interfaceNode) => {
+      const nodeName = getTypeSymbolText(interfaceNode.getType(), (node) =>
+        node.getType().getSymbolOrThrow().getEscapedName(),
+      );
       const importCodeBase: IImportConfiguration = {
         hash,
-        namedBindings: [typeAlias.getType().getText()],
+        namedBindings: [
+          {
+            name: nodeName,
+            alias: nodeName,
+          },
+        ],
         importFile: source.getFilePath().toString(),
         source,
       };
@@ -53,10 +70,18 @@ export default function getLocalExportStatementImport({
       return importCodeBase;
     }),
 
-    matchAndExportedClasses.map((typeAlias) => {
+    matchAndExportedClasses.map((classNode) => {
+      const nodeName = getTypeSymbolText(classNode.getType(), (node) =>
+        node.getType().getSymbolOrThrow().getEscapedName(),
+      );
       const importCodeBase: IImportConfiguration = {
         hash,
-        namedBindings: [typeAlias.getType().getText()],
+        namedBindings: [
+          {
+            name: nodeName,
+            alias: nodeName,
+          },
+        ],
         importFile: source.getFilePath().toString(),
         source,
       };

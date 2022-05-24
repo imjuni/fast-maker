@@ -1,16 +1,14 @@
+import IGetModuleInImports from '@compiler/interface/IGetModuleInImports';
 import IImportConfiguration from '@compiler/interface/IImportConfiguration';
-import * as tsm from 'ts-morph';
-import { type IGetResolvedModuleInImportsReturn } from '@compiler/tool/getResolvedModuleInImports';
 import { isFalse } from 'my-easy-fp';
+import * as tsm from 'ts-morph';
 
 export default function getImportConfigurationFromResolutions({
-  hash,
   source,
   resolutions,
 }: {
-  hash: string;
   source: tsm.SourceFile;
-  resolutions: IGetResolvedModuleInImportsReturn[];
+  resolutions: IGetModuleInImports[];
 }): IImportConfiguration[] {
   const importConfigurations = resolutions.map((resolution) => {
     const defaultImportDeclarations = resolution.importDeclarations.find(
@@ -18,10 +16,13 @@ export default function getImportConfigurationFromResolutions({
     );
 
     const importConfiguration: IImportConfiguration = {
-      hash,
+      hash: resolution.hash,
       namedBindings: resolution.importDeclarations
         .filter((importDeclaration) => isFalse(importDeclaration.isDefaultExport))
-        .map((importDeclaration) => importDeclaration.importModuleNameTo),
+        .map((importDeclaration) => ({
+          name: importDeclaration.importModuleNameFrom,
+          alias: importDeclaration.importModuleNameTo,
+        })),
       nonNamedBinding: defaultImportDeclarations?.importModuleNameTo,
       importFile: resolution.exportFrom,
       source,
