@@ -17,133 +17,131 @@ import * as tsm from 'ts-morph';
 
 const share: { projectPath: string; project: tsm.Project; option: IOption } = {} as any;
 
-describe('validation', () => {
-  beforeAll(async () => {
-    share.projectPath = path.join(env.examplePath, 'tsconfig.json');
+beforeAll(async () => {
+  share.projectPath = path.join(env.examplePath, 'tsconfig.json');
 
-    const optionEither = await getProcessedConfig({
-      args: {
-        _: [],
-        $0: 'route',
-        project: share.projectPath,
-        v: false,
-        verbose: false,
-        d: false,
-        debugLog: false,
-        p: share.projectPath,
-        h: env.handlerPath,
-        handler: env.handlerPath,
-        o: env.handlerPath,
-        output: env.handlerPath,
-      },
+  const optionEither = await getProcessedConfig({
+    args: {
+      _: [],
+      $0: 'route',
       project: share.projectPath,
-    });
-
-    if (isFail(optionEither)) {
-      throw optionEither.fail;
-    }
-
-    consola.level = LogLevel.Debug;
-    share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
-    share.option = optionEither.pass;
+      v: false,
+      verbose: false,
+      d: false,
+      debugLog: false,
+      p: share.projectPath,
+      h: env.handlerPath,
+      handler: env.handlerPath,
+      o: env.handlerPath,
+      output: env.handlerPath,
+    },
+    project: share.projectPath,
   });
 
-  test('validatePropertySignature', async () => {
-    // project://example/handlers/get/justice/world.ts
-    const routeFilePath = replaceSepToPosix(path.join(env.handlerPath, 'get\\justice\\world.ts'));
-    const source = share.project.getSourceFileOrThrow(routeFilePath);
-    const handlerWithOption = getHandlerWithOption(source);
-    const handler = handlerWithOption.find((node) => node.kind === 'handler');
+  if (isFail(optionEither)) {
+    throw optionEither.fail;
+  }
 
-    if (isEmpty(handler)) {
-      throw new Error('invalid handler');
-    }
+  consola.level = LogLevel.Debug;
+  share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
+  share.option = optionEither.pass;
+});
 
-    const functionNode = handler as IHandlerStatement;
+test('validatePropertySignature', async () => {
+  // project://example/handlers/get/justice/world.ts
+  const routeFilePath = replaceSepToPosix(path.join(env.handlerPath, 'get\\justice\\world.ts'));
+  const source = share.project.getSourceFileOrThrow(routeFilePath);
+  const handlerWithOption = getHandlerWithOption(source);
+  const handler = handlerWithOption.find((node) => node.kind === 'handler');
 
-    const casted =
-      functionNode.node.getKind() === tsm.SyntaxKind.FunctionDeclaration
-        ? functionNode.node.asKindOrThrow(tsm.SyntaxKind.FunctionDeclaration)
-        : functionNode.node.asKindOrThrow(tsm.SyntaxKind.ArrowFunction);
+  if (isEmpty(handler)) {
+    throw new Error('invalid handler');
+  }
 
-    const parameters = casted.getParameters();
-    const [parameter] = parameters;
+  const functionNode = handler as IHandlerStatement;
 
-    const propertySignatures = getPropertySignatures({ parameter });
-    const validationResult = validatePropertySignature({ propertySignatures, type: 'FastifyRequest' });
+  const casted =
+    functionNode.node.getKind() === tsm.SyntaxKind.FunctionDeclaration
+      ? functionNode.node.asKindOrThrow(tsm.SyntaxKind.FunctionDeclaration)
+      : functionNode.node.asKindOrThrow(tsm.SyntaxKind.ArrowFunction);
 
-    const expectation = {
-      valid: false,
-      fuzzyValid: true,
-      match: ['Body', 'Headers'],
-      fuzzy: [
-        { rendered: 'Querystring', score: 258, signature: 'Querysting', expectName: 'Querystring', matchCase: false },
-      ],
-    };
+  const parameters = casted.getParameters();
+  const [parameter] = parameters;
 
-    consola.debug(validationResult);
+  const propertySignatures = getPropertySignatures({ parameter });
+  const validationResult = validatePropertySignature({ propertySignatures, type: 'FastifyRequest' });
 
-    expect(validationResult).toEqual(expectation);
-  });
+  const expectation = {
+    valid: false,
+    fuzzyValid: true,
+    match: ['Body', 'Headers'],
+    fuzzy: [
+      { rendered: 'Querystring', score: 258, signature: 'Querysting', expectName: 'Querystring', matchCase: false },
+    ],
+  };
 
-  test('validateTypeReferences', async () => {
-    // project://example/handlers/post/dc/world.ts
-    const routeFilePath = replaceSepToPosix(path.join(env.handlerPath, 'post\\dc\\world.ts'));
-    const source = share.project.getSourceFileOrThrow(routeFilePath);
-    const handlerWithOption = getHandlerWithOption(source);
-    const handler = handlerWithOption.find((node) => node.kind === 'handler');
+  consola.debug(validationResult);
 
-    if (isEmpty(handler)) {
-      throw new Error('invalid handler');
-    }
+  expect(validationResult).toEqual(expectation);
+});
 
-    const functionNode = handler as IHandlerStatement;
+test('validateTypeReferences', async () => {
+  // project://example/handlers/post/dc/world.ts
+  const routeFilePath = replaceSepToPosix(path.join(env.handlerPath, 'post\\dc\\world.ts'));
+  const source = share.project.getSourceFileOrThrow(routeFilePath);
+  const handlerWithOption = getHandlerWithOption(source);
+  const handler = handlerWithOption.find((node) => node.kind === 'handler');
 
-    const casted =
-      functionNode.node.getKind() === tsm.SyntaxKind.FunctionDeclaration
-        ? functionNode.node.asKindOrThrow(tsm.SyntaxKind.FunctionDeclaration)
-        : functionNode.node.asKindOrThrow(tsm.SyntaxKind.ArrowFunction);
+  if (isEmpty(handler)) {
+    throw new Error('invalid handler');
+  }
 
-    const parameters = casted.getParameters();
-    const [parameter] = parameters;
+  const functionNode = handler as IHandlerStatement;
 
-    const typeReferenceNodes = getTypeReferences(parameter);
-    const validationResult = validateTypeReferences({ source, typeReferenceNodes });
+  const casted =
+    functionNode.node.getKind() === tsm.SyntaxKind.FunctionDeclaration
+      ? functionNode.node.asKindOrThrow(tsm.SyntaxKind.FunctionDeclaration)
+      : functionNode.node.asKindOrThrow(tsm.SyntaxKind.ArrowFunction);
 
-    const expectation = {
-      valid: false,
-      typeAliases: {
-        total: ['QuerystringAndBody'],
-        exported: [],
-      },
-      interfaces: {
-        total: [],
-        exported: [],
-      },
-      classes: {
-        total: [],
-        exported: [],
-      },
-    };
+  const parameters = casted.getParameters();
+  const [parameter] = parameters;
 
-    const extract = {
-      valid: validationResult.valid,
-      typeAliases: {
-        total: validationResult.typeAliases.total.map((node) => node.getType()?.getText()),
-        exported: validationResult.typeAliases.exported.map((node) => node.getType()?.getText()),
-      },
-      interfaces: {
-        total: validationResult.interfaces.total.map((node) => node.getText()),
-        exported: validationResult.interfaces.exported.map((node) => node.getText()),
-      },
-      classes: {
-        total: validationResult.classes.total.map((node) => node.getText()),
-        exported: validationResult.classes.exported.map((node) => node.getText()),
-      },
-    };
+  const typeReferenceNodes = getTypeReferences(parameter);
+  const validationResult = validateTypeReferences({ source, typeReferenceNodes });
 
-    consola.debug(extract);
+  const expectation = {
+    valid: false,
+    typeAliases: {
+      total: ['QuerystringAndBody'],
+      exported: [],
+    },
+    interfaces: {
+      total: [],
+      exported: [],
+    },
+    classes: {
+      total: [],
+      exported: [],
+    },
+  };
 
-    expect(extract).toEqual(expectation);
-  });
+  const extract = {
+    valid: validationResult.valid,
+    typeAliases: {
+      total: validationResult.typeAliases.total.map((node) => node.getType()?.getText()),
+      exported: validationResult.typeAliases.exported.map((node) => node.getType()?.getText()),
+    },
+    interfaces: {
+      total: validationResult.interfaces.total.map((node) => node.getText()),
+      exported: validationResult.interfaces.exported.map((node) => node.getText()),
+    },
+    classes: {
+      total: validationResult.classes.total.map((node) => node.getText()),
+      exported: validationResult.classes.exported.map((node) => node.getText()),
+    },
+  };
+
+  consola.debug(extract);
+
+  expect(extract).toEqual(expectation);
 });

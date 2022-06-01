@@ -13,127 +13,125 @@ import * as tsm from 'ts-morph';
 
 const share: { projectPath: string; project: tsm.Project } = {} as any;
 
-describe('navigate', () => {
-  beforeAll(async () => {
-    consola.level = LogLevel.Debug;
-    share.projectPath = path.join(env.examplePath, 'tsconfig.json');
-    share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
-  });
+beforeAll(async () => {
+  consola.level = LogLevel.Debug;
+  share.projectPath = path.join(env.examplePath, 'tsconfig.json');
+  share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
+});
 
-  test('getHandlerWithOption', async () => {
-    const handlerFileInfos = [
-      replaceSepToPosix(path.join(env.examplePath, 'handlers\\get\\justice\\[dc-league]\\hello.ts')),
-      replaceSepToPosix(path.join(env.examplePath, 'handlers\\delete\\world.ts')),
-    ].map((sourcePath) => {
-      const source = share.project.getSourceFileOrThrow(sourcePath);
-      const handlerFileInfo = getHandlerWithOption(source);
-
-      return handlerFileInfo;
-    });
-
-    consola.success(handlerFileInfos);
-
-    const expectation = [
-      [
-        { kind: 'option' },
-        {
-          kind: 'handler',
-          type: 'async',
-          name: 'hello',
-        },
-      ],
-      [
-        { kind: 'option' },
-        {
-          kind: 'handler',
-          type: 'async',
-          name: 'anonymous function',
-        },
-      ],
-    ];
-
-    expect(handlerFileInfos).toMatchObject(expectation);
-  });
-
-  test('getArrowFunctionModifier', async () => {
-    const sourcePath = replaceSepToPosix(path.join(env.examplePath, 'handlers\\delete\\world.ts'));
+test('getHandlerWithOption', async () => {
+  const handlerFileInfos = [
+    replaceSepToPosix(path.join(env.examplePath, 'handlers\\get\\justice\\[dc-league]\\hello.ts')),
+    replaceSepToPosix(path.join(env.examplePath, 'handlers\\delete\\world.ts')),
+  ].map((sourcePath) => {
     const source = share.project.getSourceFileOrThrow(sourcePath);
+    const handlerFileInfo = getHandlerWithOption(source);
 
-    const declarationMap = source.getExportedDeclarations();
-    const declarations = declarationMap.get('default') ?? [];
-    const handlerStatement = getArrowFunctionWithModifier(declarations);
-
-    if (isEmpty(handlerStatement)) {
-      throw new Error('handler statement empty');
-    }
-
-    // eslint-disable-next-line
-    const { node: _node, ...processed } = handlerStatement;
-    const expectation = {
-      kind: 'handler',
-      type: 'async',
-      name: 'anonymous function',
-    };
-
-    consola.success(processed);
-
-    expect(processed).toEqual(expectation);
+    return handlerFileInfo;
   });
 
-  test('getFunctionDeclarationWithModifier', async () => {
-    const sourcePath = replaceSepToPosix(path.join(env.examplePath, 'handlers\\get\\xman\\fastify.ts'));
-    const source = share.project.getSourceFileOrThrow(sourcePath);
+  consola.success(handlerFileInfos);
 
-    const declarationMap = source.getExportedDeclarations();
-    const declarations = declarationMap.get('default') ?? [];
-    const handlerStatement = getFunctionDeclarationWithModifier(declarations);
+  const expectation = [
+    [
+      { kind: 'option' },
+      {
+        kind: 'handler',
+        type: 'async',
+        name: 'hello',
+      },
+    ],
+    [
+      { kind: 'option' },
+      {
+        kind: 'handler',
+        type: 'async',
+        name: 'anonymous function',
+      },
+    ],
+  ];
 
-    if (isEmpty(handlerStatement)) {
-      throw new Error('handler statement empty');
-    }
+  expect(handlerFileInfos).toMatchObject(expectation);
+});
 
-    // eslint-disable-next-line
-    const { node: _node, ...processed } = handlerStatement;
-    const expectation = {
-      kind: 'handler',
-      type: 'sync',
-      name: 'anonymous function',
-    };
+test('getArrowFunctionModifier', async () => {
+  const sourcePath = replaceSepToPosix(path.join(env.examplePath, 'handlers\\delete\\world.ts'));
+  const source = share.project.getSourceFileOrThrow(sourcePath);
 
-    consola.success(processed);
+  const declarationMap = source.getExportedDeclarations();
+  const declarations = declarationMap.get('default') ?? [];
+  const handlerStatement = getArrowFunctionWithModifier(declarations);
 
-    expect(processed).toEqual(expectation);
-  });
+  if (isEmpty(handlerStatement)) {
+    throw new Error('handler statement empty');
+  }
 
-  test('getPropertySignatures', async () => {
-    // project://example/handlers/get/justice/world.ts
-    // project://example/handlers/get/xman/world.ts
-    const routeFilePath = replaceSepToPosix(path.join(env.handlerPath, 'get\\justice\\world.ts'));
-    // const routeFilePath = replaceSepToPosix(path.join(env.handlerPath, 'get\\xman\\world.ts'));
-    const source = share.project.getSourceFileOrThrow(routeFilePath);
-    const handlerWithOption = getHandlerWithOption(source);
-    const handler = handlerWithOption.find((node) => node.kind === 'handler');
+  // eslint-disable-next-line
+  const { node: _node, ...processed } = handlerStatement;
+  const expectation = {
+    kind: 'handler',
+    type: 'async',
+    name: 'anonymous function',
+  };
 
-    if (isEmpty(handler)) {
-      throw new Error('invalid handler');
-    }
+  consola.success(processed);
 
-    const functionNode = handler as IHandlerStatement;
+  expect(processed).toEqual(expectation);
+});
 
-    const casted =
-      functionNode.node.getKind() === tsm.SyntaxKind.FunctionDeclaration
-        ? functionNode.node.asKindOrThrow(tsm.SyntaxKind.FunctionDeclaration)
-        : functionNode.node.asKindOrThrow(tsm.SyntaxKind.ArrowFunction);
+test('getFunctionDeclarationWithModifier', async () => {
+  const sourcePath = replaceSepToPosix(path.join(env.examplePath, 'handlers\\get\\xman\\fastify.ts'));
+  const source = share.project.getSourceFileOrThrow(sourcePath);
 
-    const parameters = casted.getParameters();
-    const [parameter] = parameters;
+  const declarationMap = source.getExportedDeclarations();
+  const declarations = declarationMap.get('default') ?? [];
+  const handlerStatement = getFunctionDeclarationWithModifier(declarations);
 
-    const propertySignatures = getPropertySignatures({ parameter });
-    const names = propertySignatures.map((symbol) => symbol.getEscapedName());
+  if (isEmpty(handlerStatement)) {
+    throw new Error('handler statement empty');
+  }
 
-    const expectation = ['Querysting', 'Body', 'Headers'];
-    // const expectation = ['query', 'body', 'headers'];
+  // eslint-disable-next-line
+  const { node: _node, ...processed } = handlerStatement;
+  const expectation = {
+    kind: 'handler',
+    type: 'sync',
+    name: 'anonymous function',
+  };
 
-    expect(names).toEqual(expectation);
-  });
+  consola.success(processed);
+
+  expect(processed).toEqual(expectation);
+});
+
+test('getPropertySignatures', async () => {
+  // project://example/handlers/get/justice/world.ts
+  // project://example/handlers/get/xman/world.ts
+  const routeFilePath = replaceSepToPosix(path.join(env.handlerPath, 'get\\justice\\world.ts'));
+  // const routeFilePath = replaceSepToPosix(path.join(env.handlerPath, 'get\\xman\\world.ts'));
+  const source = share.project.getSourceFileOrThrow(routeFilePath);
+  const handlerWithOption = getHandlerWithOption(source);
+  const handler = handlerWithOption.find((node) => node.kind === 'handler');
+
+  if (isEmpty(handler)) {
+    throw new Error('invalid handler');
+  }
+
+  const functionNode = handler as IHandlerStatement;
+
+  const casted =
+    functionNode.node.getKind() === tsm.SyntaxKind.FunctionDeclaration
+      ? functionNode.node.asKindOrThrow(tsm.SyntaxKind.FunctionDeclaration)
+      : functionNode.node.asKindOrThrow(tsm.SyntaxKind.ArrowFunction);
+
+  const parameters = casted.getParameters();
+  const [parameter] = parameters;
+
+  const propertySignatures = getPropertySignatures({ parameter });
+  const names = propertySignatures.map((symbol) => symbol.getEscapedName());
+
+  const expectation = ['Querysting', 'Body', 'Headers'];
+  // const expectation = ['query', 'body', 'headers'];
+
+  expect(names).toEqual(expectation);
 });

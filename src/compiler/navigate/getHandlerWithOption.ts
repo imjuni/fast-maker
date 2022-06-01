@@ -40,7 +40,7 @@ export default function getHandlerWithOption(source: tsm.SourceFile): THandlerNo
           const [firstNode] = defaultExportedNodes;
           const variableDeclarationNode = firstNode.asKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
 
-          const initialiezer = variableDeclarationNode.getInitializer()!;
+          const initialiezer = variableDeclarationNode.getInitializerOrThrow();
           const identifier = variableDeclarationNode.getNameNode().asKindOrThrow(tsm.SyntaxKind.Identifier);
 
           return getArrowFunctionWithModifier([identifier, initialiezer]);

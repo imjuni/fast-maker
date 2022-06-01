@@ -1,6 +1,6 @@
 {
   "name": "fast-maker",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "create route file on specific directory",
   "scripts": {
     "test": "cross-env ENABLE_DEBUG_LOG=on jest",
@@ -89,10 +89,10 @@
     "deepmerge": "^4.2.2",
     "fast-glob": "^3.2.11",
     "fast-safe-stringify": "^2.1.1",
-    "fastify": "^3.29.0",
+    "fastify": "^4.0.3",
     "find-up": "^5.0.0",
     "fs-extra": "^10.1.0",
-    "fuzzy": "^0.1.3",
+    "fuse.js": "^6.6.2",
     "inquirer": "^8.0.0",
     "is-plain-object": "^5.0.0",
     "jsonc-parser": "^3.0.0",

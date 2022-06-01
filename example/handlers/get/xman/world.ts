@@ -6,15 +6,15 @@ import IReqPokeHello from '../interface/IReqPokeHello';
 
 export default async function world(
   req: {
-    query: IReqPokeHello['querystring'];
-    body:
+    querystring: IReqPokeHello['querystring'];
+    Body:
       | IReqPokeHello['Body']
       | {
           help: TAbnormalPreent;
           company: ICompany;
           ability: IAbility;
         };
-    headers: {
+    Headers: {
       'access-token': string;
       'refresh-token': string;
       kind: { name: 'develop' } & { name: 'prod' } & { name: ICompany };
@@ -30,8 +30,8 @@ export default async function world(
   },
   _reply: FastifyReply,
 ) {
-  console.debug(req.query);
-  console.debug(req.body);
+  console.debug(req.querystring);
+  console.debug(req.Body);
 
   return 'hello';
 }

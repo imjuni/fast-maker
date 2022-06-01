@@ -1,3 +1,7 @@
+/*
+ * TypeArgument Union Type Example
+ */
+
 import { FastifyReply, FastifyRequest, RouteShorthandOptions } from 'fastify';
 import { Server } from 'http';
 import type IReqPokeHello from '../../get/interface/IReqPokeHello';

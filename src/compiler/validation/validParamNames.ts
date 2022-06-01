@@ -1,5 +1,5 @@
 const validParamNamesFromFastifyRequest = ['Body', 'Querystring', 'Params', 'Headers'];
-const validParamNamesFromCustomType = ['query', 'params', 'headers', 'body'];
+const validParamNamesFromCustomType = ['Body', 'Querystring', 'Params', 'Headers'];
 
 const validParamNames = {
   fastify: validParamNamesFromFastifyRequest,

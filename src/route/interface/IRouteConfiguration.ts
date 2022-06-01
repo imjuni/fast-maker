@@ -7,6 +7,7 @@ export default interface IRouteConfiguration {
 
   hash: string;
   hasOption: boolean;
+  handlerName: string;
   typeArgument?: string;
 
   sourceFilePath: string;
