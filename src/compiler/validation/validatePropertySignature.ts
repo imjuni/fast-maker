@@ -12,20 +12,21 @@ export default function validatePropertySignature({ propertySignatures, type }: 
   const names = propertySignatures.map((propertySignature) => propertySignature.getEscapedName());
   const expectNames = type === 'FastifyRequest' ? validParamNames.fastify : validParamNames.custom;
 
-  const validNames = names
-    .map((member) => expectNames.find((name) => (name.localeCompare(member) === 0 ? member : undefined)))
-    .filter((value): value is string => isNotEmpty(value));
-
+  const validNames = names.filter((name) => expectNames.includes(name));
   const anotherNames = names.filter((name) => isFalse(validNames.includes(name)));
 
   const fuzzyResult = anotherNames.reduce<Record<string, IFuzzyWithCaseReturn>>((aggregated, name) => {
     const fuzzyResults = expectNames
-      .map((expectName) => fuzzyWithCase(name, expectName))
-      .filter((fuzzied) => fuzzied.score > 0);
+      .map((expectName) => fuzzyWithCase(expectName, name))
+      .filter((fuzzied) => fuzzied.score > 0 || fuzzied.score === 0);
 
     const [headFuzzyResult] = fuzzyResults;
 
-    return { ...aggregated, [name]: headFuzzyResult };
+    if (isNotEmpty(headFuzzyResult)) {
+      return { ...aggregated, [name]: headFuzzyResult };
+    }
+
+    return aggregated;
   }, {});
 
   return {

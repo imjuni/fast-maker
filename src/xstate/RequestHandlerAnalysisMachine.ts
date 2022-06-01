@@ -325,6 +325,13 @@ const requestHandlerAnalysisMachine = (
             hasOption: isNotEmpty(next.routeOption),
             method: next.routeHandler.method,
             routePath: next.routeHandler.routePath,
+            handlerName:
+              next.handler.name === 'anonymous function'
+                ? appendPostfixHash(
+                    getHandlerNameWithoutSquareBracket(path.basename(next.source.getFilePath().toString(), '.ts')),
+                    next.hash,
+                  )
+                : appendPostfixHash(getHandlerNameWithoutSquareBracket(next.handler.name), next.hash),
 
             sourceFilePath,
             source: context.source,
@@ -512,6 +519,13 @@ const requestHandlerAnalysisMachine = (
             hasOption: isNotEmpty(next.routeOption),
             method: next.routeHandler.method,
             routePath: next.routeHandler.routePath,
+            handlerName:
+              next.handler.name === 'anonymous function'
+                ? appendPostfixHash(
+                    getHandlerNameWithoutSquareBracket(path.basename(next.source.getFilePath().toString(), '.ts')),
+                    next.hash,
+                  )
+                : appendPostfixHash(getHandlerNameWithoutSquareBracket(next.handler.name), next.hash),
 
             sourceFilePath,
             source: context.source,

@@ -49,9 +49,23 @@ fast-maker based on TypeScript type system and use TypeScript compiler API(using
 ## Directory structure is route path
 fast-maker inspired by CodeIgniter and Next.js routing system. fast-maker using specific directory name use to method discrimination. So fast-maker need get, post, put, delete, etc directory need to method discrimination.
 
-* example
-    * as-is: <your project>/handlers/get/utility/health_check 
-    * to-be: server.get('/utility/health_check')
+### method
+get, post, put, delete, all, etc directory bind method
+
+* as-is: <your project>/src/handlers/get/utility/health_check 
+* to-be: server.get('/utility/health_check')
+
+* as-is: <your project>/src/handlers/post/articles
+* to-be: server.post('/articles')
+
+### path parameter
+square brackets replace to path parameter
+
+* as-is: <your project>/src/handlers/get/articles/[id].ts
+* to-be: server.get('/articles/:id')
+
+* as-is: <your project>/src/handlers/get/major/[majorId]/student/[studentId].ts
+* to-be: server.get('/major/:majorId/student/:studentId')
     
 ## Single file, Single route
 fast-maker using default function to handler function. `option` variable use to `RouteShorthandOptions`.

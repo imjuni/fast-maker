@@ -12,6 +12,7 @@ describe('route-test', () => {
 
     const expectation = [
       replaceSepToPosix(path.join(env.handlerPath, 'get/justice/[dc-league]/hello.ts')),
+      replaceSepToPosix(path.join(env.handlerPath, 'get/justice/[dc-league]/world.ts')),
       replaceSepToPosix(path.join(env.handlerPath, 'get/justice/world.ts')),
       replaceSepToPosix(path.join(env.handlerPath, 'get/po-ke/hello.ts')),
       replaceSepToPosix(path.join(env.handlerPath, 'get/po-ke/world.ts')),
@@ -83,6 +84,11 @@ describe('route-test', () => {
         filename: replaceSepToPosix(path.join(env.handlerPath, 'get/justice/[dc-league]/hello.ts')),
         method: 'get',
         routePath: '/justice/:dc-league/hello',
+      },
+      {
+        filename: replaceSepToPosix(path.join(env.handlerPath, 'get/justice/[dc-league]/world.ts')),
+        method: 'get',
+        routePath: '/justice/:dc-league/world',
       },
       {
         filename: replaceSepToPosix(path.join(env.handlerPath, 'get/justice/world.ts')),
