@@ -12,9 +12,7 @@ import posixJoin from '@tool/posixJoin';
 import requestHandlerAnalysisMachine, {
   IContextRequestHandlerAnalysisMachine,
 } from '@xstate/RequestHandlerAnalysisMachine';
-import chalk from 'chalk';
 import consola, { LogLevel } from 'consola';
-import fastSafeStringify from 'fast-safe-stringify';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
@@ -55,7 +53,7 @@ beforeAll(async () => {
   share.option = optionEither.pass;
 });
 
-test('t001-RequestHandlerAnalysisMachine-TypeLiteral', async () => {
+test('t001-FSM-TypeLiteral', async () => {
   const expectFileName = expect.getState().currentTestName.replace(/^([tT][0-9]+)(-.+)/, 'expect$2.ts');
 
   // project://example\handlers\get\justice\world.ts
@@ -78,7 +76,7 @@ test('t001-RequestHandlerAnalysisMachine-TypeLiteral', async () => {
     throw new Error(`Cannot create route handler configuration: ${routeFilePath}`);
   }
 
-  const hash = getHash(source.getFilePath().toString());
+  const hash = getHash(replaceSepToPosix(path.relative(env.examplePath, source.getFilePath().toString())));
   const nodes = getHandlerWithOption(source);
   const routeHandler = nodes.find((node): node is IHandlerStatement => node.kind === 'handler');
   const routeOption = nodes.find((node): node is IOptionStatement => node.kind === 'option');
@@ -121,7 +119,9 @@ test('t001-RequestHandlerAnalysisMachine-TypeLiteral', async () => {
   expect(terminateCircularResult).toEqual(expectation.default);
 });
 
-test('RequestHandlerAnalysisMachine-FastifyRequest', async () => {
+test('t002-FSM-FastifyRequest', async () => {
+  const expectFileName = expect.getState().currentTestName.replace(/^([tT][0-9]+)(-.+)/, 'expect$2.ts');
+
   // project://example\handlers\get\justice\world.ts
   // project://example\handlers\get\xman\world.ts
   const routeFilePath = posixJoin(env.handlerPath, 'get', 'justice', 'world.ts');
@@ -142,7 +142,7 @@ test('RequestHandlerAnalysisMachine-FastifyRequest', async () => {
     throw new Error(`Cannot create route handler configuration: ${routeFilePath}`);
   }
 
-  const hash = getHash(source.getFilePath().toString());
+  const hash = getHash(replaceSepToPosix(path.relative(env.examplePath, source.getFilePath().toString())));
   const nodes = getHandlerWithOption(source);
   const routeHandler = nodes.find((node): node is IHandlerStatement => node.kind === 'handler');
   const routeOption = nodes.find((node): node is IOptionStatement => node.kind === 'option');
@@ -177,65 +177,10 @@ test('RequestHandlerAnalysisMachine-FastifyRequest', async () => {
     service.start();
   });
 
-  const parsedDataBoxForTest = JSON.parse(
-    fastSafeStringify(
-      parsedDataBox,
-      (_key, value) => {
-        if (value === '[Circular]') {
-          return undefined;
-        }
+  const expectation = await import(path.join(__dirname, 'expects', expectFileName));
+  const terminateCircularResult = getTestValue(parsedDataBox);
 
-        if (value instanceof tsm.Node) {
-          return undefined;
-        }
+  consola.debug(terminateCircularResult);
 
-        return value;
-      },
-      2,
-    ),
-  );
-
-  consola.debug(parsedDataBoxForTest);
-
-  const expectation = {
-    importBox: {
-      [replaceSepToPosix(path.join(env.examplePath, 'handlers/get/interface/IReqPokeHello.ts'))]: {
-        hash: 'SynyPSafLHaoobLmnZXzP70l78QG5PfE',
-        namedBindings: [],
-        nonNamedBinding: 'IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE',
-        importFile: replaceSepToPosix(path.join(env.examplePath, 'handlers/get/interface/IReqPokeHello.ts')),
-      },
-      [replaceSepToPosix(path.join(env.examplePath, 'handlers/get/justice/world.ts'))]: {
-        hash: 'um2VlboH9kiovJ4hoCH9ZVv6n3cm3OrV',
-        namedBindings: [{ alias: 'option_um2VlboH9kiovJ4hoCH9ZVv6n3cm3OrV', name: 'option' }],
-        nonNamedBinding: 'world_um2VlboH9kiovJ4hoCH9ZVv6n3cm3OrV',
-        importFile: replaceSepToPosix(path.join(env.examplePath, 'handlers/get/justice/world.ts')),
-      },
-    },
-    routeBox: {
-      [replaceSepToPosix(path.join(env.examplePath, 'handlers/get/justice/world.ts'))]: {
-        hash: 'um2VlboH9kiovJ4hoCH9ZVv6n3cm3OrV',
-        handlerName: 'world_um2VlboH9kiovJ4hoCH9ZVv6n3cm3OrV',
-        hasOption: true,
-        method: 'get',
-        routePath: '/justice/world',
-        sourceFilePath: replaceSepToPosix(path.join(env.examplePath, 'handlers/get/justice/world.ts')),
-        typeArgument:
-          "{\n      Querysting: IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE['querystring'];\n      Body: IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE['Body'];\n      Headers: {\n        'access-token': string;\n        'refresh-token': string;\n        'expire-time': {\n          token: string;\n          expire: number;\n          site: {\n            host: string;\n            port: number;\n          };\n        };\n      };\n    }",
-      },
-    },
-    messages: [
-      {
-        type: 'warn',
-        filePath: replaceSepToPosix(path.join(env.examplePath, 'handlers/get/justice/world.ts')),
-        lineAndCharacter: {
-          character: 16,
-          line: 14,
-        },
-        message: `Do you want Querystring? "${chalk.yellow('Querysting')}" in source code`,
-      },
-    ],
-  };
-
-  expect(parsedDataBoxForTest).toEqual(expectation);
+  expect(terminateCircularResult).toEqual(expectation.default);
 });

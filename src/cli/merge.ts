@@ -1,7 +1,7 @@
-import { exists } from 'my-node-fp';
 import { IOption } from '@module/IOption';
 import mergewith from 'lodash.mergewith';
 import { isEmpty, isFalse } from 'my-easy-fp';
+import { exists } from 'my-node-fp';
 
 // import ll from '@modules/ll';
 // const log = ll(__filename);

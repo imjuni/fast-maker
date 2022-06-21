@@ -1,5 +1,5 @@
 import consola from 'consola';
-import { pass, PassFailEither, fail } from 'my-only-either';
+import { fail, pass, PassFailEither } from 'my-only-either';
 import * as path from 'path';
 import typescript from 'typescript';
 

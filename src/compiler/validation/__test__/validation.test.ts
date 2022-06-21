@@ -7,6 +7,7 @@ import validateTypeReferences from '@compiler/validation/validateTypeReference';
 import { IOption } from '@module/IOption';
 import * as env from '@testenv/env';
 import getProcessedConfig from '@tool/getProcessedConfig';
+import posixJoin from '@tool/posixJoin';
 import consola, { LogLevel } from 'consola';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';
@@ -49,7 +50,7 @@ beforeAll(async () => {
 
 test('validatePropertySignature', async () => {
   // project://example/handlers/get/justice/world.ts
-  const routeFilePath = replaceSepToPosix(path.join(env.handlerPath, 'get\\justice\\world.ts'));
+  const routeFilePath = posixJoin(env.handlerPath, 'get', 'justice', 'world.ts');
   const source = share.project.getSourceFileOrThrow(routeFilePath);
   const handlerWithOption = getHandlerWithOption(source);
   const handler = handlerWithOption.find((node) => node.kind === 'handler');
@@ -76,7 +77,14 @@ test('validatePropertySignature', async () => {
     fuzzyValid: true,
     match: ['Body', 'Headers'],
     fuzzy: [
-      { rendered: 'Querystring', score: 258, signature: 'Querysting', expectName: 'Querystring', matchCase: false },
+      {
+        target: 'Querysting',
+        origin: 'Querystring',
+        expectName: 'Querystring',
+        score: 0.1,
+        percent: 90,
+        matchCase: false,
+      },
     ],
   };
 

@@ -474,7 +474,7 @@ const requestHandlerAnalysisMachine = (
               source: context.source,
               node: next.handler.node,
               lineAndCharacter: { line: lineAndCharacter.line, character: lineAndCharacter.column },
-              message: `Do you want ${fuzzyWarn.expectName}? "${chalk.yellow(fuzzyWarn.signature)}" in source code`,
+              message: `Do you want ${fuzzyWarn.expectName}? "${chalk.yellow(fuzzyWarn.target)}" in source code`,
             };
 
             return reason;
@@ -653,11 +653,24 @@ const requestHandlerAnalysisMachine = (
 
           const [typeArgument] = typeArguments;
 
+          const typeName = typeArgument.getSymbol()?.getName();
+          const isFastifyTypeName =
+            typeName === 'RequestGenericInterface' ||
+            typeName === 'RouteGenericInterface' ||
+            typeName === 'RawServer' ||
+            typeName === 'RawRequest' ||
+            typeName === 'SchemaCompiler' ||
+            typeName === 'TypeProvider' ||
+            typeName === 'ContextConfig' ||
+            typeName === 'RequestType' ||
+            typeName === 'Logger';
+
           if (
-            typeArgument.isObject() ||
-            typeArgument.isClassOrInterface() ||
-            typeArgument.isLiteral() ||
-            typeArgument.isUnionOrIntersection()
+            isFalse(isFastifyTypeName) &&
+            (typeArgument.isObject() ||
+              typeArgument.isClassOrInterface() ||
+              typeArgument.isLiteral() ||
+              typeArgument.isUnionOrIntersection())
           ) {
             return true;
           }
@@ -672,11 +685,24 @@ const requestHandlerAnalysisMachine = (
             return false;
           }
 
+          const typeName = typeNode.getSymbol()?.getName();
+          const isFastifyTypeName =
+            typeName === 'RequestGenericInterface' ||
+            typeName === 'RouteGenericInterface' ||
+            typeName === 'RawServer' ||
+            typeName === 'RawRequest' ||
+            typeName === 'SchemaCompiler' ||
+            typeName === 'TypeProvider' ||
+            typeName === 'ContextConfig' ||
+            typeName === 'RequestType' ||
+            typeName === 'Logger';
+
           if (
-            typeNode.isObject() ||
-            typeNode.isClassOrInterface() ||
-            typeNode.isLiteral() ||
-            typeNode.isUnionOrIntersection()
+            isFalse(isFastifyTypeName) &&
+            (typeNode.isObject() ||
+              typeNode.isClassOrInterface() ||
+              typeNode.isLiteral() ||
+              typeNode.isUnionOrIntersection())
           ) {
             return true;
           }

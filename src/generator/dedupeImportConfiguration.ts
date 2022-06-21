@@ -1,6 +1,6 @@
 import IImportConfiguration from '@compiler/interface/IImportConfiguration';
 import mergeImportConfiguration from '@generator/mergeImportConfiguration';
-import { isNotEmpty, isEmpty } from 'my-easy-fp';
+import { isEmpty, isNotEmpty } from 'my-easy-fp';
 
 export default function dedupeImportConfiguration(configurations: IImportConfiguration[]): IImportConfiguration[] {
   const record = configurations.reduce<Record<string, IImportConfiguration>>((aggregation, importConfiguration) => {
