@@ -4,36 +4,43 @@
  * matchCase를 별도로 전달한다
  */
 import Fuse from 'fuse.js';
-import { isEmpty } from 'my-easy-fp';
+import { bignumber } from 'mathjs';
 
 export interface IFuzzyWithCaseReturn {
-  rendered: string;
+  target: string;
+  origin: string;
   score: number;
+  percent: number;
   matchCase: boolean;
-  signature: string;
   expectName: string;
 }
 
-export default function fuzzyWithCase(source: string, target: string): IFuzzyWithCaseReturn {
-  const fuse = new Fuse([source], { includeScore: true });
-  const fuzzinessResults = fuse.search(target);
-  const [fuzzinessResult] = fuzzinessResults;
+export default function fuzzyWithCase(sources: string | string[], target: string): IFuzzyWithCaseReturn[] {
+  const fuse = new Fuse(Array.isArray(sources) ? sources : [sources], { includeScore: true });
+  const fuzzinesses = fuse.search(target);
 
-  if (isEmpty(fuzzinessResult) || Object.keys(fuzzinessResult).length <= 0) {
-    return {
-      rendered: target,
-      signature: source,
-      expectName: target,
-      score: -1,
-      matchCase: source.localeCompare(target) === 0,
-    };
-  }
+  const fuzzyWithCases = fuzzinesses.map<IFuzzyWithCaseReturn>((fuzzinessResult) => ({
+    target,
+    origin: fuzzinessResult.item,
+    expectName: fuzzinessResult.item,
 
-  return {
-    rendered: target,
-    score: fuzzinessResult.score ?? 0,
-    signature: source,
-    expectName: target,
-    matchCase: source.localeCompare(target) === 0,
-  };
+    score: bignumber(fuzzinessResult.score ?? 0)
+      .mul(1000)
+      .floor()
+      .div(1000)
+      .toNumber(),
+
+    percent: bignumber(1)
+      .sub(fuzzinessResult.score ?? 0)
+      .div(1)
+      .mul(100)
+      .mul(1000)
+      .floor()
+      .div(1000)
+      .toNumber(),
+
+    matchCase: fuzzinessResult.item.localeCompare(target) === 0,
+  }));
+
+  return fuzzyWithCases;
 }

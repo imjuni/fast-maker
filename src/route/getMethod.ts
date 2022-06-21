@@ -1,5 +1,5 @@
 import TMethodType from '@route/interface/TMethodType';
-import { PassFailEither, pass, fail } from 'my-only-either';
+import { fail, pass, PassFailEither } from 'my-only-either';
 
 export default function getMethod(method: string): PassFailEither<Error, TMethodType> {
   const toLoweredMethod = method.toLowerCase();

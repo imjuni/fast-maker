@@ -16,10 +16,7 @@ export default function validatePropertySignature({ propertySignatures, type }: 
   const anotherNames = names.filter((name) => isFalse(validNames.includes(name)));
 
   const fuzzyResult = anotherNames.reduce<Record<string, IFuzzyWithCaseReturn>>((aggregated, name) => {
-    const fuzzyResults = expectNames
-      .map((expectName) => fuzzyWithCase(expectName, name))
-      .filter((fuzzied) => fuzzied.score > 0 || fuzzied.score === 0);
-
+    const fuzzyResults = fuzzyWithCase(expectNames, name).filter((fuzzied) => fuzzied.percent > 0);
     const [headFuzzyResult] = fuzzyResults;
 
     if (isNotEmpty(headFuzzyResult)) {

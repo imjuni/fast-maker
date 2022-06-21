@@ -1,3 +1,4 @@
+import validParamNames from '@compiler/validation/validParamNames';
 import fuzzyWithCase from '@tool/fuzzyWithCase';
 import consola, { LogLevel } from 'consola';
 import 'jest';
@@ -9,13 +10,41 @@ beforeAll(() => {
 test('fuzzy-test', () => {
   consola.debug('fuzzy-test start');
 
-  const examples = ['querystring', 'query-string', 'queryString', 'query_string'];
-  const result = examples.map((example) => fuzzyWithCase('Querystring', example));
+  const examples = ['querystring', 'query-string', 'queryString', 'query_string', 'ironman'];
+  const result = examples.map((example) => fuzzyWithCase(validParamNames.fastify, example)).flatMap((f) => f);
 
   expect(result).toEqual([
-    { rendered: 'querystring', score: Infinity, signature: 'Querystring', expectName: 'querystring', matchCase: false },
-    { rendered: 'query-string', score: 177, signature: 'Querystring', expectName: 'query-string', matchCase: false },
-    { rendered: 'queryString', score: Infinity, signature: 'Querystring', expectName: 'queryString', matchCase: false },
-    { rendered: 'query_string', score: 177, signature: 'Querystring', expectName: 'query_string', matchCase: false },
+    {
+      target: 'querystring',
+      origin: 'Querystring',
+      expectName: 'Querystring',
+      score: 0,
+      percent: 100,
+      matchCase: false,
+    },
+    {
+      target: 'query-string',
+      origin: 'Querystring',
+      expectName: 'Querystring',
+      score: 0.083,
+      percent: 91.666,
+      matchCase: false,
+    },
+    {
+      target: 'queryString',
+      origin: 'Querystring',
+      expectName: 'Querystring',
+      score: 0,
+      percent: 100,
+      matchCase: false,
+    },
+    {
+      target: 'query_string',
+      origin: 'Querystring',
+      expectName: 'Querystring',
+      score: 0.083,
+      percent: 91.666,
+      matchCase: false,
+    },
   ]);
 });

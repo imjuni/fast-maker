@@ -2,7 +2,6 @@ import { isFalse, isNotEmpty } from 'my-easy-fp';
 import { exists, isDirectory } from 'my-node-fp';
 import { fail, pass, PassFailEither } from 'my-only-either';
 import * as path from 'path';
-import 'fs-extra';
 
 export default async function getTsconfigPath(tsconfigPath?: string): Promise<PassFailEither<Error, string>> {
   // tsconfigPath is non empty

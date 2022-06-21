@@ -18,13 +18,13 @@ import type { IContextRequestHandlerAnalysisMachine as IAnalysisMachineContext }
 import requestHandlerAnalysisMachine from '@xstate/RequestHandlerAnalysisMachine';
 import chalk from 'chalk';
 import consola from 'consola';
+import fastSafeStringify from 'fast-safe-stringify';
 import fs from 'fs';
 import { isEmpty, isFalse, isNotEmpty } from 'my-easy-fp';
 import { fail, isFail, pass, PassFailEither } from 'my-only-either';
 import path from 'path';
-import { interpret } from 'xstate';
-import fastSafeStringify from 'fast-safe-stringify';
 import * as tsm from 'ts-morph';
+import { interpret } from 'xstate';
 
 export default async function generator(
   option: IOption,

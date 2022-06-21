@@ -122,8 +122,8 @@ test('getResolvedModuleInImports', async () => {
     {
       isExternalLibraryImport: false,
       hash: 'SynyPSafLHaoobLmnZXzP70l78QG5PfE',
-      importAt: 'F:/project/node/github/fast-maker/example/handlers/get/xman/world.ts',
-      exportFrom: 'F:/project/node/github/fast-maker/example/handlers/get/interface/IReqPokeHello.ts',
+      importAt: posixJoin(env.examplePath, 'handlers', 'get', 'xman', 'world.ts'),
+      exportFrom: posixJoin(env.examplePath, 'handlers', 'get', 'interface', 'IReqPokeHello.ts'),
       importDeclarations: [
         {
           isDefaultExport: true,
@@ -135,8 +135,8 @@ test('getResolvedModuleInImports', async () => {
     {
       isExternalLibraryImport: false,
       hash: 'DS8Pg2MYm5AsqoJVltiuqlOctGQfT78w',
-      importAt: 'F:/project/node/github/fast-maker/example/handlers/get/xman/world.ts',
-      exportFrom: 'F:/project/node/github/fast-maker/example/interface/TAbnormalPresident.ts',
+      importAt: posixJoin(env.examplePath, 'handlers', 'get', 'xman', 'world.ts'),
+      exportFrom: posixJoin(env.examplePath, 'interface', 'TAbnormalPresident.ts'),
       importDeclarations: [
         {
           isDefaultExport: true,
@@ -148,8 +148,8 @@ test('getResolvedModuleInImports', async () => {
     {
       isExternalLibraryImport: false,
       hash: '6bwarMss36QHeqUXTVMxB9uAjEjVZOL1',
-      importAt: 'F:/project/node/github/fast-maker/example/handlers/get/xman/world.ts',
-      exportFrom: 'F:/project/node/github/fast-maker/example/interface/ICompany.ts',
+      importAt: posixJoin(env.examplePath, 'handlers', 'get', 'xman', 'world.ts'),
+      exportFrom: posixJoin(env.examplePath, 'interface', 'ICompany.ts'),
       importDeclarations: [
         {
           isDefaultExport: true,
@@ -160,8 +160,8 @@ test('getResolvedModuleInImports', async () => {
     },
     {
       isExternalLibraryImport: false,
-      importAt: 'F:/project/node/github/fast-maker/example/handlers/get/xman/world.ts',
-      exportFrom: 'F:/project/node/github/fast-maker/example/interface/IAbility.ts',
+      importAt: posixJoin(env.examplePath, 'handlers', 'get', 'xman', 'world.ts'),
+      exportFrom: posixJoin(env.examplePath, 'interface', 'IAbility.ts'),
       hash: 'FaJPXXq2KiAC6EVDBL3aeh4ER262pWhl',
       importDeclarations: [
         {
