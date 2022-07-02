@@ -1,5 +1,5 @@
 import IGetModuleInImports from '@compiler/interface/IGetModuleInImports';
-import { IOption } from '@module/IOption';
+import IConfig from '@config/interface/IConfig';
 import appendPostfixHash from '@tool/appendPostfixHash';
 import getHash from '@tool/getHash';
 import consola from 'consola';
@@ -10,7 +10,7 @@ import * as tsm from 'ts-morph';
 
 interface IGetResolvedModuleParam {
   source: tsm.SourceFile;
-  option: IOption;
+  option: IConfig;
   typeReferenceNodes: tsm.TypeReferenceNode[];
 }
 
@@ -74,7 +74,7 @@ export default function getResolvedModuleInImports({
       const moduleSourceFile = typeNameWithImportDeclaration.importDeclaration.getModuleSpecifierSourceFileOrThrow();
       const moduleSourceFilePath = moduleSourceFile.getFilePath();
 
-      const relativeFilePath = replaceSepToPosix(path.relative(option.path.output, moduleSourceFilePath));
+      const relativeFilePath = replaceSepToPosix(path.relative(option.output, moduleSourceFilePath));
       const moduleHash = getHash(relativeFilePath);
 
       // default import 인 경우

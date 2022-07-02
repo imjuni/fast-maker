@@ -1,4 +1,4 @@
-import { FastifyRequest, FastifyReply, RouteShorthandOptions } from 'fastify';
+import { FastifyReply, FastifyRequest, RouteShorthandOptions } from 'fastify';
 import { Server } from 'http';
 import type IReqPokeHello from '../interface/IReqPokeHello';
 import schema from '../interface/JSC_IReqPokeHello';

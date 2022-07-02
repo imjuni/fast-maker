@@ -1,8 +1,8 @@
 import IReason from '@compiler/interface/IReason';
 import { IHandlerStatement, IOptionStatement } from '@compiler/interface/THandlerNode';
 import getHandlerWithOption from '@compiler/navigate/getHandlerWithOption';
+import IConfig from '@config/interface/IConfig';
 import ErrorWithMessage from '@module/ErrorWithMessage';
-import { IOption } from '@module/IOption';
 import IRouteHandler from '@route/interface/IRouteHandler';
 import getHash from '@tool/getHash';
 import requestHandlerAnalysisMachine, {
@@ -16,7 +16,7 @@ import { interpret } from 'xstate';
 
 interface IGetSourceTextParam {
   routeHandlerWithOption: IRouteHandler;
-  option: IOption;
+  option: IConfig;
   project: tsm.Project;
 }
 

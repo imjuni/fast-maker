@@ -1,7 +1,5 @@
 {
   "project": "./example/tsconfig.json",
-  "path": {
-    "handler": "./example/handlers",
-    "output": "./example/handlers"
-  }
+  "handler": "./example/handlers",
+  "output": "./example/handlers"
 }

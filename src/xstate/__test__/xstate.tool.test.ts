@@ -1,12 +1,11 @@
 import IReason from '@compiler/interface/IReason';
 import { IHandlerStatement, IOptionStatement } from '@compiler/interface/THandlerNode';
 import getHandlerWithOption from '@compiler/navigate/getHandlerWithOption';
+import IConfig from '@config/interface/IConfig';
 import ErrorWithMessage from '@module/ErrorWithMessage';
-import { IOption } from '@module/IOption';
 import getRouteFiles from '@route/getRouteFiles';
 import * as env from '@testenv/env';
 import getHash from '@tool/getHash';
-import getProcessedConfig from '@tool/getProcessedConfig';
 import getTestValue from '@tool/getTestValue';
 import posixJoin from '@tool/posixJoin';
 import requestHandlerAnalysisMachine, {
@@ -16,41 +15,28 @@ import consola, { LogLevel } from 'consola';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
-import { isFail } from 'my-only-either';
 import path from 'path';
 import * as tsm from 'ts-morph';
 import { interpret } from 'xstate';
 
-const share: { projectPath: string; project: tsm.Project; option: IOption } = {} as any;
+const share: { projectPath: string; project: tsm.Project; option: IConfig } = {} as any;
 
 beforeAll(async () => {
   share.projectPath = path.join(env.examplePath, 'tsconfig.json');
 
-  const optionEither = await getProcessedConfig({
-    args: {
-      _: [],
-      $0: 'route',
-      project: share.projectPath,
-      v: false,
-      verbose: false,
-      d: false,
-      debugLog: false,
-      p: share.projectPath,
-      h: env.handlerPath,
-      handler: env.handlerPath,
-      o: env.handlerPath,
-      output: env.handlerPath,
-    },
-    project: share.projectPath,
-  });
-
-  if (isFail(optionEither)) {
-    throw optionEither.fail;
-  }
-
   consola.level = LogLevel.Debug;
   share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
-  share.option = optionEither.pass;
+  share.option = {
+    project: share.projectPath,
+    v: false,
+    verbose: false,
+    debugLog: false,
+    p: share.projectPath,
+    h: env.handlerPath,
+    handler: env.handlerPath,
+    o: env.handlerPath,
+    output: env.handlerPath,
+  };
 });
 
 test('t001-FSM-TypeLiteral', async () => {
@@ -67,7 +53,7 @@ test('t001-FSM-TypeLiteral', async () => {
     throw new Error('invalid handler');
   }
 
-  const routeHandlerFiles = await getRouteFiles(share.option.path.handler);
+  const routeHandlerFiles = await getRouteFiles(share.option.handler);
   const testRouteHandlerFile = routeHandlerFiles
     .filter((routeHandlerFile) => routeHandlerFile.method === 'get')
     .find((routeHandlerFile) => routeHandlerFile.filename === routeFilePath);
@@ -133,7 +119,7 @@ test('t002-FSM-FastifyRequest', async () => {
     throw new Error('invalid handler');
   }
 
-  const routeHandlerFiles = await getRouteFiles(share.option.path.handler);
+  const routeHandlerFiles = await getRouteFiles(share.option.handler);
   const testRouteHandlerFile = routeHandlerFiles
     .filter((routeHandlerFile) => routeHandlerFile.method === 'get')
     .find((routeHandlerFile) => routeHandlerFile.filename === routeFilePath);
