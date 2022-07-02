@@ -1,13 +1,13 @@
 {
   "name": "fast-maker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "create route file on specific directory",
   "scripts": {
     "test": "jest",
     "test:debug": "node -r ts-node/register --inspect --nolazy node_modules/jest/bin/jest",
     "dev": "ts-node ./src/cli.ts",
     "clean": "just --config ./.config/just.config.ts clean",
-    "pub:prod": "just pub:prod",
+    "pub:prod": "just --config ./.config/just.config.ts pub:prod",
     "pub": "just --config ./.config/just.config.ts pub",
     "tsc": "just --config ./.config/just.config.ts tsc",
     "build:prod": "just --config ./.config/just.config.ts build:prod",
@@ -24,13 +24,13 @@
     "url": "git+https://github.com/imjuni/fast-maker.git"
   },
   "bin": {
-    "fast-maker": "dist/index.js"
+    "fast-maker": "dist/cli.js"
   },
   "private": false,
   "author": "ByungJoon Lee",
   "license": "MIT",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "dist/fast-maker.js",
+  "typings": "dist/fast-maker.d.ts",
   "files": [
     "dist"
   ],
