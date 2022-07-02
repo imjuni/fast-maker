@@ -37,6 +37,7 @@ module.exports = {
         argsIgnorePattern: '^_.+$',
       },
     ],
+    'no-underscore-dangle': ['error', { allowAfterThis: true }],
     // '@typescript-eslint/naming-convention': [
     //   'error',
     //   {

@@ -4,10 +4,11 @@ const webpack = require('webpack');
 const path = require('path');
 const TsconfigPathsWebpackPlugin = require('tsconfig-paths-webpack-plugin');
 const webpackNodeExternals = require('webpack-node-externals');
+const { merge } = require('webpack-merge');
 
-const distPath = path.resolve(path.join(__dirname, 'dist'));
+const distPath = path.resolve(path.join(__dirname, '..', 'dist'));
 
-const config = {
+const appConfig = {
   devtool: 'inline-source-map',
   externals: [
     webpackNodeExternals({
@@ -34,14 +35,12 @@ const config = {
     },
   },
 
-  plugins: [new webpack.BannerPlugin({ banner: '#!/usr/bin/env node', raw: true })],
-
   entry: {
-    frm: ['./src/fast-maker.ts'],
+    ['fast-maker']: ['./src/fast-maker.ts'],
   },
 
   output: {
-    filename: 'index.js',
+    filename: 'fast-maker.js',
     libraryTarget: 'commonjs',
     path: distPath,
   },
@@ -61,18 +60,23 @@ const config = {
         exclude: /node_modules/,
         loader: 'ts-loader',
         test: /\.tsx?$/,
-        options: {
-          configFile: 'tsconfig.json',
-        },
       },
     ],
   },
-
-  node: {
-    __dirname: false,
-    __filename: false,
-    global: false,
-  },
 };
 
-module.exports = config;
+const cliConfig = merge(appConfig, {
+  plugins: [new webpack.BannerPlugin({ banner: '#!/usr/bin/env node', raw: true })],
+
+  entry: {
+    ['fast-maker']: ['./src/cli.ts'],
+  },
+
+  output: {
+    filename: 'cli.js',
+    libraryTarget: 'commonjs',
+    path: distPath,
+  },
+});
+
+module.exports = [appConfig, cliConfig];

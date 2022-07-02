@@ -1,9 +1,9 @@
-import { IOption } from '@module/IOption';
+import IConfig from '@config/interface/IConfig';
 import IRouteConfiguration from '@route/interface/IRouteConfiguration';
 import { isNotEmpty } from 'my-easy-fp';
 
 interface IRouteCodeGenerator {
-  option: IOption;
+  option: IConfig;
   routeConfigurations: IRouteConfiguration[];
 }
 

@@ -1,81 +1,174 @@
-import builder from '@cli/builder';
-import { IFastMakerYargsParameter } from '@cli/IFastMakerYargsParameter';
-import getTsconfigPath from '@compiler/tool/getTsconfigPath';
-import { CliUx } from '@oclif/core';
-import getProcessedConfig from '@tool/getProcessedConfig';
+import progress from '@cli/progress';
+import spinner from '@cli/spinner';
+import IReason from '@compiler/interface/IReason';
+import getTypeScriptProject from '@compiler/tool/getTypeScriptProject';
+import IConfig from '@config/interface/IConfig';
+import IWatchConfig from '@config/interface/IWatchConfig';
+import prettierProcessing from '@generator/prettierProcessing';
+import getRouteAnalysis from '@module/getRouteAnalysis';
+import getWritableCode from '@module/getWritableCode';
+import writeDebugLog from '@module/writeDebugLog';
+import getRouteFiles from '@route/getRouteFiles';
 import messageDisplay from '@tool/messageDisplay';
-import preLoadConfig from '@tool/preLoadConfig';
-import consola, { LogLevel } from 'consola';
-import * as fs from 'fs';
-import { isFail } from 'my-only-either';
-import * as path from 'path';
-import yargsAnyType, { Arguments, Argv } from 'yargs';
-import generator from './generator';
+import chalk from 'chalk';
+import chokidar from 'chokidar';
+import consola from 'consola';
+import fs from 'fs';
+import { isError } from 'my-easy-fp';
+import { getDirnameSync, replaceSepToPosix, win32DriveLetterUpdown } from 'my-node-fp';
+import { fail, isFail, isPass, pass, PassFailEither } from 'my-only-either';
+import path from 'path';
+import * as rx from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
-const version = '0.0.1';
-consola.level = LogLevel.Success;
+export async function generateRouteFile(
+  config: IConfig,
+  message?: { progress?: boolean; spinner?: boolean; message?: boolean },
+): Promise<PassFailEither<Error, { code: string; reasons: IReason[] }>> {
+  progress.enable = message?.progress ?? false;
+  spinner.enable = message?.spinner ?? false;
 
-// Yargs default type using object type(= {}). But object type cause error that
-// fast-maker cli option interface type. So we make concrete type yargs instance
-// make using by any type.
-const yargs: Argv<IFastMakerYargsParameter> = yargsAnyType as any;
-// const enableCliUx = isFalse(process.env.DISABLE_CLIUX === 'off');
+  const logObject: Record<string, any> = {};
 
-// eslint-disable-next-line
-const argv = yargs(process.argv.slice(2))
-  .command<IFastMakerYargsParameter>({
-    aliases: '$0 [cwds...]',
-    command: 'route [cwds...]',
-    describe: 'create route.ts file in your directory using by tsconfig.json',
-    builder,
-    handler: async (args: Arguments<IFastMakerYargsParameter>) => {
-      try {
-        if (process.env.ENABLE_DEBUG_LOG === 'on') {
-          consola.level = LogLevel.Debug;
-        } else if (args.verbose) {
-          consola.level = LogLevel.Log;
-        }
+  try {
+    spinner.update(`load tsconfig.json: ${config.project}`);
 
-        CliUx.ux.action.start('fast-maker start to route configuration generate', 'start');
+    const tsProject = await getTypeScriptProject(config.project);
 
-        const tsconfigPath = await getTsconfigPath(args.project);
+    spinner.update('typescript handler source complete, ...');
 
-        if (isFail(tsconfigPath)) {
-          throw tsconfigPath.fail;
-        }
+    const reasons: IReason[] = [];
+    const routeHandlers = await getRouteFiles(config.handler);
 
-        CliUx.ux.action.status = `found tsconfig.json: ${tsconfigPath.pass}`;
+    logObject.option = config;
+    logObject.routeHandlers = routeHandlers;
 
-        const optionEither = await getProcessedConfig({ args, project: tsconfigPath.pass });
+    const {
+      routesAnalysised,
+      reasons: analysisReasons,
+      logObject: analysisLogObject,
+    } = await getRouteAnalysis(tsProject, config, routeHandlers);
 
-        if (isFail(optionEither)) {
-          throw optionEither.fail;
-        }
+    Object.entries(analysisLogObject).forEach(([key, value]) => {
+      logObject[key] = value;
+    });
 
-        const generatedCodeEither = await generator(optionEither.pass);
+    const {
+      importConfigurations,
+      routeConfigurations,
+      importCodes,
+      routeCodes,
+      reasons: aggregatedReasons,
+    } = getWritableCode(routesAnalysised, config);
 
-        if (isFail(generatedCodeEither)) {
-          throw generatedCodeEither.fail;
-        }
+    logObject.importConfigurations = importConfigurations;
+    logObject.routeConfigurations = routeConfigurations;
+    logObject.importCodes = importCodes;
+    logObject.routeCodes = routeCodes;
 
-        await fs.promises.writeFile(
-          path.join(optionEither.pass.path.output, 'route.ts'),
-          generatedCodeEither.pass.code,
-        );
+    reasons.push(...analysisReasons, ...aggregatedReasons);
 
-        messageDisplay(generatedCodeEither.pass.reasons);
+    const finalCode = [
+      `import { FastifyInstance } from 'fastify';`,
+      ...importCodes,
+      '\n',
+      `export default function routing(fastify: FastifyInstance): void {`,
+      ...routeCodes,
+      `}`,
+    ];
 
-        // /CliUx.ux.action.stop('complete!');
-      } catch (catched) {
-        const err = catched instanceof Error ? catched : new Error('unknown error raised');
-        consola.error(err);
+    logObject.finalCode = importCodes;
 
-        CliUx.ux.action.stop('error!');
+    await writeDebugLog(config, routeConfigurations, logObject);
+
+    const prettfiedEither = await prettierProcessing({ code: finalCode.join('\n') });
+
+    consola.debug('--------------------------------------------------------');
+    consola.debug(prettfiedEither);
+    consola.debug('--------------------------------------------------------');
+
+    if (isFail(prettfiedEither)) {
+      throw prettfiedEither.fail;
+    }
+
+    progress.update(routeHandlers.length);
+
+    return pass({ code: prettfiedEither.pass, reasons });
+  } catch (catched) {
+    const err = catched instanceof Error ? catched : new Error('unknown error raised');
+
+    logObject.err = {
+      message: err.message,
+      stack: err.stack ?? '',
+    };
+
+    await writeDebugLog(config, [], logObject);
+
+    return fail(err);
+  } finally {
+    progress.stop();
+  }
+}
+
+export function watchRouteFile(
+  config: IConfig & IWatchConfig,
+  message?: { progress?: boolean; spinner?: boolean; message?: boolean },
+) {
+  progress.enable = message?.progress ?? false;
+  spinner.enable = message?.spinner ?? false;
+
+  const cwd = replaceSepToPosix(path.resolve(getDirnameSync(config.handler)));
+  const watchDebounceTime = config.debounceTime;
+
+  consola.success('Route generation watch mode start!');
+
+  const watcher = chokidar.watch(cwd, {
+    ignored: [
+      /__tests__/,
+      /__test__/,
+      'interface',
+      'interfaces',
+      'JSC_*',
+      '*.d.ts',
+      'node_modules',
+      /^\..+/,
+      'route.ts',
+    ],
+    ignoreInitial: true,
+    cwd,
+  });
+
+  const subject = new rx.Subject<{ type: 'add' | 'change'; filePath: string }>();
+
+  subject.pipe(debounceTime(watchDebounceTime)).subscribe(async (changeValue) => {
+    try {
+      const filePath = path.isAbsolute(changeValue.filePath)
+        ? changeValue.filePath
+        : replaceSepToPosix(win32DriveLetterUpdown(path.resolve(path.join(cwd, changeValue.filePath)), 'upper'));
+
+      consola.debug('file changed: ', filePath);
+
+      const generatedCode = await generateRouteFile(config);
+
+      if (isPass(generatedCode)) {
+        await fs.promises.writeFile(path.join(config.output, 'route.ts'), generatedCode.pass.code);
+        messageDisplay(generatedCode.pass.reasons);
+
+        consola.success('route file generation success!');
       }
-    },
-  })
-  .version(version, 'version', 'display version information')
-  .config(preLoadConfig())
-  .help().argv;
+    } catch (catched) {
+      const err = isError(catched) ?? new Error('unknown error raised from watchRouteFile');
+      consola.debug(err);
+    }
+  });
 
-consola.debug('argv: ', argv);
+  watcher
+    .on('add', (filePath) => {
+      consola.info(`file added: ${chalk.yellow(filePath)}`);
+      subject.next({ type: 'add', filePath });
+    })
+    .on('change', (filePath) => {
+      consola.info(`file changed: ${chalk.yellow(filePath)}`);
+      subject.next({ type: 'change', filePath });
+    });
+}

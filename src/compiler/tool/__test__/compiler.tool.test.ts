@@ -2,87 +2,37 @@ import { IHandlerStatement } from '@compiler/interface/THandlerNode';
 import getHandlerWithOption from '@compiler/navigate/getHandlerWithOption';
 import getInternalImportTypeReference from '@compiler/tool/getInternalImportTypeReference';
 import getResolvedModuleInImports from '@compiler/tool/getResolvedModuleInImports';
-import getTsconfigPath from '@compiler/tool/getTsconfigPath';
 import getTypeReferences from '@compiler/tool/getTypeReferences';
-import getTypeScriptProject from '@compiler/tool/getTypeScriptProject';
 import replaceTypeReferenceInTypeLiteral from '@compiler/tool/replaceTypeReferenceInTypeLiteral';
-import { IOption } from '@module/IOption';
+import IConfig from '@config/interface/IConfig';
 import * as env from '@testenv/env';
-import getProcessedConfig from '@tool/getProcessedConfig';
 import posixJoin from '@tool/posixJoin';
 import consola, { LogLevel } from 'consola';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
-import { isFail } from 'my-only-either';
 import path from 'path';
 import * as tsm from 'ts-morph';
 
-const share: { projectPath: string; project: tsm.Project; option: IOption } = {} as any;
+const share: { projectPath: string; project: tsm.Project; option: IConfig } = {} as any;
 
 beforeAll(async () => {
   share.projectPath = path.join(env.examplePath, 'tsconfig.json');
 
-  const optionEither = await getProcessedConfig({
-    args: {
-      _: [],
-      $0: 'route',
-      project: share.projectPath,
-      v: false,
-      verbose: false,
-      d: false,
-      debugLog: false,
-      p: share.projectPath,
-      h: env.handlerPath,
-      handler: env.handlerPath,
-      o: env.handlerPath,
-      output: env.handlerPath,
-    },
-    project: share.projectPath,
-  });
-
-  if (isFail(optionEither)) {
-    throw optionEither.fail;
-  }
-
   consola.level = LogLevel.Debug;
+
   share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
-  share.option = optionEither.pass;
-});
-
-test('getTsconfigPath', async () => {
-  consola.success('getTsconfigPath-test start');
-
-  const expectationExists = await getTsconfigPath(path.join(env.examplePath, 'tsconfig.json'));
-
-  process.chdir(env.mockCliPath);
-  const expectationNonExists = await getTsconfigPath();
-
-  consola.success([expectationExists, expectationNonExists]);
-
-  expect([expectationExists, expectationNonExists]).toEqual([
-    { type: 'pass', pass: path.join(env.examplePath, 'tsconfig.json') },
-    { type: 'pass', pass: path.join(env.mockCliPath, 'tsconfig.json') },
-  ]);
-});
-
-test('getTypeScriptProgram', async () => {
-  const projectPath = path.join(env.examplePath, 'tsconfig.json');
-  const expectationExists = await getTsconfigPath(projectPath);
-
-  if (isFail(expectationExists)) {
-    throw expectationExists.fail;
-  }
-
-  const programEither = await getTypeScriptProject(expectationExists.pass);
-
-  if (isFail(programEither)) {
-    throw programEither.fail;
-  }
-
-  const project = new tsm.Project({ tsConfigFilePath: projectPath });
-
-  expect(Object.keys(programEither.pass)).toEqual(Object.keys(project));
+  share.option = {
+    project: share.projectPath,
+    v: false,
+    verbose: false,
+    debugLog: false,
+    p: share.projectPath,
+    h: env.handlerPath,
+    handler: env.handlerPath,
+    o: env.handlerPath,
+    output: env.handlerPath,
+  };
 });
 
 test('getResolvedModuleInImports', async () => {

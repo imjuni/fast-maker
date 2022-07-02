@@ -4,48 +4,34 @@ import getInternalImportTypeReference from '@compiler/tool/getInternalImportType
 import getResolvedModuleInImports from '@compiler/tool/getResolvedModuleInImports';
 import getTypeReferences from '@compiler/tool/getTypeReferences';
 import replaceTypeReferenceInTypeLiteral from '@compiler/tool/replaceTypeReferenceInTypeLiteral';
-import { IOption } from '@module/IOption';
+import IConfig from '@config/interface/IConfig';
 import * as env from '@testenv/env';
-import getProcessedConfig from '@tool/getProcessedConfig';
 import consola, { LogLevel } from 'consola';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
-import { isFail } from 'my-only-either';
 import path from 'path';
 import * as tsm from 'ts-morph';
 
-const share: { projectPath: string; project: tsm.Project; option: IOption } = {} as any;
+const share: { projectPath: string; project: tsm.Project; option: IConfig } = {} as any;
 
 describe('navigate', () => {
   beforeAll(async () => {
     share.projectPath = path.join(env.examplePath, 'tsconfig.json');
 
-    const optionEither = await getProcessedConfig({
-      args: {
-        _: [],
-        $0: 'route',
-        project: share.projectPath,
-        v: false,
-        verbose: false,
-        d: false,
-        debugLog: false,
-        p: share.projectPath,
-        h: env.handlerPath,
-        handler: env.handlerPath,
-        o: env.handlerPath,
-        output: env.handlerPath,
-      },
-      project: share.projectPath,
-    });
-
-    if (isFail(optionEither)) {
-      throw optionEither.fail;
-    }
-
     consola.level = LogLevel.Debug;
     share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
-    share.option = optionEither.pass;
+    share.option = {
+      project: share.projectPath,
+      v: false,
+      verbose: false,
+      debugLog: false,
+      p: share.projectPath,
+      h: env.handlerPath,
+      handler: env.handlerPath,
+      o: env.handlerPath,
+      output: env.handlerPath,
+    };
   });
 
   test('generateRouteFunctionCode', async () => {

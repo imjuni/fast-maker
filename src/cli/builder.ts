@@ -1,8 +1,8 @@
-import { IFastMakerYargsParameter } from '@cli/IFastMakerYargsParameter';
+import IConfig from '@config/interface/IConfig';
 import * as path from 'path';
 import { Argv } from 'yargs';
 
-export default function builder(args: Argv<IFastMakerYargsParameter>): Argv<IFastMakerYargsParameter> {
+export default function builder(args: Argv<IConfig>): Argv<IConfig> {
   args
     .option('handler', {
       alias: 'h',

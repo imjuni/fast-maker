@@ -19,6 +19,10 @@ export default async function getHandlerFile(handlersPath?: string): Promise<str
       replaceSepToPosix(path.resolve(handlersPath, '**', 'interfaces')),
       replaceSepToPosix(path.resolve(handlersPath, '**', '*.d.ts')),
       replaceSepToPosix(path.resolve(handlersPath, '**', 'JSC_*')),
+      replaceSepToPosix(path.resolve(handlersPath, '**', 'test')),
+      replaceSepToPosix(path.resolve(handlersPath, '**', 'tests')),
+      replaceSepToPosix(path.resolve(handlersPath, '**', '__test__')),
+      replaceSepToPosix(path.resolve(handlersPath, '**', '__tests__')),
     ];
 
     const globResult = await fastGlob(tsfileGlobs, { ignore: ignoreFileGlobs });

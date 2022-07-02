@@ -29,6 +29,11 @@ task('clean', async () => {
   });
 });
 
+task('clean:dts', async () => {
+  const cmd = 'rimraf dist/src dist/example';
+  await exec(cmd, { stderr: process.stderr, stdout: process.stdout });
+});
+
 task('lint', async () => {
   const cmd = 'eslint --no-ignore --ext ts,tsx,json ./src/**/*';
 
@@ -39,12 +44,17 @@ task('lint', async () => {
 });
 
 task('tsc', async () => {
-  const cmd = 'tsc --noemit --incremental -p ./tsconfig.json';
+  const cmd = 'tsc --incremental -p ./tsconfig.json';
 
   await exec(cmd, {
     stderr: process.stderr,
     stdout: process.stdout,
   });
+});
+
+task('+dts-bundle', async () => {
+  const cmd = 'dts-bundle-generator --no-banner dist/src/fast-maker.d.ts -o dist/fast-maker.d.ts';
+  await exec(cmd, { stderr: process.stderr, stdout: process.stdout });
 });
 
 task('+pub', async () => {
@@ -71,7 +81,7 @@ task('+build:dev', async () => {
     NODE_ENV: 'production',
   };
 
-  const cmd = `cross-env ${getEnvironmentPrefix(env)} webpack --config webpack.config.dev.js`;
+  const cmd = `cross-env ${getEnvironmentPrefix(env)} webpack --config ./.config/webpack.config.dev.js`;
 
   logger.info('Script Build: ', cmd);
 
@@ -87,7 +97,7 @@ task('+build:prod', async () => {
     NODE_ENV: 'production',
   };
 
-  const cmd = `cross-env ${getEnvironmentPrefix(env)} webpack --config webpack.config.prod.js`;
+  const cmd = `cross-env ${getEnvironmentPrefix(env)} webpack --config ./.config/webpack.config.prod.js`;
 
   logger.info('Script Build: ', cmd);
 
@@ -100,5 +110,5 @@ task('+build:prod', async () => {
 task('build', series('clean', 'lint', '+build:dev'));
 task('pub', series('clean', 'lint', '+build:dev', '+pub'));
 task('pub:prod', series('clean', 'lint', '+build:prod', '+pub:prod'));
-task('build:dev', series('clean', 'lint', '+build:dev'));
-task('build:prod', series('clean', 'lint', '+build:prod'));
+task('build:dev', series('clean', 'lint', '+build:dev', '+dts-bundle', 'clean:dts'));
+task('build:prod', series('clean', 'lint', '+build:prod', '+dts-bundle', 'clean:dts'));

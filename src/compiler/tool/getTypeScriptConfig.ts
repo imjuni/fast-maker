@@ -1,5 +1,4 @@
 import consola from 'consola';
-import { fail, pass, PassFailEither } from 'my-only-either';
 import * as path from 'path';
 import typescript from 'typescript';
 
@@ -8,35 +7,25 @@ import typescript from 'typescript';
  *
  * @param tsconfigPath current working directory, target directory from cli or passed
  */
-export default async function getTypeScriptConfig({
-  tsconfigPath,
-}: {
-  tsconfigPath: string;
-}): Promise<PassFailEither<Error, typescript.ParsedCommandLine>> {
-  try {
-    consola.debug(`tsconfig file load from "${tsconfigPath}"`);
+export default async function getTypeScriptConfig(tsconfigPath: string): Promise<typescript.ParsedCommandLine> {
+  consola.debug(`tsconfig file load from "${tsconfigPath}"`);
 
-    const parseConfigHost: typescript.ParseConfigHost = {
-      fileExists: typescript.sys.fileExists,
-      readFile: typescript.sys.readFile,
-      readDirectory: typescript.sys.readDirectory,
-      useCaseSensitiveFileNames: true,
-    };
+  const parseConfigHost: typescript.ParseConfigHost = {
+    fileExists: typescript.sys.fileExists,
+    readFile: typescript.sys.readFile,
+    readDirectory: typescript.sys.readDirectory,
+    useCaseSensitiveFileNames: true,
+  };
 
-    const configFile = typescript.readConfigFile(tsconfigPath, typescript.sys.readFile);
+  const configFile = typescript.readConfigFile(tsconfigPath, typescript.sys.readFile);
 
-    const tsconfig = typescript.parseJsonConfigFileContent(
-      configFile.config,
-      parseConfigHost,
-      path.dirname(tsconfigPath),
-    );
+  const tsconfig = typescript.parseJsonConfigFileContent(
+    configFile.config,
+    parseConfigHost,
+    path.dirname(tsconfigPath),
+  );
 
-    consola.debug(`number of typescript source file: ${tsconfig.fileNames.length}`);
+  consola.debug(`number of typescript source file: ${tsconfig.fileNames.length}`);
 
-    return pass(tsconfig);
-  } catch (catched) {
-    const err = catched instanceof Error ? catched : new Error('unknown error raised');
-
-    return fail(err);
-  }
+  return tsconfig;
 }

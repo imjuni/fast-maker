@@ -1,6 +1,6 @@
 import IGetModuleInImports from '@compiler/interface/IGetModuleInImports';
 import getTypeSymbolText from '@compiler/tool/getTypeSymbolText';
-import { IOption } from '@module/IOption';
+import IConfig from '@config/interface/IConfig';
 import appendPostfixHash from '@tool/appendPostfixHash';
 import getHash from '@tool/getHash';
 import { isNotEmpty } from 'my-easy-fp';
@@ -10,7 +10,7 @@ import * as tsm from 'ts-morph';
 
 interface IGetLocalModuleInImports {
   source: tsm.SourceFile;
-  option: IOption;
+  option: IConfig;
   typeReferenceNodes: tsm.TypeReferenceNode[];
 }
 
@@ -26,7 +26,7 @@ export default function getLocalModuleInImports({
   const typeNames = typeReferenceNodes.map((typeReferenceNode) => typeReferenceNode.getTypeName().getText());
 
   const moduleSourceFilePath = source.getFilePath().toString();
-  const relativeFilePath = replaceSepToPosix(path.relative(option.path.output, moduleSourceFilePath));
+  const relativeFilePath = replaceSepToPosix(path.relative(option.output, moduleSourceFilePath));
   const moduleHash = getHash(relativeFilePath);
 
   const matchedTypeAliases = typeAliases.filter((typeAlias) => typeNames.includes(typeAlias.getName()));

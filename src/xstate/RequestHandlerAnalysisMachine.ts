@@ -9,10 +9,10 @@ import getTypeSymbolText from '@compiler/tool/getTypeSymbolText';
 import replaceTypeReferenceInTypeLiteral from '@compiler/tool/replaceTypeReferenceInTypeLiteral';
 import validatePropertySignature from '@compiler/validation/validatePropertySignature';
 import validateTypeReferences from '@compiler/validation/validateTypeReference';
+import IConfig from '@config/interface/IConfig';
 import dedupeImportConfiguration from '@generator/dedupeImportConfiguration';
 import getHandlerNameWithoutSquareBracket from '@generator/getHandlerNameWithoutSquareBracket';
 import getImportConfigurationFromResolutions from '@generator/getImportConfigurationFromResolutions';
-import { IOption } from '@module/IOption';
 import IRouteConfiguration from '@route/interface/IRouteConfiguration';
 import IRouteHandler from '@route/interface/IRouteHandler';
 import appendPostfixHash from '@tool/appendPostfixHash';
@@ -30,7 +30,7 @@ export interface IContextRequestHandlerAnalysisMachine {
   routeHandler: IRouteHandler;
   handler: IHandlerStatement;
   currentNode: number;
-  option: IOption;
+  option: IConfig;
   routeOption?: IOptionStatement;
   hash: string;
 

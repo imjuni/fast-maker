@@ -1,11 +1,11 @@
 import IImportConfiguration from '@compiler/interface/IImportConfiguration';
+import IConfig from '@config/interface/IConfig';
 import getHashedBindingCode from '@generator/getHashedBindingCode';
-import { IOption } from '@module/IOption';
 import { replaceSepToPosix } from 'my-node-fp';
 import * as path from 'path';
 
 interface IImportCodeGeneratorParam {
-  option: IOption;
+  option: IConfig;
   importConfigurations: IImportConfiguration[];
 }
 
@@ -31,7 +31,7 @@ export default function importCodeGenerator({ importConfigurations, option }: II
       namedBindings: importConfiguration.namedBindings,
     });
 
-    const relativePath = getRelativePath(option.path.output, importConfiguration.importFile, false);
+    const relativePath = getRelativePath(option.output, importConfiguration.importFile, false);
     return `import ${bindingCode} '${relativePath}';`;
   });
 
