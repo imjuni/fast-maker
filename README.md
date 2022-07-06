@@ -2,7 +2,7 @@
 [![Download Status](https://img.shields.io/npm/dw/fast-maker.svg)](https://npmcharts.com/compare/fast-maker?minimal=true) [![Github Star](https://img.shields.io/github/stars/imjuni/fast-maker.svg?style=popout)](https://github.com/imjuni/fast-maker) [![Github Issues](https://img.shields.io/github/issues-raw/imjuni/fast-maker.svg)](https://github.com/imjuni/fast-maker/issues) [![NPM version](https://img.shields.io/npm/v/fast-maker.svg)](https://www.npmjs.com/package/fast-maker) [![License](https://img.shields.io/npm/l/fast-maker.svg)](https://github.com/imjuni/fast-maker/blob/master/LICENSE) [![fast-maker](https://circleci.com/gh/imjuni/fast-maker.svg?style=shield)](https://app.circleci.com/pipelines/github/imjuni/fast-maker?branch=master)
 
 
-fast-maker is micro utility for fastify.js over 3.x. fast-maker inspired by codeigniter(in PHP) and Next.js auto routing algorithms. fast-maker auto generate route.ts file using directory structure futhermore include type declaration that inheritance RequestGenericInterface. This method have some benefits. See below.
+fast-maker is micro utility for [fastify.js](https://www.fastify.io/) over 3.x. fast-maker inspired by codeigniter(in PHP) and Next.js auto routing algorithms. fast-maker auto generate route.ts file using directory structure futhermore include type declaration that inheritance RequestGenericInterface. This method have some benefits. See below.
 
 1. So keep similar code style of route handler function
 1. More focus about business logic
