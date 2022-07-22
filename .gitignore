@@ -69,3 +69,4 @@ artifact/
 
 # Example
 example/handlers/route.ts
+.eslintcache

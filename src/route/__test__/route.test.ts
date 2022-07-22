@@ -140,9 +140,9 @@ test('getRouteFiles', async () => {
       routePath: '/dc/world',
     },
     {
-      filename: posixJoin(env.handlerPath, 'post/hello.ts'),
+      filename: posixJoin(env.handlerPath, 'post/hello2.ts'),
       method: 'post',
-      routePath: '/hello',
+      routePath: '/hello2',
     },
     {
       filename: posixJoin(env.handlerPath, 'put/hello.ts'),
