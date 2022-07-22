@@ -35,7 +35,7 @@ task('clean:dts', async () => {
 });
 
 task('lint', async () => {
-  const cmd = 'eslint --no-ignore --ext ts,tsx,json ./src/**/*';
+  const cmd = 'eslint --cache --ext ts,tsx,json .';
 
   await exec(cmd, {
     stderr: process.stderr,

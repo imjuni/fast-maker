@@ -297,6 +297,11 @@ const requestHandlerAnalysisMachine = (
           const next = { ...context };
           const sourceFilePath = context.source.getFilePath().toString();
 
+          // TODO: 관련 코드에 [filenamify](https://github.com/sindresorhus/filenamify)와
+          // [valid-filename](https://github.com/sindresorhus/valid-filename)를
+          // 적용하고, valid 아닌 경우 IReason으로 경고도 출력한다
+
+          // apply filenamify, valid-filename after display IReason by warn
           const routeFileImportConfiguration: IImportConfiguration = {
             hash: next.hash,
             namedBindings: isNotEmpty(next.routeOption)

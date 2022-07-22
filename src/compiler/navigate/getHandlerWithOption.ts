@@ -6,10 +6,13 @@ import * as tsm from 'ts-morph';
 
 /**
  * 파일에 선언된 http handler를 가져온다. async/sync 구분을 하고 function, arrow function을 구분한다
- * @param source 타입스크립트 소스 파일
+ *
+ * Route handler get from sourceFile object. After collect information that async/sync and classify
+ * function and arrow function
+ * @param sourceFile TypeScript source file object, tsm.SourceFile object
  */
-export default function getHandlerWithOption(source: tsm.SourceFile): THandlerNode[] {
-  const declarationMap = source.getExportedDeclarations();
+export default function getHandlerWithOption(sourceFile: tsm.SourceFile): THandlerNode[] {
+  const declarationMap = sourceFile.getExportedDeclarations();
   const defaultExportedNodes = declarationMap.get('default');
   const optionNamedExportedNodes = declarationMap.get('option');
 
