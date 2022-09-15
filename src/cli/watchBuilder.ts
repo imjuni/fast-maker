@@ -6,6 +6,7 @@ export default function builder(args: Argv<IConfig & IWatchConfig>): Argv<IConfi
   args.option('debounceTime', {
     description: 'watch file debounceTime',
     type: 'number',
+    default: 1000,
   });
 
   return args;

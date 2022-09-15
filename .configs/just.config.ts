@@ -43,15 +43,6 @@ task('lint', async () => {
   });
 });
 
-task('tsc', async () => {
-  const cmd = 'tsc --incremental -p ./tsconfig.json';
-
-  await exec(cmd, {
-    stderr: process.stderr,
-    stdout: process.stdout,
-  });
-});
-
 task('+dts-bundle', async () => {
   const cmd = 'dts-bundle-generator --no-banner dist/src/fast-maker.d.ts -o dist/fast-maker.d.ts';
   await exec(cmd, { stderr: process.stderr, stdout: process.stdout });
@@ -75,13 +66,15 @@ task('+pub:prod', async () => {
   });
 });
 
-task('+build:dev', async () => {
+task('+rollup:prod', async () => {
   const env = {
     DEBUG: 'frm:*',
     NODE_ENV: 'production',
   };
 
-  const cmd = `cross-env ${getEnvironmentPrefix(env)} webpack --config ./.config/webpack.config.dev.js`;
+  const cmd = `cross-env ${getEnvironmentPrefix(
+    env,
+  )} rollup --config ./.configs/rollup.config.prod.ts --configPlugin ts`;
 
   logger.info('Script Build: ', cmd);
 
@@ -91,13 +84,15 @@ task('+build:dev', async () => {
   });
 });
 
-task('+build:prod', async () => {
+task('+rollup:dev', async () => {
   const env = {
     DEBUG: 'frm:*',
     NODE_ENV: 'production',
   };
 
-  const cmd = `cross-env ${getEnvironmentPrefix(env)} webpack --config ./.config/webpack.config.prod.js`;
+  const cmd = `cross-env ${getEnvironmentPrefix(
+    env,
+  )} rollup --config ./.configs/rollup.config.dev.ts --configPlugin ts`;
 
   logger.info('Script Build: ', cmd);
 
@@ -107,8 +102,19 @@ task('+build:prod', async () => {
   });
 });
 
-task('build', series('clean', 'lint', '+build:dev'));
-task('pub', series('clean', 'lint', '+build:dev', '+pub'));
-task('pub:prod', series('clean', 'lint', '+build:prod', '+pub:prod'));
-task('build:dev', series('clean', 'lint', '+build:dev', '+dts-bundle', 'clean:dts'));
-task('build:prod', series('clean', 'lint', '+build:prod', '+dts-bundle', 'clean:dts'));
+task('+tsc', async () => {
+  const cmd = 'tsc --project ./tsconfig.json  --incremental';
+
+  logger.info('TypeScript compiler build: ', cmd);
+
+  await exec(cmd, {
+    stderr: process.stderr,
+    stdout: process.stdout,
+  });
+});
+
+task('build', series('clean', 'lint', '+tsc'));
+task('pub', series('clean', 'lint', '+rollup:dev', '+pub'));
+task('pub:prod', series('clean', 'lint', '+rollup:prod', '+pub:prod'));
+task('rollup:prod', series('clean', 'lint', '+rollup:prod'));
+task('rollup:dev', series('clean', 'lint', '+rollup:dev'));

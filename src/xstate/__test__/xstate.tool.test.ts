@@ -36,11 +36,13 @@ beforeAll(async () => {
     handler: env.handlerPath,
     o: env.handlerPath,
     output: env.handlerPath,
+    useDefaultExport: true,
+    routeFunctionName: 'routing',
   };
 });
 
 test('t001-FSM-TypeLiteral', async () => {
-  const expectFileName = expect.getState().currentTestName.replace(/^([tT][0-9]+)(-.+)/, 'expect$2.ts');
+  const expectFileName = expect.getState().currentTestName?.replace(/^([tT][0-9]+)(-.+)/, 'expect$2.ts') ?? 'N/A';
 
   // project://example\handlers\get\justice\world.ts
   // project://example\handlers\get\xman\world.ts
@@ -106,7 +108,7 @@ test('t001-FSM-TypeLiteral', async () => {
 });
 
 test('t002-FSM-FastifyRequest', async () => {
-  const expectFileName = expect.getState().currentTestName.replace(/^([tT][0-9]+)(-.+)/, 'expect$2.ts');
+  const expectFileName = expect.getState().currentTestName?.replace(/^([tT][0-9]+)(-.+)/, 'expect$2.ts') ?? 'N/A';
 
   // project://example\handlers\get\justice\world.ts
   // project://example\handlers\get\xman\world.ts

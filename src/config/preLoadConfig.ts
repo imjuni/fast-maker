@@ -3,13 +3,13 @@ import consola from 'consola';
 import * as findUp from 'find-up';
 import * as fs from 'fs';
 import { parse } from 'jsonc-parser';
-import minimist from 'minimist';
 import { isEmpty, isError, isFalse, isNotEmpty } from 'my-easy-fp';
 import { existsSync } from 'my-node-fp';
+import yargs from 'yargs';
 
 export default function preLoadConfig() {
   try {
-    const argv = minimist([...process.argv.slice(2)]);
+    const argv = yargs(process.argv.slice(2)).parseSync() as any;
 
     const configFilePath =
       isNotEmpty(argv.config) || isNotEmpty(argv.c) ? findUp.sync([argv.config, argv.c]) : findUp.sync('.fastmakerrc');
@@ -37,6 +37,10 @@ export default function preLoadConfig() {
 
       v: argv.v ?? argv.verbose ?? rawConfig.v ?? rawConfig.verbose,
       verbose: argv.v ?? argv.verbose ?? rawConfig.v ?? rawConfig.verbose,
+
+      useDefaultExport: argv.useDefaultExport ?? rawConfig.useDefaultExport,
+
+      routeFunctionName: argv.routeFunctionName ?? rawConfig.routeFunctionName,
     };
 
     return config;

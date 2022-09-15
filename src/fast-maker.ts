@@ -72,7 +72,9 @@ export async function generateRouteFile(
       `import { FastifyInstance } from 'fastify';`,
       ...importCodes,
       '\n',
-      `export default function routing(fastify: FastifyInstance): void {`,
+      `export ${config.useDefaultExport ? 'default ' : ''}function ${
+        config.routeFunctionName
+      }(fastify: FastifyInstance): void {`,
       ...routeCodes,
       `}`,
     ];
