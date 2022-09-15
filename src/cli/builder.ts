@@ -24,6 +24,17 @@ export default function builder(args: Argv<IConfig>): Argv<IConfig> {
       alias: 'v',
       description: 'display verbose message',
       type: 'boolean',
+      default: false,
+    })
+    .option('useDefaultExport', {
+      description: 'route function in output file that use default export',
+      type: 'boolean',
+      default: true,
+    })
+    .option('routeFunctionName', {
+      description: 'rotue function name',
+      type: 'string',
+      default: 'routing',
     })
     .demandOption(['project', 'handler']);
 

@@ -24,6 +24,8 @@ export default function getConcreteConfig(partialConfig: Partial<IConfig>): ICon
     p: project,
     v: partialConfig.v ?? partialConfig.verbose ?? false,
     verbose: partialConfig.v ?? partialConfig.verbose ?? false,
+    useDefaultExport: partialConfig.useDefaultExport ?? true,
+    routeFunctionName: partialConfig.routeFunctionName ?? 'routing',
   };
 
   return config;

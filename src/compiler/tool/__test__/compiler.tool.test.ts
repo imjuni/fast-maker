@@ -32,6 +32,8 @@ beforeAll(async () => {
     handler: env.handlerPath,
     o: env.handlerPath,
     output: env.handlerPath,
+    useDefaultExport: true,
+    routeFunctionName: 'routing',
   };
 });
 

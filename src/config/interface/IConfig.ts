@@ -21,4 +21,16 @@ export default interface IConfig {
   /** verbose message display */
   v: boolean;
   verbose: boolean;
+
+  /**
+   * route function in output file that use default export
+   * @default true
+   *  */
+  useDefaultExport: boolean;
+
+  /**
+   * rotue function name
+   * @default routing
+   */
+  routeFunctionName: string;
 }

@@ -2,13 +2,13 @@ import cliProgesss from 'cli-progress';
 import { isFalse } from 'my-easy-fp';
 
 class Progress {
-  private _enable: boolean;
+  #enable: boolean;
 
-  private _bar: cliProgesss.SingleBar;
+  #bar: cliProgesss.SingleBar;
 
   constructor() {
-    this._enable = true;
-    this._bar = new cliProgesss.SingleBar(
+    this.#enable = true;
+    this.#bar = new cliProgesss.SingleBar(
       {
         format: 'PROGRESS | {bar} | {value}/{total} Files',
         barCompleteChar: '\u25A0',
@@ -20,39 +20,39 @@ class Progress {
   }
 
   get enable(): boolean {
-    return this._enable;
+    return this.#enable;
   }
 
   set enable(enable) {
-    this._enable = enable;
+    this.#enable = enable;
   }
 
   start(total: number, startValue: number) {
-    if (isFalse(this._enable)) {
+    if (isFalse(this.#enable)) {
       return;
     }
 
-    this._bar.start(total, startValue);
+    this.#bar.start(total, startValue);
   }
 
   increment() {
-    if (isFalse(this._enable)) {
+    if (isFalse(this.#enable)) {
       return;
     }
 
-    this._bar.increment();
+    this.#bar.increment();
   }
 
   update(updateValue: number) {
-    if (isFalse(this._enable)) {
+    if (isFalse(this.#enable)) {
       return;
     }
 
-    this._bar.update(updateValue);
+    this.#bar.update(updateValue);
   }
 
   stop() {
-    this._bar.stop();
+    this.#bar.stop();
   }
 }
 
