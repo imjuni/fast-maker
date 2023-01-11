@@ -12,9 +12,9 @@
       }
     },
     {
-      "files": ".tjsclirc",
+      "files": ".eslintrc",
       "options": {
-        "parser": "json5"
+        "parser": "json"
       }
     },
     {
