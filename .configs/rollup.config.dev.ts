@@ -15,8 +15,7 @@ export default [
     plugins: [
       nodeResolve({
         resolveOnly: (module) => {
-          const isLocal = pkg?.dependencies?.[module] == null && pkg?.devDependencies?.[module] == null;
-          return isLocal;
+          return pkg?.dependencies?.[module] == null && pkg?.devDependencies?.[module] == null;
         },
       }),
       ts({ tsconfig: 'tsconfig.json' }),
@@ -39,8 +38,7 @@ export default [
     plugins: [
       nodeResolve({
         resolveOnly: (module) => {
-          const isLocal = pkg?.dependencies?.[module] == null && pkg?.devDependencies?.[module] == null;
-          return isLocal;
+          return pkg?.dependencies?.[module] == null && pkg?.devDependencies?.[module] == null;
         },
       }),
       ts({ tsconfig: 'tsconfig.json' }),

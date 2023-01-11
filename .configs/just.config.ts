@@ -1,16 +1,12 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import { logger, option, series, task } from 'just-scripts';
-import { exec } from 'just-scripts-utils';
+import execa from 'execa';
+import { series, task } from 'just-task';
 import * as uuid from 'uuid';
 
-option('env', { default: { env: 'develop' } });
-
-function getEnvironmentPrefix(env: Record<string, string | boolean>): string {
-  const envPrefix = Object.entries(env)
-    .map(([key, value]) => `${key}=${value}`)
-    .join(' ');
-
-  return envPrefix;
+function splitArgs(args: string): string[] {
+  return args
+    .split(' ')
+    .map((line) => line.trim())
+    .filter((line) => line != null && line !== '');
 }
 
 task('uid', () => {
@@ -21,37 +17,29 @@ task('uid', () => {
 });
 
 task('clean', async () => {
-  const cmd = 'rimraf dist artifact';
+  const cmd = 'rimraf';
+  const option = 'dist artifact';
 
-  await exec(cmd, {
+  await execa(cmd, splitArgs(option), {
     stderr: process.stderr,
     stdout: process.stdout,
   });
-});
-
-task('clean:dts', async () => {
-  const cmd = 'rimraf dist/src dist/example';
-  await exec(cmd, { stderr: process.stderr, stdout: process.stdout });
 });
 
 task('lint', async () => {
-  const cmd = 'eslint --cache .';
+  const cmd = 'eslint';
+  const option = '--cache .';
 
-  await exec(cmd, {
+  await execa(cmd, splitArgs(option), {
     stderr: process.stderr,
     stdout: process.stdout,
   });
-});
-
-task('+dts-bundle', async () => {
-  const cmd = 'dts-bundle-generator --no-banner dist/src/fast-maker.d.ts -o dist/fast-maker.d.ts';
-  await exec(cmd, { stderr: process.stderr, stdout: process.stdout });
 });
 
 task('+pub', async () => {
   const cmd = 'npm publish --registry http://localhost:8901 --force';
 
-  await exec(cmd, {
+  await execa(cmd, {
     stderr: process.stderr,
     stdout: process.stdout,
   });
@@ -60,54 +48,41 @@ task('+pub', async () => {
 task('+pub:prod', async () => {
   const cmd = 'npm publish --registry https://registry.npmjs.org --access=public';
 
-  await exec(cmd, {
+  await execa(cmd, {
     stderr: process.stderr,
     stdout: process.stdout,
   });
 });
 
 task('+rollup:prod', async () => {
-  const env = {
-    DEBUG: 'frm:*',
-    NODE_ENV: 'production',
-  };
+  const cmd = 'rollup';
+  const option = '--config ./.configs/rollup.config.prod.ts --configPlugin ts';
 
-  const cmd = `cross-env ${getEnvironmentPrefix(
-    env,
-  )} rollup --config ./.configs/rollup.config.prod.ts --configPlugin ts`;
-
-  logger.info('Script Build: ', cmd);
-
-  await exec(cmd, {
+  await execa(cmd, splitArgs(option), {
+    env: {
+      DEBUG: 'frm:*',
+      NODE_ENV: 'production',
+    },
     stderr: process.stderr,
     stdout: process.stdout,
   });
 });
 
 task('+rollup:dev', async () => {
-  const env = {
-    DEBUG: 'frm:*',
-    NODE_ENV: 'production',
-  };
+  const cmd = 'rollup';
+  const option = '--config ./.configs/rollup.config.dev.ts --configPlugin ts';
 
-  const cmd = `cross-env ${getEnvironmentPrefix(
-    env,
-  )} rollup --config ./.configs/rollup.config.dev.ts --configPlugin ts`;
-
-  logger.info('Script Build: ', cmd);
-
-  await exec(cmd, {
+  await execa(cmd, splitArgs(option), {
     stderr: process.stderr,
     stdout: process.stdout,
   });
 });
 
 task('+tsc', async () => {
-  const cmd = 'tsc --project ./tsconfig.json  --incremental';
+  const cmd = 'tsc';
+  const option = '--project ./tsconfig.json  --incremental';
 
-  logger.info('TypeScript compiler build: ', cmd);
-
-  await exec(cmd, {
+  await execa(cmd, splitArgs(option), {
     stderr: process.stderr,
     stdout: process.stdout,
   });
