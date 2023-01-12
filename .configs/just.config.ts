@@ -36,6 +36,16 @@ task('lint', async () => {
   });
 });
 
+task('prettier', async () => {
+  const cmd = 'prettier';
+  const option = '--write src/**/*.ts';
+
+  await execa(cmd, splitArgs(option), {
+    stderr: process.stderr,
+    stdout: process.stdout,
+  });
+});
+
 task('+pub', async () => {
   const cmd = 'npm publish --registry http://localhost:8901 --force';
 

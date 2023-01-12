@@ -1,54 +1,45 @@
-import IConfig from '#config/interface/IConfig';
 import logger from '#tool/logger';
 import * as findUp from 'find-up';
 import * as fs from 'fs';
 import { parse } from 'jsonc-parser';
-import { isEmpty, isError, isFalse, isNotEmpty } from 'my-easy-fp';
-import { existsSync } from 'my-node-fp';
-import yargs from 'yargs';
+import minimist from 'minimist';
+import { getDirnameSync } from 'my-node-fp';
 
 const log = logger();
 
+function getConfigFilePath(argv: minimist.ParsedArgs, projectPath?: string) {
+  const argvConfigFilePath = argv.c ?? argv.config;
+  const projectDirPath = projectPath != null ? getDirnameSync(projectPath) : undefined;
+
+  const configFilePathSearchResultOnCwd = findUp.sync('.ctirc');
+  const configFilePathSearchProjectDirPath =
+    projectDirPath != null ? findUp.sync('.ctirc', { cwd: projectDirPath }) : undefined;
+
+  return argvConfigFilePath ?? configFilePathSearchResultOnCwd ?? configFilePathSearchProjectDirPath;
+}
+
 export default function preLoadConfig() {
   try {
-    const argv = yargs(process.argv.slice(2)).parseSync() as any;
+    const argv = minimist(process.argv.slice(2));
 
-    const configFilePath =
-      isNotEmpty(argv.config) || isNotEmpty(argv.c) ? findUp.sync([argv.config, argv.c]) : findUp.sync('.fastmakerrc');
+    const tsconfigPath =
+      argv.project != null || argv.p != null ? findUp.sync([argv.project, argv.p]) : findUp.sync('tsconfig.json');
 
-    if (isEmpty(configFilePath) || isFalse(existsSync(configFilePath))) {
-      return {};
-    }
+    const configFilePath = getConfigFilePath(argv, tsconfigPath);
+    const config = configFilePath != null ? parse(fs.readFileSync(configFilePath).toString()) : {};
 
-    const configBuf = fs.readFileSync(configFilePath);
-    const rawConfig: Partial<IConfig> = parse(configBuf.toString());
-    const config: Partial<IConfig> = {
+    return {
+      ...config,
+      p: tsconfigPath,
+      project: tsconfigPath,
       c: configFilePath,
       config: configFilePath,
-
-      debugLog: argv.debugLog ?? rawConfig.debugLog ?? false,
-
-      h: argv.h ?? argv.handler ?? rawConfig.h ?? rawConfig.handler,
-      handler: argv.h ?? argv.handler ?? rawConfig.h ?? rawConfig.handler,
-
-      o: argv.o ?? argv.output ?? rawConfig.o ?? rawConfig.output ?? rawConfig.handler,
-      output: argv.o ?? argv.output ?? rawConfig.o ?? rawConfig.output ?? rawConfig.handler,
-
-      p: argv.p ?? argv.project ?? rawConfig.p ?? rawConfig.project,
-      project: argv.p ?? argv.project ?? rawConfig.p ?? rawConfig.project,
-
-      v: argv.v ?? argv.verbose ?? rawConfig.v ?? rawConfig.verbose,
-      verbose: argv.v ?? argv.verbose ?? rawConfig.v ?? rawConfig.verbose,
-
-      useDefaultExport: argv.useDefaultExport ?? rawConfig.useDefaultExport,
-
-      routeFunctionName: argv.routeFunctionName ?? rawConfig.routeFunctionName,
     };
-
-    return config;
   } catch (catched) {
-    const err = isError(catched) ?? new Error('unknown error raised');
+    const err = catched instanceof Error ? catched : new Error('unknown error raised');
+
     log.error(err);
+    log.error(err.stack);
 
     return {};
   }

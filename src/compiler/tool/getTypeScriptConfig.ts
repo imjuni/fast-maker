@@ -1,6 +1,6 @@
 import logger from '#tool/logger';
 import * as path from 'path';
-import typescript from 'typescript';
+import ts from 'typescript';
 
 const log = logger();
 
@@ -9,23 +9,19 @@ const log = logger();
  *
  * @param tsconfigPath current working directory, target directory from cli or passed
  */
-export default async function getTypeScriptConfig(tsconfigPath: string): Promise<typescript.ParsedCommandLine> {
+export default async function getTypeScriptConfig(tsconfigPath: string): Promise<ts.ParsedCommandLine> {
   log.debug(`tsconfig file load from "${tsconfigPath}"`);
 
-  const parseConfigHost: typescript.ParseConfigHost = {
-    fileExists: typescript.sys.fileExists,
-    readFile: typescript.sys.readFile,
-    readDirectory: typescript.sys.readDirectory,
+  const parseConfigHost: ts.ParseConfigHost = {
+    fileExists: ts.sys.fileExists,
+    readFile: ts.sys.readFile,
+    readDirectory: ts.sys.readDirectory,
     useCaseSensitiveFileNames: true,
   };
 
-  const configFile = typescript.readConfigFile(tsconfigPath, typescript.sys.readFile);
+  const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
 
-  const tsconfig = typescript.parseJsonConfigFileContent(
-    configFile.config,
-    parseConfigHost,
-    path.dirname(tsconfigPath),
-  );
+  const tsconfig = ts.parseJsonConfigFileContent(configFile.config, parseConfigHost, path.dirname(tsconfigPath));
 
   log.debug(`number of typescript source file: ${tsconfig.fileNames.length}`);
 
