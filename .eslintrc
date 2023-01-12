@@ -4,7 +4,13 @@
     "es6": true,
     "node": true
   },
-  "extends": ["plugin:@typescript-eslint/eslint-recommended", "airbnb-typescript/base", "plugin:prettier/recommended"],
+  "extends": [
+    "plugin:@typescript-eslint/eslint-recommended",
+    "airbnb-base",
+    "airbnb-typescript/base",
+    "plugin:prettier/recommended",
+    "prettier"
+  ],
   "ignorePatterns": [
     "__test__/*",
     "__tests__/*",
@@ -23,7 +29,6 @@
   },
   "plugins": ["@typescript-eslint", "prettier", "import"],
   "rules": {
-    "prettier/prettier": "error",
     "max-len": [
       "error",
       {
@@ -45,5 +50,11 @@
     ],
     "import/extensions": ["off"]
   },
-  "settings": {}
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true
+      }
+    }
+  }
 }

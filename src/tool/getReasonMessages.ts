@@ -1,12 +1,12 @@
 import IReason from '#compiler/interface/IReason';
 import chalk from 'chalk';
 import { isEmpty } from 'my-easy-fp';
-import * as path from 'path';
+import path from 'path';
 
-export default function messageDisplay(reasons: IReason[]): void {
-  console.log('');
+export default function getReasonMessages(reasons: IReason[]): string {
+  const messages = reasons.map((reason) => {
+    const messageBuf = [''];
 
-  reasons.forEach((reason) => {
     const typeMessage =
       reason.type === 'error'
         ? chalk.bgRed(`   ${reason.type.toUpperCase()}   `)
@@ -20,21 +20,28 @@ export default function messageDisplay(reasons: IReason[]): void {
 
     const chevronRight = reason.type === 'error' ? chalk.red('>') : chalk.yellow('>');
 
-    console.log(typeMessage, filename);
+    messageBuf.push(`${typeMessage} ${filename}`);
 
     if (isEmpty(reason.lineAndCharacter)) {
-      console.log(`   ${chevronRight} ${chalk.gray(`${filePath}`)}`);
+      messageBuf.push(`   ${chevronRight} ${chalk.gray(`${filePath}`)}`);
     } else {
-      console.log(
+      messageBuf.push(
         `   ${chevronRight} ${chalk.gray(
           `${filePath}:${reason.lineAndCharacter.line}:${reason.lineAndCharacter.character}`,
         )}`,
       );
     }
-    reason.message.split('\n').forEach((splittedMessage) => {
-      console.log(`   ${chevronRight} ${chalk.gray(splittedMessage.trim())}`);
-    });
 
-    console.log('');
+    messageBuf.push(
+      ...reason.message.split('\n').map((splittedMessage) => {
+        return `   ${chevronRight} ${chalk.gray(splittedMessage.trim())}`;
+      }),
+    );
+
+    messageBuf.push('');
+
+    return messageBuf;
   });
+
+  return messages.flat().join('\n');
 }

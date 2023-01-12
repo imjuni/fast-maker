@@ -1,5 +1,4 @@
 import IConfig from '#config/interface/IConfig';
-import * as path from 'path';
 import { Argv } from 'yargs';
 
 export default function builder(args: Argv<IConfig>): Argv<IConfig> {
@@ -13,7 +12,6 @@ export default function builder(args: Argv<IConfig>): Argv<IConfig> {
       alias: 'c',
       description: 'pass configuration file path, default value is cwd(current working directory)',
       type: 'string',
-      default: path.join(process.cwd(), '.fastmakerrc'),
     })
     .option('project', {
       alias: 'p',
