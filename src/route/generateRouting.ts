@@ -1,5 +1,5 @@
-import progress from '#cli/progress';
-import spinner from '#cli/spinner';
+import progress from '#cli/display/progress';
+import spinner from '#cli/display/spinner';
 import IReason from '#compiler/interface/IReason';
 import getTypeScriptProject from '#compiler/tool/getTypeScriptProject';
 import IConfig from '#config/interface/IConfig';

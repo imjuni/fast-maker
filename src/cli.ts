@@ -1,5 +1,5 @@
-import configBuilder from '#cli/builder';
-import watchBuilder from '#cli/watchBuilder';
+import builder from '#cli/builder/builder';
+import watchBuilder from '#cli/builder/watchBuilder';
 import IConfig from '#config/interface/IConfig';
 import IWatchConfig from '#config/interface/IWatchConfig';
 import isValidConfig from '#config/isValidConfig';
@@ -20,7 +20,7 @@ const log = logger();
 const routeCmd: CommandModule<IConfig, IConfig> = {
   command: 'route',
   describe: 'create route.ts file in your directory using by tsconfig.json',
-  builder: configBuilder,
+  builder,
   handler: async (args) => {
     try {
       const generatedCode = await generateRouting(args, { message: true, spinner: true, progress: true });
@@ -43,8 +43,8 @@ const watchCmd: CommandModule<IConfig & IWatchConfig, IConfig & IWatchConfig> = 
   command: 'watch',
   describe: 'watch for create route.ts file in your directory using by tsconfig.json',
   builder: (args) => {
-    return [configBuilder, watchBuilder].reduce((nextArgs, builder) => {
-      return builder(nextArgs);
+    return [builder, watchBuilder].reduce((nextArgs, current) => {
+      return current(nextArgs);
     }, args as any);
   },
   handler: async (args: Arguments<IConfig & IWatchConfig>) => {

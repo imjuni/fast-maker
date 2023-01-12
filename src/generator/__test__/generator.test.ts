@@ -5,7 +5,7 @@ import getResolvedModuleInImports from '#compiler/tool/getResolvedModuleInImport
 import getTypeReferences from '#compiler/tool/getTypeReferences';
 import replaceTypeReferenceInTypeLiteral from '#compiler/tool/replaceTypeReferenceInTypeLiteral';
 import IConfig from '#config/interface/IConfig';
-import * as env from '#testenv/env';
+import * as env from '#test-tools/env';
 import logger from '#tool/logger';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';

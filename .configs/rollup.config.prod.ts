@@ -1,4 +1,5 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import terser from '@rollup/plugin-terser';
 import readPackage from 'read-pkg';
 import ts from 'rollup-plugin-ts';
 
@@ -19,10 +20,11 @@ export default [
         },
       }),
       ts({ tsconfig: 'tsconfig.prod.json' }),
+      terser(),
     ],
   },
   {
-    input: 'src/fast-maker.ts',
+    input: 'src/index.ts',
     output: [
       {
         format: 'cjs',
@@ -43,6 +45,7 @@ export default [
         },
       }),
       ts({ tsconfig: 'tsconfig.prod.json' }),
+      terser(),
     ],
   },
 ];

@@ -5,7 +5,7 @@ import getTypeReferences from '#compiler/tool/getTypeReferences';
 import validatePropertySignature from '#compiler/validation/validatePropertySignature';
 import validateTypeReferences from '#compiler/validation/validateTypeReference';
 import IConfig from '#config/interface/IConfig';
-import * as env from '#testenv/env';
+import * as env from '#test-tools/env';
 import logger from '#tool/logger';
 import posixJoin from '#tool/posixJoin';
 import 'jest';

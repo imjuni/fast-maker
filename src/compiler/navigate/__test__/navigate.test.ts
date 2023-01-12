@@ -3,7 +3,7 @@ import getArrowFunctionWithModifier from '#compiler/navigate/getArrowFunctionWit
 import getFunctionDeclarationWithModifier from '#compiler/navigate/getFunctionDeclarationWithModifier';
 import getHandlerWithOption from '#compiler/navigate/getHandlerWithOption';
 import getPropertySignatures from '#compiler/navigate/getPropertySignatures';
-import * as env from '#testenv/env';
+import * as env from '#test-tools/env';
 import logger from '#tool/logger';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';
