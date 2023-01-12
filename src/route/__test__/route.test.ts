@@ -1,8 +1,8 @@
-import getHandlerFile from '@route/getHandlerFile';
-import getRouteFiles from '@route/getRouteFiles';
-import getRoutePath from '@route/getRoutePath';
-import * as env from '@testenv/env';
-import posixJoin from '@tool/posixJoin';
+import getHandlerFile from '#route/getHandlerFile';
+import getRouteFiles from '#route/getRouteFiles';
+import getRoutePath from '#route/getRoutePath';
+import * as env from '#testenv/env';
+import posixJoin from '#tool/posixJoin';
 import 'jest';
 import path from 'path';
 

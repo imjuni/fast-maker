@@ -1,4 +1,4 @@
-import TMethodType from '@route/interface/TMethodType';
+import TMethodType from '#route/interface/TMethodType';
 
 export default interface IRouteHandler {
   filename: string;

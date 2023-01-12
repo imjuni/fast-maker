@@ -1,5 +1,5 @@
-import getMethod from '@route/getMethod';
-import IRouteHandler from '@route/interface/IRouteHandler';
+import getMethod from '#route/getMethod';
+import IRouteHandler from '#route/interface/IRouteHandler';
 import consola from 'consola';
 import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix, startSepAppend, startSepRemove } from 'my-node-fp';

@@ -1,8 +1,8 @@
-import IGetModuleInImports from '@compiler/interface/IGetModuleInImports';
-import getTypeSymbolText from '@compiler/tool/getTypeSymbolText';
-import IConfig from '@config/interface/IConfig';
-import appendPostfixHash from '@tool/appendPostfixHash';
-import getHash from '@tool/getHash';
+import IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
+import getTypeSymbolText from '#compiler/tool/getTypeSymbolText';
+import IConfig from '#config/interface/IConfig';
+import appendPostfixHash from '#tool/appendPostfixHash';
+import getHash from '#tool/getHash';
 import { isNotEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
 import path from 'path';

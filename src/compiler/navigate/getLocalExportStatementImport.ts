@@ -1,5 +1,5 @@
-import IImportConfiguration from '@compiler/interface/IImportConfiguration';
-import getTypeSymbolText from '@compiler/tool/getTypeSymbolText';
+import IImportConfiguration from '#compiler/interface/IImportConfiguration';
+import getTypeSymbolText from '#compiler/tool/getTypeSymbolText';
 import { isNotEmpty } from 'my-easy-fp';
 import * as tsm from 'ts-morph';
 

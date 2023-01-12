@@ -1,5 +1,5 @@
-import IImportConfiguration from '@compiler/interface/IImportConfiguration';
-import getHandlerNameWithoutSquareBracket from '@generator/getHandlerNameWithoutSquareBracket';
+import IImportConfiguration from '#compiler/interface/IImportConfiguration';
+import getHandlerNameWithoutSquareBracket from '#generator/getHandlerNameWithoutSquareBracket';
 import { isNotEmpty } from 'my-easy-fp';
 
 export default function getHashedBindingCode({

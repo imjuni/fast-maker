@@ -1,5 +1,5 @@
-import validParamNames from '@compiler/validation/validParamNames';
-import fuzzyWithCase, { type IFuzzyWithCaseReturn } from '@tool/fuzzyWithCase';
+import validParamNames from '#compiler/validation/validParamNames';
+import fuzzyWithCase, { type IFuzzyWithCaseReturn } from '#tool/fuzzyWithCase';
 import { isFalse, isNotEmpty } from 'my-easy-fp';
 import * as tsm from 'ts-morph';
 

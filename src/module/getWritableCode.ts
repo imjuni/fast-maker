@@ -1,10 +1,10 @@
-import IImportConfiguration from '@compiler/interface/IImportConfiguration';
-import IConfig from '@config/interface/IConfig';
-import dedupeImportConfiguration from '@generator/dedupeImportConfiguration';
-import importCodeGenerator from '@generator/importCodeGenerator';
-import routeCodeGenerator from '@generator/routeCodeGenerator';
-import IRouteConfiguration from '@route/interface/IRouteConfiguration';
-import type { IContextRequestHandlerAnalysisMachine as IAnalysisMachineContext } from '@xstate/RequestHandlerAnalysisMachine';
+import IImportConfiguration from '#compiler/interface/IImportConfiguration';
+import IConfig from '#config/interface/IConfig';
+import dedupeImportConfiguration from '#generator/dedupeImportConfiguration';
+import importCodeGenerator from '#generator/importCodeGenerator';
+import routeCodeGenerator from '#generator/routeCodeGenerator';
+import IRouteConfiguration from '#route/interface/IRouteConfiguration';
+import type { IContextRequestHandlerAnalysisMachine as IAnalysisMachineContext } from '#xstate/RequestHandlerAnalysisMachine';
 
 export default function getWritableCode(
   routesAnalysised: Pick<IAnalysisMachineContext, 'importBox' | 'routeBox' | 'messages'>[],

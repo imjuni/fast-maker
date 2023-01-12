@@ -1,4 +1,4 @@
-import IConfig from '@config/interface/IConfig';
+import IConfig from '#config/interface/IConfig';
 import * as path from 'path';
 import { Argv } from 'yargs';
 

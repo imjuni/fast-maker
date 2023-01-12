@@ -1,5 +1,5 @@
-import IConfig from '@config/interface/IConfig';
-import IRouteConfiguration from '@route/interface/IRouteConfiguration';
+import IConfig from '#config/interface/IConfig';
+import IRouteConfiguration from '#route/interface/IRouteConfiguration';
 import { isNotEmpty } from 'my-easy-fp';
 
 interface IRouteCodeGenerator {

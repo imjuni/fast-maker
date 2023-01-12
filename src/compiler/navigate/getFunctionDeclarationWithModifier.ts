@@ -1,4 +1,4 @@
-import { IHandlerStatement } from '@compiler/interface/THandlerNode';
+import { IHandlerStatement } from '#compiler/interface/THandlerNode';
 import { isEmpty } from 'my-easy-fp';
 import * as tsm from 'ts-morph';
 

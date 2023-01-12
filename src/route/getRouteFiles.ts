@@ -1,7 +1,7 @@
-import getHandlerFile from '@route/getHandlerFile';
-import getRoutePath from '@route/getRoutePath';
-import IRouteHandler from '@route/interface/IRouteHandler';
-import methods from '@route/interface/methods';
+import getHandlerFile from '#route/getHandlerFile';
+import getRoutePath from '#route/getRoutePath';
+import IRouteHandler from '#route/interface/IRouteHandler';
+import methods from '#route/interface/methods';
 import consola from 'consola';
 import * as path from 'path';
 

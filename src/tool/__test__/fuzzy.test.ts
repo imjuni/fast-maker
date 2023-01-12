@@ -1,5 +1,5 @@
-import validParamNames from '@compiler/validation/validParamNames';
-import fuzzyWithCase from '@tool/fuzzyWithCase';
+import validParamNames from '#compiler/validation/validParamNames';
+import fuzzyWithCase from '#tool/fuzzyWithCase';
 import consola, { LogLevel } from 'consola';
 import 'jest';
 

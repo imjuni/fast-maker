@@ -1,7 +1,7 @@
-import IGetModuleInImports from '@compiler/interface/IGetModuleInImports';
-import IConfig from '@config/interface/IConfig';
-import appendPostfixHash from '@tool/appendPostfixHash';
-import getHash from '@tool/getHash';
+import IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
+import IConfig from '#config/interface/IConfig';
+import appendPostfixHash from '#tool/appendPostfixHash';
+import getHash from '#tool/getHash';
 import consola from 'consola';
 import { isEmpty, isFalse, isNotEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
