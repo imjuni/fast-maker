@@ -1,5 +1,5 @@
-import IImportConfiguration from '@compiler/interface/IImportConfiguration';
-import mergeImportConfiguration from '@generator/mergeImportConfiguration';
+import IImportConfiguration from '#compiler/interface/IImportConfiguration';
+import mergeImportConfiguration from '#generator/mergeImportConfiguration';
 import { isEmpty, isNotEmpty } from 'my-easy-fp';
 
 export default function dedupeImportConfiguration(configurations: IImportConfiguration[]): IImportConfiguration[] {

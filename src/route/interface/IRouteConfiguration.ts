@@ -1,4 +1,4 @@
-import TMethodType from '@route/interface/TMethodType';
+import TMethodType from '#route/interface/TMethodType';
 import * as tsm from 'ts-morph';
 
 export default interface IRouteConfiguration {

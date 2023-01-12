@@ -1,6 +1,6 @@
-import IImportConfiguration from '@compiler/interface/IImportConfiguration';
-import IConfig from '@config/interface/IConfig';
-import getHashedBindingCode from '@generator/getHashedBindingCode';
+import IImportConfiguration from '#compiler/interface/IImportConfiguration';
+import IConfig from '#config/interface/IConfig';
+import getHashedBindingCode from '#generator/getHashedBindingCode';
 import { replaceSepToPosix } from 'my-node-fp';
 import * as path from 'path';
 

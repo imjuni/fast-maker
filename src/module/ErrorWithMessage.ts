@@ -1,4 +1,4 @@
-import IReason from '@compiler/interface/IReason';
+import IReason from '#compiler/interface/IReason';
 
 export default class ErrorWithMessage extends Error {
   private inReason: IReason;

@@ -1,5 +1,5 @@
-import IGetModuleInImports from '@compiler/interface/IGetModuleInImports';
-import IImportConfiguration from '@compiler/interface/IImportConfiguration';
+import IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
+import IImportConfiguration from '#compiler/interface/IImportConfiguration';
 import { isFalse } from 'my-easy-fp';
 import * as tsm from 'ts-morph';
 

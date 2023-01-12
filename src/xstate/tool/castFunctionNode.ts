@@ -1,4 +1,4 @@
-import type { IHandlerStatement } from '@compiler/interface/THandlerNode';
+import type { IHandlerStatement } from '#compiler/interface/THandlerNode';
 import * as tsm from 'ts-morph';
 
 export default function castFunctionNode(handlerStatement: IHandlerStatement) {

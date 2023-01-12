@@ -1,16 +1,16 @@
-import IReason from '@compiler/interface/IReason';
-import { IHandlerStatement, IOptionStatement } from '@compiler/interface/THandlerNode';
-import getHandlerWithOption from '@compiler/navigate/getHandlerWithOption';
-import IConfig from '@config/interface/IConfig';
-import ErrorWithMessage from '@module/ErrorWithMessage';
-import getRouteFiles from '@route/getRouteFiles';
-import * as env from '@testenv/env';
-import getHash from '@tool/getHash';
-import getTestValue from '@tool/getTestValue';
-import posixJoin from '@tool/posixJoin';
+import IReason from '#compiler/interface/IReason';
+import { IHandlerStatement, IOptionStatement } from '#compiler/interface/THandlerNode';
+import getHandlerWithOption from '#compiler/navigate/getHandlerWithOption';
+import IConfig from '#config/interface/IConfig';
+import ErrorWithMessage from '#module/ErrorWithMessage';
+import getRouteFiles from '#route/getRouteFiles';
+import * as env from '#testenv/env';
+import getHash from '#tool/getHash';
+import getTestValue from '#tool/getTestValue';
+import posixJoin from '#tool/posixJoin';
 import requestHandlerAnalysisMachine, {
   IContextRequestHandlerAnalysisMachine,
-} from '@xstate/RequestHandlerAnalysisMachine';
+} from '#xstate/RequestHandlerAnalysisMachine';
 import consola, { LogLevel } from 'consola';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';

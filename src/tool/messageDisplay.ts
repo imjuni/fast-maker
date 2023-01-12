@@ -1,4 +1,4 @@
-import IReason from '@compiler/interface/IReason';
+import IReason from '#compiler/interface/IReason';
 import chalk from 'chalk';
 import { isEmpty } from 'my-easy-fp';
 import * as path from 'path';

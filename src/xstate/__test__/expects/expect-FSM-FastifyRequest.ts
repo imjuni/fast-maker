@@ -1,5 +1,5 @@
-import * as env from '@testenv/env';
-import posixJoin from '@tool/posixJoin';
+import * as env from '#testenv/env';
+import posixJoin from '#tool/posixJoin';
 import chalk from 'chalk';
 
 export default {

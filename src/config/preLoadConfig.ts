@@ -1,4 +1,4 @@
-import IConfig from '@config/interface/IConfig';
+import IConfig from '#config/interface/IConfig';
 import consola from 'consola';
 import * as findUp from 'find-up';
 import * as fs from 'fs';

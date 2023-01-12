@@ -1,4 +1,4 @@
-import IImportConfiguration from '@compiler/interface/IImportConfiguration';
+import IImportConfiguration from '#compiler/interface/IImportConfiguration';
 import consola from 'consola';
 import { isNotEmpty, TResolveArray } from 'my-easy-fp';
 

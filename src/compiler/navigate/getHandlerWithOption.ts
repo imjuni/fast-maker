@@ -1,6 +1,6 @@
-import THandlerNode, { IOptionStatement } from '@compiler/interface/THandlerNode';
-import getArrowFunctionWithModifier from '@compiler/navigate/getArrowFunctionWithModifier';
-import getFunctionDeclarationWithModifier from '@compiler/navigate/getFunctionDeclarationWithModifier';
+import THandlerNode, { IOptionStatement } from '#compiler/interface/THandlerNode';
+import getArrowFunctionWithModifier from '#compiler/navigate/getArrowFunctionWithModifier';
+import getFunctionDeclarationWithModifier from '#compiler/navigate/getFunctionDeclarationWithModifier';
 import { isEmpty, isNotEmpty } from 'my-easy-fp';
 import * as tsm from 'ts-morph';
 

@@ -1,9 +1,9 @@
-import { IHandlerStatement } from '@compiler/interface/THandlerNode';
-import getArrowFunctionWithModifier from '@compiler/navigate/getArrowFunctionWithModifier';
-import getFunctionDeclarationWithModifier from '@compiler/navigate/getFunctionDeclarationWithModifier';
-import getHandlerWithOption from '@compiler/navigate/getHandlerWithOption';
-import getPropertySignatures from '@compiler/navigate/getPropertySignatures';
-import * as env from '@testenv/env';
+import { IHandlerStatement } from '#compiler/interface/THandlerNode';
+import getArrowFunctionWithModifier from '#compiler/navigate/getArrowFunctionWithModifier';
+import getFunctionDeclarationWithModifier from '#compiler/navigate/getFunctionDeclarationWithModifier';
+import getHandlerWithOption from '#compiler/navigate/getHandlerWithOption';
+import getPropertySignatures from '#compiler/navigate/getPropertySignatures';
+import * as env from '#testenv/env';
 import consola, { LogLevel } from 'consola';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';

@@ -1,4 +1,4 @@
-import IConfig from '@config/interface/IConfig';
+import IConfig from '#config/interface/IConfig';
 
 export default function getConcreteConfig(partialConfig: Partial<IConfig>): IConfig {
   const project = partialConfig.p ?? partialConfig.project;
