@@ -46,6 +46,26 @@ task('prettier', async () => {
   });
 });
 
+task('ctix:single', async () => {
+  const cmd = 'ctix';
+  const option = 'single -p ./tsconfig.prod.json --config ./.configs/.ctirc';
+
+  await execa(cmd, splitArgs(option), {
+    stderr: process.stderr,
+    stdout: process.stdout,
+  });
+});
+
+task('ctix:remove', async () => {
+  const cmd = 'ctix';
+  const option = 'remove -p ./tsconfig.json --config ./.configs/.ctirc';
+
+  await execa(cmd, splitArgs(option), {
+    stderr: process.stderr,
+    stdout: process.stdout,
+  });
+});
+
 task('+pub', async () => {
   const cmd = 'npm publish --registry http://localhost:8901 --force';
 
@@ -98,8 +118,8 @@ task('+tsc', async () => {
   });
 });
 
-task('build', series('clean', 'lint', '+tsc'));
+task('build', series('clean', '+tsc'));
 task('pub', series('clean', 'lint', '+rollup:dev', '+pub'));
-task('pub:prod', series('clean', 'lint', '+rollup:prod', '+pub:prod'));
-task('rollup:prod', series('clean', 'lint', '+rollup:prod'));
-task('rollup:dev', series('clean', 'lint', '+rollup:dev'));
+task('pub:prod', series('clean', 'lint', 'ctix:single', '+rollup:prod', 'ctix:remove', '+pub:prod'));
+task('rollup:prod', series('clean', 'lint', 'ctix:single', '+rollup:prod', 'ctix:remove'));
+task('rollup:dev', series('clean', 'lint', 'ctix:single', '+rollup:dev', 'ctix:remove'));

@@ -1,13 +1,12 @@
 import cliProgesss from 'cli-progress';
-import { isFalse } from 'my-easy-fp';
 
 class Progress {
-  #enable: boolean;
+  accessor enable: boolean;
 
   #bar: cliProgesss.SingleBar;
 
   constructor() {
-    this.#enable = true;
+    this.enable = true;
     this.#bar = new cliProgesss.SingleBar(
       {
         format: 'PROGRESS | {bar} | {value}/{total} Files',
@@ -19,16 +18,8 @@ class Progress {
     );
   }
 
-  get enable(): boolean {
-    return this.#enable;
-  }
-
-  set enable(enable) {
-    this.#enable = enable;
-  }
-
   start(total: number, startValue: number) {
-    if (isFalse(this.#enable)) {
+    if (this.enable === false) {
       return;
     }
 
@@ -36,7 +27,7 @@ class Progress {
   }
 
   increment() {
-    if (isFalse(this.#enable)) {
+    if (this.enable === false) {
       return;
     }
 
@@ -44,7 +35,7 @@ class Progress {
   }
 
   update(updateValue: number) {
-    if (isFalse(this.#enable)) {
+    if (this.enable === false) {
       return;
     }
 

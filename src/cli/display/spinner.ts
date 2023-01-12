@@ -1,26 +1,17 @@
-import { isFalse } from 'my-easy-fp';
 import ora from 'ora';
 
 class Spinner {
-  #enable: boolean;
+  accessor enable: boolean;
 
   #spinner: ora.Ora;
 
   constructor() {
-    this.#enable = true;
+    this.enable = true;
     this.#spinner = ora();
   }
 
-  get enable(): boolean {
-    return this.#enable;
-  }
-
-  set enable(enable) {
-    this.#enable = enable;
-  }
-
   start() {
-    if (isFalse(this.#enable)) {
+    if (this.enable === false) {
       return;
     }
 

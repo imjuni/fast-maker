@@ -1,5 +1,5 @@
-import progress from '#cli/progress';
-import spinner from '#cli/spinner';
+import progress from '#cli/display/progress';
+import spinner from '#cli/display/spinner';
 import IConfig from '#config/interface/IConfig';
 import IWatchConfig from '#config/interface/IWatchConfig';
 import generateRouting from '#route/generateRouting';

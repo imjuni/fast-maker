@@ -1,4 +1,4 @@
-import spinner from '#cli/spinner';
+import spinner from '#cli/display/spinner';
 import IConfig from '#config/interface/IConfig';
 import IRouteConfiguration from '#route/interface/IRouteConfiguration';
 import logger from '#tool/logger';

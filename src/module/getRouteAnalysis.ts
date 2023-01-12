@@ -1,4 +1,4 @@
-import progress from '#cli/progress';
+import progress from '#cli/display/progress';
 import IReason from '#compiler/interface/IReason';
 import THandlerNode, { IHandlerStatement, IOptionStatement } from '#compiler/interface/THandlerNode';
 import getHandlerWithOption from '#compiler/navigate/getHandlerWithOption';
