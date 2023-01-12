@@ -5,8 +5,8 @@ import getConcreteWatchConfig from '#config/getConcreteWatchConfig';
 import IConfig from '#config/interface/IConfig';
 import IWatchConfig from '#config/interface/IWatchConfig';
 import preLoadConfig from '#config/preLoadConfig';
+import logger from '#tool/logger';
 import messageDisplay from '#tool/messageDisplay';
-import consola, { LogLevel } from 'consola';
 import * as fs from 'fs';
 import { isError } from 'my-easy-fp';
 import { isFail } from 'my-only-either';
@@ -14,16 +14,11 @@ import * as path from 'path';
 import yargsAnyType, { Arguments, Argv } from 'yargs';
 import { generateRouteFile, watchRouteFile } from './fast-maker';
 
-const version = '0.0.1';
-consola.level = LogLevel.Success;
-
-// Yargs default type using object type(= {}). But object type cause error that
-// fast-maker cli option interface type. So we make concrete type yargs instance
-// make using by any type.
 const yargs: Argv<IConfig> = yargsAnyType as any;
+const log = logger();
 
 // eslint-disable-next-line
-const argv = yargs(process.argv.slice(2))
+yargs(process.argv.slice(2))
   .command<IConfig>({
     command: 'route',
     describe: 'create route.ts file in your directory using by tsconfig.json',
@@ -41,8 +36,8 @@ const argv = yargs(process.argv.slice(2))
 
         messageDisplay(generatedCode.pass.reasons);
       } catch (catched) {
-        const err = isError(catched) ?? Error('unknown error raised');
-        consola.error(err);
+        const err = isError(catched) ?? new Error('unknown error raised');
+        log.error(err);
       }
     },
   })
@@ -63,14 +58,11 @@ const argv = yargs(process.argv.slice(2))
         watchRouteFile(config);
       } catch (catched) {
         const err = isError(catched) ?? Error('unknown error raised');
-        consola.error(err);
+        log.error(err);
       }
     },
   })
   .demandCommand()
   .recommendCommands()
-  .version(version, 'version', 'display version information')
   .config(preLoadConfig())
   .help().argv;
-
-consola.debug('argv: ', argv);

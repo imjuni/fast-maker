@@ -16,13 +16,15 @@ import getImportConfigurationFromResolutions from '#generator/getImportConfigura
 import IRouteConfiguration from '#route/interface/IRouteConfiguration';
 import IRouteHandler from '#route/interface/IRouteHandler';
 import appendPostfixHash from '#tool/appendPostfixHash';
+import logger from '#tool/logger';
 import castFunctionNode from '#xstate/tool/castFunctionNode';
 import chalk from 'chalk';
-import consola from 'consola';
 import { isEmpty, isFalse, isNotEmpty } from 'my-easy-fp';
 import * as path from 'path';
 import * as tsm from 'ts-morph';
 import { assign, createMachine } from 'xstate';
+
+const log = logger();
 
 export interface IContextRequestHandlerAnalysisMachine {
   project: tsm.Project;
@@ -80,7 +82,7 @@ const requestHandlerAnalysisMachine = (
       states: {
         [EN_STATES.INITIAL]: {
           entry: (context) => {
-            consola.debug(`xstate 상태 기계 시작: ${context.currentNode}`);
+            log.debug(`xstate 상태 기계 시작: ${context.currentNode}`);
           },
           always: [
             {
@@ -224,7 +226,7 @@ const requestHandlerAnalysisMachine = (
         [EN_STATES.COMPLETE]: {
           type: 'final',
           entry: () => {
-            consola.debug('분석이 끝?? -3');
+            log.debug('분석이 끝?? -3');
           },
           data: (context): Pick<IContextRequestHandlerAnalysisMachine, 'importBox' | 'routeBox' | 'messages'> => {
             return {

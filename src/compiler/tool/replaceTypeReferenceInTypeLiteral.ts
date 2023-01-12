@@ -1,7 +1,9 @@
 import IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
-import consola from 'consola';
+import logger from '#tool/logger';
 import { isEmpty } from 'my-easy-fp';
 import * as tsm from 'ts-morph';
+
+const log = logger();
 
 interface IReplaceTypeReferenceInTypeLiteralParam {
   resolutions: IGetModuleInImports[];
@@ -28,7 +30,7 @@ export default function replaceTypeReferenceInTypeLiteral({
       return moduleNames.includes(typeReferenceNode.getText());
     });
 
-  consola.debug('목표는: ', resolutionWithTypeReferenceNodePairs.length);
+  log.debug('Target: ', resolutionWithTypeReferenceNodePairs.length);
 
   resolutionWithTypeReferenceNodePairs.forEach((resolutionWithTypeReferenceNodePair) => {
     const { resolution, typeReferenceNode } = resolutionWithTypeReferenceNodePair;

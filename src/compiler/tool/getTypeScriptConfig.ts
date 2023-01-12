@@ -1,6 +1,8 @@
-import consola from 'consola';
+import logger from '#tool/logger';
 import * as path from 'path';
 import typescript from 'typescript';
+
+const log = logger();
 
 /**
  * tsconfig 파일을 읽고 ParseCommandLine 객체를 돌려준다
@@ -8,7 +10,7 @@ import typescript from 'typescript';
  * @param tsconfigPath current working directory, target directory from cli or passed
  */
 export default async function getTypeScriptConfig(tsconfigPath: string): Promise<typescript.ParsedCommandLine> {
-  consola.debug(`tsconfig file load from "${tsconfigPath}"`);
+  log.debug(`tsconfig file load from "${tsconfigPath}"`);
 
   const parseConfigHost: typescript.ParseConfigHost = {
     fileExists: typescript.sys.fileExists,
@@ -25,7 +27,7 @@ export default async function getTypeScriptConfig(tsconfigPath: string): Promise
     path.dirname(tsconfigPath),
   );
 
-  consola.debug(`number of typescript source file: ${tsconfig.fileNames.length}`);
+  log.debug(`number of typescript source file: ${tsconfig.fileNames.length}`);
 
   return tsconfig;
 }

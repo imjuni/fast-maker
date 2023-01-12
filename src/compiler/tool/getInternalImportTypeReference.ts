@@ -1,7 +1,9 @@
-import consola from 'consola';
+import logger from '#tool/logger';
 import { isEmpty, isFalse, isNotEmpty } from 'my-easy-fp';
 import * as tsm from 'ts-morph';
 import getNamedBindingName from './getNamedBindingName';
+
+const log = logger();
 
 interface IFilterExternalTypeReferenceParam {
   source: tsm.SourceFile;
@@ -12,9 +14,9 @@ export default function getInternalImportTypeReference({
   source,
   typeReferenceNodes,
 }: IFilterExternalTypeReferenceParam) {
-  consola.debug('---------------------------------------------------------------------------------------------');
-  consola.debug('filterExternalTypeReference');
-  consola.debug('---------------------------------------------------------------------------------------------');
+  log.debug('---------------------------------------------------------------------------------------------');
+  log.debug('filterExternalTypeReference');
+  log.debug('---------------------------------------------------------------------------------------------');
 
   const importDeclarations = source.getImportDeclarations().filter((importDeclaration) => {
     const moduleSourceFile = importDeclaration.getModuleSpecifierSourceFile();

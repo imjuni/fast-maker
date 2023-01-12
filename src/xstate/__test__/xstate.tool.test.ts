@@ -7,11 +7,11 @@ import getRouteFiles from '#route/getRouteFiles';
 import * as env from '#testenv/env';
 import getHash from '#tool/getHash';
 import getTestValue from '#tool/getTestValue';
+import logger from '#tool/logger';
 import posixJoin from '#tool/posixJoin';
 import requestHandlerAnalysisMachine, {
   IContextRequestHandlerAnalysisMachine,
 } from '#xstate/RequestHandlerAnalysisMachine';
-import consola, { LogLevel } from 'consola';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
@@ -20,11 +20,12 @@ import * as tsm from 'ts-morph';
 import { interpret } from 'xstate';
 
 const share: { projectPath: string; project: tsm.Project; option: IConfig } = {} as any;
+const log = logger();
 
 beforeAll(async () => {
   share.projectPath = path.join(env.examplePath, 'tsconfig.json');
 
-  consola.level = LogLevel.Debug;
+  log.level = 'debug';
   share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
   share.option = {
     project: share.projectPath,
@@ -102,7 +103,7 @@ test('t001-FSM-TypeLiteral', async () => {
   const expectation = await import(path.join(__dirname, 'expects', expectFileName));
   const terminateCircularResult = getTestValue(parsedDataBox);
 
-  consola.debug(terminateCircularResult);
+  log.debug(terminateCircularResult);
 
   expect(terminateCircularResult).toEqual(expectation.default);
 });
@@ -168,7 +169,7 @@ test('t002-FSM-FastifyRequest', async () => {
   const expectation = await import(path.join(__dirname, 'expects', expectFileName));
   const terminateCircularResult = getTestValue(parsedDataBox);
 
-  consola.debug(terminateCircularResult);
+  log.debug(terminateCircularResult);
 
   expect(terminateCircularResult).toEqual(expectation.default);
 });

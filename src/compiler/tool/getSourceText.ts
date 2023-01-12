@@ -5,14 +5,16 @@ import IConfig from '#config/interface/IConfig';
 import ErrorWithMessage from '#module/ErrorWithMessage';
 import IRouteHandler from '#route/interface/IRouteHandler';
 import getHash from '#tool/getHash';
+import logger from '#tool/logger';
 import requestHandlerAnalysisMachine, {
   IContextRequestHandlerAnalysisMachine as IAnalysisMachineContext,
 } from '#xstate/RequestHandlerAnalysisMachine';
-import consola from 'consola';
 import { isEmpty } from 'my-easy-fp';
 import { fail, pass, PassFailEither } from 'my-only-either';
 import * as tsm from 'ts-morph';
 import { interpret } from 'xstate';
+
+const log = logger();
 
 interface IGetSourceTextParam {
   routeHandlerWithOption: IRouteHandler;
@@ -72,7 +74,7 @@ export default async function getSourceText({
     return pass(parsedDataBox);
   } catch (catched) {
     const err = catched instanceof Error ? catched : new Error('unknown error raised');
-    consola.debug(err);
+    log.error(err);
 
     return fail(err);
   }

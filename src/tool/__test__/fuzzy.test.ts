@@ -1,14 +1,16 @@
 import validParamNames from '#compiler/validation/validParamNames';
 import fuzzyWithCase from '#tool/fuzzyWithCase';
-import consola, { LogLevel } from 'consola';
+import logger from '#tool/logger';
 import 'jest';
 
+const log = logger();
+
 beforeAll(() => {
-  consola.level = LogLevel.Debug;
+  log.level = 'debug';
 });
 
 test('fuzzy-test', () => {
-  consola.debug('fuzzy-test start');
+  log.debug('fuzzy-test start');
 
   const examples = ['querystring', 'query-string', 'queryString', 'query_string', 'ironman'];
   const result = examples.map((example) => fuzzyWithCase(validParamNames.fastify, example)).flatMap((f) => f);
