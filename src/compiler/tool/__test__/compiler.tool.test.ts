@@ -6,8 +6,8 @@ import getTypeReferences from '#compiler/tool/getTypeReferences';
 import replaceTypeReferenceInTypeLiteral from '#compiler/tool/replaceTypeReferenceInTypeLiteral';
 import IConfig from '#config/interface/IConfig';
 import * as env from '#testenv/env';
+import logger from '#tool/logger';
 import posixJoin from '#tool/posixJoin';
-import consola, { LogLevel } from 'consola';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
@@ -15,11 +15,12 @@ import path from 'path';
 import * as tsm from 'ts-morph';
 
 const share: { projectPath: string; project: tsm.Project; option: IConfig } = {} as any;
+const log = logger();
 
 beforeAll(async () => {
   share.projectPath = path.join(env.examplePath, 'tsconfig.json');
 
-  consola.level = LogLevel.Debug;
+  log.level = 'debug';
 
   share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
   share.option = {
@@ -68,7 +69,7 @@ test('getResolvedModuleInImports', async () => {
     option: share.option,
   });
 
-  consola.debug(JSON.stringify(resolutions, null, 2));
+  log.debug(JSON.stringify(resolutions, null, 2));
 
   expect(resolutions).toEqual([
     {

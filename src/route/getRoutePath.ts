@@ -1,12 +1,13 @@
 import getMethod from '#route/getMethod';
 import IRouteHandler from '#route/interface/IRouteHandler';
-import consola from 'consola';
+import logger from '#tool/logger';
 import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix, startSepAppend, startSepRemove } from 'my-node-fp';
 import { isFail } from 'my-only-either';
 import * as path from 'path';
 import urljoin from 'url-join';
 
+const log = logger();
 const routePathMatchReg = /(.*)(\/|)(get|post|put|delete|options|head|patch|all)(\/|)(.+)(\.ts)/;
 const routePathElementMatchReg = /(\[|)([-_0-9a-zA-Z]+)(\]|)(\.ts|\.mts|\.cts|)/;
 
@@ -52,7 +53,7 @@ export default function getRoutePath(originFilename: string): IRouteHandler {
 
   const joined = urljoin(paramsAppliedRouteElements);
 
-  consola.debug(' >>> ', joined);
+  log.debug(' >>> ', joined);
 
   return { filename, method: methodEither.pass, routePath: startSepAppend(joined, path.posix.sep) };
 }

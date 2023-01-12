@@ -9,10 +9,10 @@ import getRouteAnalysis from '#module/getRouteAnalysis';
 import getWritableCode from '#module/getWritableCode';
 import writeDebugLog from '#module/writeDebugLog';
 import getRouteFiles from '#route/getRouteFiles';
+import logger from '#tool/logger';
 import messageDisplay from '#tool/messageDisplay';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
-import consola from 'consola';
 import fs from 'fs';
 import { isError } from 'my-easy-fp';
 import { getDirnameSync, replaceSepToPosix, win32DriveLetterUpdown } from 'my-node-fp';
@@ -20,6 +20,8 @@ import { fail, isFail, isPass, pass, PassFailEither } from 'my-only-either';
 import path from 'path';
 import * as rx from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+
+const log = logger();
 
 export async function generateRouteFile(
   config: IConfig,
@@ -85,9 +87,9 @@ export async function generateRouteFile(
 
     const prettfiedEither = await prettierProcessing({ code: finalCode.join('\n') });
 
-    consola.debug('--------------------------------------------------------');
-    consola.debug(prettfiedEither);
-    consola.debug('--------------------------------------------------------');
+    log.debug('--------------------------------------------------------');
+    log.debug(prettfiedEither);
+    log.debug('--------------------------------------------------------');
 
     if (isFail(prettfiedEither)) {
       throw prettfiedEither.fail;
@@ -122,7 +124,7 @@ export function watchRouteFile(
   const cwd = replaceSepToPosix(path.resolve(getDirnameSync(config.handler)));
   const watchDebounceTime = config.debounceTime;
 
-  consola.success('Route generation watch mode start!');
+  log.info('Route generation watch mode start!');
 
   const watcher = chokidar.watch(cwd, {
     ignored: [
@@ -148,7 +150,7 @@ export function watchRouteFile(
         ? changeValue.filePath
         : replaceSepToPosix(win32DriveLetterUpdown(path.resolve(path.join(cwd, changeValue.filePath)), 'upper'));
 
-      consola.debug('file changed: ', filePath);
+      log.debug('file changed: ', filePath);
 
       const generatedCode = await generateRouteFile(config);
 
@@ -156,21 +158,21 @@ export function watchRouteFile(
         await fs.promises.writeFile(path.join(config.output, 'route.ts'), generatedCode.pass.code);
         messageDisplay(generatedCode.pass.reasons);
 
-        consola.success('route file generation success!');
+        log.info('route file generation success!');
       }
     } catch (catched) {
       const err = isError(catched) ?? new Error('unknown error raised from watchRouteFile');
-      consola.debug(err);
+      log.debug(err);
     }
   });
 
   watcher
     .on('add', (filePath) => {
-      consola.info(`file added: ${chalk.yellow(filePath)}`);
+      log.info(`file added: ${chalk.yellow(filePath)}`);
       subject.next({ type: 'add', filePath });
     })
     .on('change', (filePath) => {
-      consola.info(`file changed: ${chalk.yellow(filePath)}`);
+      log.info(`file changed: ${chalk.yellow(filePath)}`);
       subject.next({ type: 'change', filePath });
     });
 }

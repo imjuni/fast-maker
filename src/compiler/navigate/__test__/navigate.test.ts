@@ -4,7 +4,7 @@ import getFunctionDeclarationWithModifier from '#compiler/navigate/getFunctionDe
 import getHandlerWithOption from '#compiler/navigate/getHandlerWithOption';
 import getPropertySignatures from '#compiler/navigate/getPropertySignatures';
 import * as env from '#testenv/env';
-import consola, { LogLevel } from 'consola';
+import logger from '#tool/logger';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
@@ -12,9 +12,9 @@ import path from 'path';
 import * as tsm from 'ts-morph';
 
 const share: { projectPath: string; project: tsm.Project } = {} as any;
+const log = logger();
 
 beforeAll(async () => {
-  consola.level = LogLevel.Debug;
   share.projectPath = path.join(env.examplePath, 'tsconfig.json');
   share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
 });
@@ -30,7 +30,7 @@ test('getHandlerWithOption', async () => {
     return handlerFileInfo;
   });
 
-  consola.success(handlerFileInfos);
+  log.info(handlerFileInfos);
 
   const expectation = [
     [
@@ -74,7 +74,7 @@ test('getArrowFunctionModifier', async () => {
     name: 'anonymous function',
   };
 
-  consola.success(processed);
+  log.info(processed);
 
   expect(processed).toEqual(expectation);
 });
@@ -99,7 +99,7 @@ test('getFunctionDeclarationWithModifier', async () => {
     name: 'anonymous function',
   };
 
-  consola.success(processed);
+  log.info(processed);
 
   expect(processed).toEqual(expectation);
 });

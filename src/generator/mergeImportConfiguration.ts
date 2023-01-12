@@ -1,13 +1,15 @@
 import IImportConfiguration from '#compiler/interface/IImportConfiguration';
-import consola from 'consola';
+import logger from '#tool/logger';
 import { isNotEmpty, TResolveArray } from 'my-easy-fp';
+
+const log = logger();
 
 export default function mergeImportConfiguration(
   source: IImportConfiguration,
   target: IImportConfiguration,
 ): IImportConfiguration {
   if (source.importFile !== target.importFile) {
-    consola.warn(`importFile is different: ${source.importFile} vs ${target.importFile}`);
+    log.warn(`importFile is different: ${source.importFile} vs ${target.importFile}`);
   }
 
   const next = { ...source };

@@ -2,11 +2,13 @@ import IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
 import IConfig from '#config/interface/IConfig';
 import appendPostfixHash from '#tool/appendPostfixHash';
 import getHash from '#tool/getHash';
-import consola from 'consola';
+import logger from '#tool/logger';
 import { isEmpty, isFalse, isNotEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
 import * as path from 'path';
 import * as tsm from 'ts-morph';
+
+const log = logger();
 
 interface IGetResolvedModuleParam {
   source: tsm.SourceFile;
@@ -64,7 +66,7 @@ export default function getResolvedModuleInImports({
     return isNotEmpty(namedBindings.find((namedBinding) => namedBinding === textTypeName));
   });
 
-  consola.debug(typeNameWithImportDeclarations);
+  log.debug(typeNameWithImportDeclarations);
 
   const nonDedupeResolutions = typeNameWithImportDeclarations.map<IGetModuleInImports>(
     (typeNameWithImportDeclaration) => {

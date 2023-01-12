@@ -1,11 +1,13 @@
 import IConfig from '#config/interface/IConfig';
-import consola from 'consola';
+import logger from '#tool/logger';
 import * as findUp from 'find-up';
 import * as fs from 'fs';
 import { parse } from 'jsonc-parser';
 import { isEmpty, isError, isFalse, isNotEmpty } from 'my-easy-fp';
 import { existsSync } from 'my-node-fp';
 import yargs from 'yargs';
+
+const log = logger();
 
 export default function preLoadConfig() {
   try {
@@ -46,7 +48,7 @@ export default function preLoadConfig() {
     return config;
   } catch (catched) {
     const err = isError(catched) ?? new Error('unknown error raised');
-    consola.error(err);
+    log.error(err);
 
     return {};
   }

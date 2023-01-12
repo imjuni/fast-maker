@@ -6,8 +6,8 @@ import validatePropertySignature from '#compiler/validation/validatePropertySign
 import validateTypeReferences from '#compiler/validation/validateTypeReference';
 import IConfig from '#config/interface/IConfig';
 import * as env from '#testenv/env';
+import logger from '#tool/logger';
 import posixJoin from '#tool/posixJoin';
-import consola, { LogLevel } from 'consola';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
@@ -15,11 +15,12 @@ import path from 'path';
 import * as tsm from 'ts-morph';
 
 const share: { projectPath: string; project: tsm.Project; option: IConfig } = {} as any;
+const log = logger();
 
 beforeAll(async () => {
   share.projectPath = path.join(env.examplePath, 'tsconfig.json');
 
-  consola.level = LogLevel.Debug;
+  log.level = 'debug';
 
   share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
   share.option = {
@@ -77,7 +78,7 @@ test('validatePropertySignature', async () => {
     ],
   };
 
-  consola.debug(validationResult);
+  log.debug(validationResult);
 
   expect(validationResult).toEqual(expectation);
 });
@@ -138,7 +139,7 @@ test('validateTypeReferences', async () => {
     },
   };
 
-  consola.debug(extract);
+  log.debug(extract);
 
   expect(extract).toEqual(expectation);
 });

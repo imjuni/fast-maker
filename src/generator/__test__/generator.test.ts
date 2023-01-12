@@ -6,7 +6,7 @@ import getTypeReferences from '#compiler/tool/getTypeReferences';
 import replaceTypeReferenceInTypeLiteral from '#compiler/tool/replaceTypeReferenceInTypeLiteral';
 import IConfig from '#config/interface/IConfig';
 import * as env from '#testenv/env';
-import consola, { LogLevel } from 'consola';
+import logger from '#tool/logger';
 import 'jest';
 import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
@@ -14,12 +14,13 @@ import path from 'path';
 import * as tsm from 'ts-morph';
 
 const share: { projectPath: string; project: tsm.Project; option: IConfig } = {} as any;
+const log = logger();
 
 describe('navigate', () => {
   beforeAll(async () => {
     share.projectPath = path.join(env.examplePath, 'tsconfig.json');
 
-    consola.level = LogLevel.Debug;
+    log.level = 'debug';
     share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
     share.option = {
       project: share.projectPath,
@@ -78,8 +79,8 @@ describe('navigate', () => {
     const typeName = parameter.getType().getSymbolOrThrow().getEscapedName();
     const typeContent = parameter.getType().getTypeArguments()[0].getText();
 
-    consola.debug('1: ', typeName);
-    consola.debug('2: ', typeContent);
-    consola.debug('3: ', replacedTypeLiteral);
+    log.debug('1: ', typeName);
+    log.debug('2: ', typeContent);
+    log.debug('3: ', replacedTypeLiteral);
   });
 });

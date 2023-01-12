@@ -1,4 +1,3 @@
-// import consola from 'consola';
 import { isEmpty } from 'my-easy-fp';
 import * as tsm from 'ts-morph';
 
