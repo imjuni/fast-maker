@@ -1,33 +1,33 @@
-import IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
-import IConfig from '#config/interface/IConfig';
+import type IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
+import type IConfig from '#config/interface/IConfig';
+import logger from '#module/logging/logger';
 import appendPostfixHash from '#tool/appendPostfixHash';
 import getHash from '#tool/getHash';
-import logger from '#tool/logger';
-import { isEmpty, isFalse, isNotEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
 import * as path from 'path';
-import * as tsm from 'ts-morph';
+import type { ImportClause, SourceFile, TypeReferenceNode } from 'ts-morph';
+import { SyntaxKind } from 'ts-morph';
 
 const log = logger();
 
 interface IGetResolvedModuleParam {
-  source: tsm.SourceFile;
+  source: SourceFile;
   option: IConfig;
-  typeReferenceNodes: tsm.TypeReferenceNode[];
+  typeReferenceNodes: TypeReferenceNode[];
 }
 
-function getNamedBindingName(bindings: ReturnType<tsm.ImportClause['getNamedBindings']>) {
-  if (isEmpty(bindings)) {
+function getNamedBindingName(bindings: ReturnType<ImportClause['getNamedBindings']>) {
+  if (bindings == null) {
     return [];
   }
 
   // namespace import에 대한 내용을 정리해야한다
-  if (bindings.getKind() === tsm.SyntaxKind.NamespaceImport) {
-    // const namespaceImport = bindings.asKindOrThrow(tsm.SyntaxKind.NamespaceImport);
+  if (bindings.getKind() === SyntaxKind.NamespaceImport) {
+    // const namespaceImport = bindings.asKindOrThrow(SyntaxKind.NamespaceImport);
     return [];
   }
 
-  const namedImports = bindings.asKindOrThrow(tsm.SyntaxKind.NamedImports);
+  const namedImports = bindings.asKindOrThrow(SyntaxKind.NamedImports);
   const names = namedImports.getElements().map((element) => element.getName());
   return names;
 }
@@ -43,27 +43,28 @@ export default function getResolvedModuleInImports({
   const importDeclarations = source.getImportDeclarations().filter((importDeclaration) => {
     const moduleSourceFile = importDeclaration.getModuleSpecifierSourceFile();
 
-    if (isEmpty(moduleSourceFile)) {
+    if (moduleSourceFile == null) {
       return false;
     }
 
-    return isFalse(moduleSourceFile.isFromExternalLibrary());
+    return moduleSourceFile.isFromExternalLibrary() === false;
   });
 
   const fullTypeNameWithImportDeclarations = textTypeNames
     .map((textTypeName) => importDeclarations.map((importDeclaration) => ({ textTypeName, importDeclaration })))
-    .flatMap((product) => product);
+    .flat();
 
   const typeNameWithImportDeclarations = fullTypeNameWithImportDeclarations.filter((typeNameWithImportDeclaration) => {
     const { textTypeName, importDeclaration } = typeNameWithImportDeclaration;
     const importClause = importDeclaration.getImportClauseOrThrow();
     const defaultImport = importClause.getDefaultImport();
 
-    const namedBindings = isNotEmpty(defaultImport)
-      ? [defaultImport.getText(), ...getNamedBindingName(importClause.getNamedBindings())]
-      : getNamedBindingName(importClause.getNamedBindings());
+    const namedBindings =
+      defaultImport != null
+        ? [defaultImport.getText(), ...getNamedBindingName(importClause.getNamedBindings())]
+        : getNamedBindingName(importClause.getNamedBindings());
 
-    return isNotEmpty(namedBindings.find((namedBinding) => namedBinding === textTypeName));
+    return namedBindings.find((namedBinding) => namedBinding === textTypeName) != null;
   });
 
   log.debug(typeNameWithImportDeclarations);
@@ -83,7 +84,7 @@ export default function getResolvedModuleInImports({
       // 생각 좀 해봤는데 이 경우 filename + hash로 처리하는게 더 효율적인 것 같다(handler 일 때처럼)
       // 이건 여러파일에 동일한 이름으로 export 한 뒤 이름만 바꿔서 사용하는 그런 경우도 있을 것 같아서
       // 오류 방지 차원에서 filename + hash로 처리한다
-      if (isNotEmpty(defaultImport)) {
+      if (defaultImport != null) {
         const baseFilename = path.basename(relativeFilePath, '.ts');
 
         return {
@@ -118,7 +119,7 @@ export default function getResolvedModuleInImports({
   );
 
   const resolutionRecord = nonDedupeResolutions.reduce<Record<string, IGetModuleInImports>>((aggregation, current) => {
-    if (isNotEmpty(aggregation[current.exportFrom])) {
+    if (aggregation[current.exportFrom] != null) {
       const concatedImportDeclarations: IGetModuleInImports['importDeclarations'] = [
         ...current.importDeclarations,
         ...aggregation[current.exportFrom].importDeclarations,

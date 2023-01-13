@@ -1,21 +1,20 @@
-import { isEmpty, isFalse, isNotEmpty } from 'my-easy-fp';
-import * as tsm from 'ts-morph';
+import type { SourceFile, TypeReferenceNode } from 'ts-morph';
 import getNamedBindingName from './getNamedBindingName';
 
 interface IFilterExternalTypeReferenceParam {
-  source: tsm.SourceFile;
-  typeReferenceNodes: tsm.TypeReferenceNode[];
+  source: SourceFile;
+  typeReferenceNodes: TypeReferenceNode[];
 }
 
 export default function getLocalTypeReference({ source, typeReferenceNodes }: IFilterExternalTypeReferenceParam) {
   const importDeclarations = source.getImportDeclarations().filter((importDeclaration) => {
     const moduleSourceFile = importDeclaration.getModuleSpecifierSourceFile();
 
-    if (isEmpty(moduleSourceFile)) {
+    if (moduleSourceFile == null) {
       return false;
     }
 
-    return isFalse(moduleSourceFile.isFromExternalLibrary());
+    return moduleSourceFile.isFromExternalLibrary() === false;
   });
 
   const exportedNamedBindingBinding = importDeclarations
@@ -23,17 +22,18 @@ export default function getLocalTypeReference({ source, typeReferenceNodes }: IF
       const importClause = importDeclaration.getImportClauseOrThrow();
       const defaultImport = importClause.getDefaultImport();
 
-      const namedBindings = isNotEmpty(defaultImport)
-        ? [defaultImport.getText(), ...getNamedBindingName(importClause.getNamedBindings())]
-        : getNamedBindingName(importClause.getNamedBindings());
+      const namedBindings =
+        defaultImport != null
+          ? [defaultImport.getText(), ...getNamedBindingName(importClause.getNamedBindings())]
+          : getNamedBindingName(importClause.getNamedBindings());
 
       return namedBindings;
     })
-    .flatMap((namedBinding) => namedBinding);
+    .flat();
 
   const filteredTypeReferenceNodes = typeReferenceNodes
     .filter((node) => exportedNamedBindingBinding.includes(node.getTypeName().getText()))
-    .filter((node) => isFalse(exportedNamedBindingBinding.includes(node.getTypeName().getText())));
+    .filter((node) => exportedNamedBindingBinding.includes(node.getTypeName().getText()) === false);
 
   return filteredTypeReferenceNodes;
 }

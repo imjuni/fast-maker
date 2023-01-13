@@ -1,4 +1,4 @@
-import * as tsm from 'ts-morph';
+import type { SourceFile } from 'ts-morph';
 
 export default interface IImportConfiguration {
   /**
@@ -25,5 +25,5 @@ export default interface IImportConfiguration {
   importFile: string;
 
   /** 소스파일 */
-  source: tsm.SourceFile;
+  source: SourceFile;
 }

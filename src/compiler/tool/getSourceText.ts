@@ -1,17 +1,16 @@
-import IReason from '#compiler/interface/IReason';
-import { IHandlerStatement, IOptionStatement } from '#compiler/interface/THandlerNode';
+import type IReason from '#compiler/interface/IReason';
+import type { IHandlerStatement, IOptionStatement } from '#compiler/interface/THandlerNode';
 import getHandlerWithOption from '#compiler/navigate/getHandlerWithOption';
-import IConfig from '#config/interface/IConfig';
+import type IConfig from '#config/interface/IConfig';
 import ErrorWithMessage from '#module/ErrorWithMessage';
-import IRouteHandler from '#route/interface/IRouteHandler';
+import logger from '#module/logging/logger';
+import type IRouteHandler from '#route/interface/IRouteHandler';
 import getHash from '#tool/getHash';
-import logger from '#tool/logger';
 import requestHandlerAnalysisMachine, {
-  IContextRequestHandlerAnalysisMachine as IAnalysisMachineContext,
+  type IContextRequestHandlerAnalysisMachine as IAnalysisMachineContext,
 } from '#xstate/RequestHandlerAnalysisMachine';
-import { isEmpty } from 'my-easy-fp';
-import { fail, pass, PassFailEither } from 'my-only-either';
-import * as tsm from 'ts-morph';
+import { fail, pass, type PassFailEither } from 'my-only-either';
+import type { Project } from 'ts-morph';
 import { interpret } from 'xstate';
 
 const log = logger();
@@ -19,7 +18,7 @@ const log = logger();
 interface IGetSourceTextParam {
   routeHandlerWithOption: IRouteHandler;
   option: IConfig;
-  project: tsm.Project;
+  project: Project;
 }
 
 export default async function getSourceText({
@@ -32,7 +31,7 @@ export default async function getSourceText({
   try {
     const source = project.getSourceFile(routeHandlerWithOption.filename);
 
-    if (isEmpty(source)) {
+    if (source == null) {
       return fail(new Error(`Source-code is empty: ${routeHandlerWithOption.filename}`));
     }
 
@@ -41,7 +40,7 @@ export default async function getSourceText({
     const routeHandler = nodes.find((node): node is IHandlerStatement => node.kind === 'handler');
     const routeOption = nodes.find((node): node is IOptionStatement => node.kind === 'option');
 
-    if (isEmpty(routeHandler)) {
+    if (routeHandler == null) {
       const reason: IReason = {
         type: 'error',
         filePath: source.getFilePath().toString(),

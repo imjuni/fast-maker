@@ -1,15 +1,14 @@
-import { IHandlerStatement } from '#compiler/interface/THandlerNode';
+import type { IHandlerStatement } from '#compiler/interface/THandlerNode';
 import getHandlerWithOption from '#compiler/navigate/getHandlerWithOption';
 import getInternalImportTypeReference from '#compiler/tool/getInternalImportTypeReference';
 import getResolvedModuleInImports from '#compiler/tool/getResolvedModuleInImports';
 import getTypeReferences from '#compiler/tool/getTypeReferences';
 import replaceTypeReferenceInTypeLiteral from '#compiler/tool/replaceTypeReferenceInTypeLiteral';
-import IConfig from '#config/interface/IConfig';
+import type IConfig from '#config/interface/IConfig';
+import logger from '#module/logging/logger';
 import * as env from '#test-tools/env';
-import logger from '#tool/logger';
 import posixJoin from '#tool/posixJoin';
 import 'jest';
-import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
 import path from 'path';
 import * as tsm from 'ts-morph';
@@ -44,7 +43,7 @@ test('getResolvedModuleInImports', async () => {
   const handlerWithOption = getHandlerWithOption(source);
   const handler = handlerWithOption.find((node) => node.kind === 'handler');
 
-  if (isEmpty(handler)) {
+  if (handler == null) {
     throw new Error('invalid handler');
   }
 
@@ -133,7 +132,7 @@ test('replaceTypeReferenceInTypeLiteral', async () => {
   const handlerWithOption = getHandlerWithOption(source);
   const handler = handlerWithOption.find((node) => node.kind === 'handler');
 
-  if (isEmpty(handler)) {
+  if (handler == null) {
     throw new Error('invalid handler');
   }
 
@@ -195,7 +194,7 @@ test('filterExternalTypeReference', async () => {
   const handlerWithOption = getHandlerWithOption(source);
   const handler = handlerWithOption.find((node) => node.kind === 'handler');
 
-  if (isEmpty(handler)) {
+  if (handler == null) {
     throw new Error('invalid handler');
   }
 

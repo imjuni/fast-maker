@@ -1,5 +1,5 @@
-import TMethodType from '#route/interface/TMethodType';
-import * as tsm from 'ts-morph';
+import type TMethodType from '#route/interface/TMethodType';
+import type { SourceFile } from 'ts-morph';
 
 export default interface IRouteConfiguration {
   method: TMethodType;
@@ -11,5 +11,5 @@ export default interface IRouteConfiguration {
   typeArgument?: string;
 
   sourceFilePath: string;
-  source: tsm.SourceFile;
+  source: SourceFile;
 }

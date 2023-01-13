@@ -1,13 +1,12 @@
-import logger from '#tool/logger';
-import { isEmpty, isFalse, isNotEmpty } from 'my-easy-fp';
-import * as tsm from 'ts-morph';
-import getNamedBindingName from './getNamedBindingName';
+import getNamedBindingName from '#compiler/tool/getNamedBindingName';
+import logger from '#module/logging/logger';
+import type { SourceFile, TypeReferenceNode } from 'ts-morph';
 
 const log = logger();
 
 interface IFilterExternalTypeReferenceParam {
-  source: tsm.SourceFile;
-  typeReferenceNodes: tsm.TypeReferenceNode[];
+  source: SourceFile;
+  typeReferenceNodes: TypeReferenceNode[];
 }
 
 export default function getInternalImportTypeReference({
@@ -21,11 +20,11 @@ export default function getInternalImportTypeReference({
   const importDeclarations = source.getImportDeclarations().filter((importDeclaration) => {
     const moduleSourceFile = importDeclaration.getModuleSpecifierSourceFile();
 
-    if (isEmpty(moduleSourceFile)) {
+    if (moduleSourceFile == null) {
       return false;
     }
 
-    return isFalse(moduleSourceFile.isFromExternalLibrary());
+    return moduleSourceFile.isFromExternalLibrary() === false;
   });
 
   const exportedNamedBindingBinding = importDeclarations
@@ -33,13 +32,14 @@ export default function getInternalImportTypeReference({
       const importClause = importDeclaration.getImportClauseOrThrow();
       const defaultImport = importClause.getDefaultImport();
 
-      const namedBindings = isNotEmpty(defaultImport)
-        ? [defaultImport.getText(), ...getNamedBindingName(importClause.getNamedBindings())]
-        : getNamedBindingName(importClause.getNamedBindings());
+      const namedBindings =
+        defaultImport != null
+          ? [defaultImport.getText(), ...getNamedBindingName(importClause.getNamedBindings())]
+          : getNamedBindingName(importClause.getNamedBindings());
 
       return namedBindings;
     })
-    .flatMap((namedBinding) => namedBinding);
+    .flat();
 
   const filteredTypeReferenceNodes = typeReferenceNodes.filter((node) =>
     exportedNamedBindingBinding.includes(node.getTypeName().getText()),

@@ -1,26 +1,24 @@
 import progress from '#cli/display/progress';
 import spinner from '#cli/display/spinner';
-import IReason from '#compiler/interface/IReason';
 import getTypeScriptProject from '#compiler/tool/getTypeScriptProject';
-import IConfig from '#config/interface/IConfig';
-import prettierProcessing from '#generator/prettierProcessing';
-import getRouteAnalysis from '#module/getRouteAnalysis';
-import getWritableCode from '#module/getWritableCode';
-import writeDebugLog from '#module/writeDebugLog';
-import getRouteFiles from '#route/getRouteFiles';
-import logger from '#tool/logger';
-import { fail, isFail, pass, PassFailEither } from 'my-only-either';
-
-const log = logger();
+import type IConfig from '#config/interface/IConfig';
+import LogBox from '#module/logging/LogBox';
+import proceedStage01 from '#module/proceedStage01';
+import proceedStage02 from '#module/proceedStage02';
+import proceedStage03 from '#module/proceedStage03';
+import type TMethodType from '#route/interface/TMethodType';
+import { fail, pass, type PassFailEither } from 'my-only-either';
 
 export default async function generateRouting(
   config: IConfig,
-  message?: { progress?: boolean; spinner?: boolean; message?: boolean },
-): Promise<PassFailEither<Error, { code: string; reasons: IReason[] }>> {
-  progress.enable = message?.progress ?? false;
-  spinner.enable = message?.spinner ?? false;
-
-  const logObject: Record<string, any> = {};
+  methods: readonly TMethodType[],
+): Promise<
+  PassFailEither<
+    { log: LogBox; err: Error },
+    { route: Omit<ReturnType<typeof proceedStage03>, 'reasons'>; log: LogBox }
+  >
+> {
+  const logbox = new LogBox();
 
   try {
     spinner.update(`load tsconfig.json: ${config.project}`);
@@ -29,21 +27,23 @@ export default async function generateRouting(
 
     spinner.update('typescript handler source complete, ...');
 
-    const reasons: IReason[] = [];
-    const routeHandlers = await getRouteFiles(config.handler);
+    const routeHandlers = await proceedStage01(config.handler, methods);
 
-    logObject.option = config;
-    logObject.routeHandlers = routeHandlers;
+    logbox.config = config;
+    logbox.routeHandlers = routeHandlers;
 
     const {
       routesAnalysised,
       reasons: analysisReasons,
       logObject: analysisLogObject,
-    } = await getRouteAnalysis(tsProject, config, routeHandlers);
+    } = await proceedStage02(tsProject, config, routeHandlers);
 
-    Object.entries(analysisLogObject).forEach(([key, value]) => {
-      logObject[key] = value;
-    });
+    logbox.fileExists = analysisLogObject.fileExists ?? [];
+    logbox.fileNotFound = analysisLogObject.fileNotFound ?? [];
+    logbox.functionExists = analysisLogObject.functionExists ?? [];
+    logbox.functionNotFound = analysisLogObject.functionNotFound ?? [];
+    logbox.routePathDuplicate = analysisLogObject.routePathDuplicate ?? [];
+    logbox.routePathUnique = analysisLogObject.routePathUnique ?? [];
 
     const {
       importConfigurations,
@@ -51,54 +51,64 @@ export default async function generateRouting(
       importCodes,
       routeCodes,
       reasons: aggregatedReasons,
-    } = getWritableCode(routesAnalysised, config);
+    } = proceedStage03(routesAnalysised, config);
 
-    logObject.importConfigurations = importConfigurations;
-    logObject.routeConfigurations = routeConfigurations;
-    logObject.importCodes = importCodes;
-    logObject.routeCodes = routeCodes;
+    logbox.importConfigurations = importConfigurations;
+    logbox.routeConfigurations = routeConfigurations;
+    logbox.importCodes = importCodes;
+    logbox.routeCodes = routeCodes;
 
-    reasons.push(...analysisReasons, ...aggregatedReasons);
+    logbox.reasons.push(...analysisReasons, ...aggregatedReasons);
 
-    const finalCode = [
-      `import { FastifyInstance } from 'fastify';`,
-      ...importCodes,
-      '\n',
-      `export ${config.useDefaultExport ? 'default ' : ''}function ${
-        config.routeFunctionName
-      }(fastify: FastifyInstance): void {`,
-      ...routeCodes,
-      `}`,
-    ];
+    return pass({
+      route: {
+        importConfigurations,
+        routeConfigurations,
+        importCodes,
+        routeCodes,
+      },
+      log: logbox,
+    });
 
-    logObject.finalCode = importCodes;
+    // const finalCode = [
+    //   `import { FastifyInstance } from 'fastify';`,
+    //   ...importCodes,
+    //   '\n',
+    //   `export ${config.useDefaultExport ? 'default ' : ''}function ${
+    //     config.routeFunctionName
+    //   }(fastify: FastifyInstance): void {`,
+    //   ...routeCodes,
+    //   `}`,
+    // ];
 
-    await writeDebugLog(config, routeConfigurations, logObject);
+    // logObject.finalCode = importCodes;
 
-    const prettfiedEither = await prettierProcessing({ code: finalCode.join('\n') });
+    // await writeDebugLog(config, routeConfigurations, logObject);
 
-    log.debug('--------------------------------------------------------');
-    log.debug(prettfiedEither);
-    log.debug('--------------------------------------------------------');
+    // const prettfiedEither = await prettierProcessing({ code: finalCode.join('\n') });
 
-    if (isFail(prettfiedEither)) {
-      throw prettfiedEither.fail;
-    }
+    // log.debug('--------------------------------------------------------');
+    // log.debug(prettfiedEither);
+    // log.debug('--------------------------------------------------------');
 
-    progress.update(routeHandlers.length);
+    // if (isFail(prettfiedEither)) {
+    //   throw prettfiedEither.fail;
+    // }
 
-    return pass({ code: prettfiedEither.pass, reasons });
+    // progress.update(routeHandlers.length);
+
+    // return pass({ code: prettfiedEither.pass, reasons: logbox.reasons });
   } catch (catched) {
     const err = catched instanceof Error ? catched : new Error('unknown error raised');
 
-    logObject.err = {
-      message: err.message,
-      stack: err.stack ?? '',
-    };
+    // logObject.err = {
+    //   message: err.message,
+    //   stack: err.stack ?? '',
+    // };
 
-    await writeDebugLog(config, [], logObject);
+    // await writeDebugLog(config, [], logObject);
 
-    return fail(err);
+    return fail({ err, log: logbox });
   } finally {
     progress.stop();
   }

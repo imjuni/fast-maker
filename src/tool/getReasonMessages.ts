@@ -1,6 +1,5 @@
-import IReason from '#compiler/interface/IReason';
+import type IReason from '#compiler/interface/IReason';
 import chalk from 'chalk';
-import { isEmpty } from 'my-easy-fp';
 import path from 'path';
 
 export default function getReasonMessages(reasons: IReason[]): string {
@@ -14,15 +13,16 @@ export default function getReasonMessages(reasons: IReason[]): string {
 
     const { filePath } = reason;
 
-    const filename = isEmpty(reason.lineAndCharacter)
-      ? `${path.basename(filePath)}`
-      : `${path.basename(filePath)}:${reason.lineAndCharacter.line}:${reason.lineAndCharacter.character}`;
+    const filename =
+      reason.lineAndCharacter == null
+        ? `${path.basename(filePath)}`
+        : `${path.basename(filePath)}:${reason.lineAndCharacter.line}:${reason.lineAndCharacter.character}`;
 
     const chevronRight = reason.type === 'error' ? chalk.red('>') : chalk.yellow('>');
 
     messageBuf.push(`${typeMessage} ${filename}`);
 
-    if (isEmpty(reason.lineAndCharacter)) {
+    if (reason.lineAndCharacter == null) {
       messageBuf.push(`   ${chevronRight} ${chalk.gray(`${filePath}`)}`);
     } else {
       messageBuf.push(

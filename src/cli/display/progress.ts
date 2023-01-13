@@ -19,27 +19,21 @@ class Progress {
   }
 
   start(total: number, startValue: number) {
-    if (this.enable === false) {
-      return;
+    if (this.enable === true) {
+      this.#bar.start(total, startValue);
     }
-
-    this.#bar.start(total, startValue);
   }
 
   increment() {
-    if (this.enable === false) {
-      return;
+    if (this.enable === true) {
+      this.#bar.increment();
     }
-
-    this.#bar.increment();
   }
 
   update(updateValue: number) {
-    if (this.enable === false) {
-      return;
+    if (this.enable === true) {
+      this.#bar.update(updateValue);
     }
-
-    this.#bar.update(updateValue);
   }
 
   stop() {

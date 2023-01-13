@@ -1,5 +1,5 @@
-import { fail, pass, PassFailEither } from 'my-only-either';
-import prettier, { Options } from 'prettier';
+import { fail, pass, type PassFailEither } from 'my-only-either';
+import prettier, { type Options } from 'prettier';
 
 export interface IPrettierProcessingParam {
   code: string;

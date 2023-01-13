@@ -1,26 +1,31 @@
-import { isNotEmpty } from 'my-easy-fp';
-import * as tsm from 'ts-morph';
+import type {
+  ClassDeclaration,
+  InterfaceDeclaration,
+  SourceFile,
+  TypeAliasDeclaration,
+  TypeReferenceNode,
+} from 'ts-morph';
 
 interface IValidatePropertySignatureParam {
-  source: tsm.SourceFile;
-  typeReferenceNodes: tsm.TypeReferenceNode[];
+  source: SourceFile;
+  typeReferenceNodes: TypeReferenceNode[];
 }
 
 interface IValidateTypeReferencesReturn {
   valid: boolean;
 
   typeAliases: {
-    total: tsm.TypeAliasDeclaration[];
-    exported: tsm.TypeAliasDeclaration[];
+    total: TypeAliasDeclaration[];
+    exported: TypeAliasDeclaration[];
   };
   interfaces: {
-    total: tsm.InterfaceDeclaration[];
-    exported: tsm.InterfaceDeclaration[];
+    total: InterfaceDeclaration[];
+    exported: InterfaceDeclaration[];
   };
 
   classes: {
-    total: tsm.ClassDeclaration[];
-    exported: tsm.ClassDeclaration[];
+    total: ClassDeclaration[];
+    exported: ClassDeclaration[];
   };
 }
 
@@ -51,7 +56,7 @@ export default function validateTypeReferences({
 
   const matchedClasses = classes.filter((classNode) => {
     const name = classNode.getName();
-    return isNotEmpty(name) && typeNames.includes(name);
+    return name != null && typeNames.includes(name);
   });
   const matchAndExportedClasses = matchedClasses.filter((classNode) => classNode.isExported());
 

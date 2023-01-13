@@ -1,6 +1,6 @@
-import IImportConfiguration from '#compiler/interface/IImportConfiguration';
-import logger from '#tool/logger';
-import { isNotEmpty, TResolveArray } from 'my-easy-fp';
+import type IImportConfiguration from '#compiler/interface/IImportConfiguration';
+import logger from '#module/logging/logger';
+import type { LastArrayElement } from 'type-fest';
 
 const log = logger();
 
@@ -19,9 +19,9 @@ export default function mergeImportConfiguration(
   next.importFile = target.importFile;
   next.namedBindings = Object.values(
     [...source.namedBindings, ...target.namedBindings].reduce<
-      Record<string, TResolveArray<IImportConfiguration['namedBindings']>>
+      Record<string, LastArrayElement<IImportConfiguration['namedBindings']>>
     >((aggregation, binding) => {
-      if (isNotEmpty(aggregation[binding.alias])) {
+      if (aggregation[binding.alias] != null) {
         return aggregation;
       }
 

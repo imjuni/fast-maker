@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import pino, { Logger } from 'pino';
+import pino, { type Logger } from 'pino';
 import pretty from 'pino-pretty';
 
 let log:

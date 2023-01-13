@@ -1,6 +1,6 @@
-import IImportConfiguration from '#compiler/interface/IImportConfiguration';
-import IReason from '#compiler/interface/IReason';
-import { IHandlerStatement, IOptionStatement } from '#compiler/interface/THandlerNode';
+import type IImportConfiguration from '#compiler/interface/IImportConfiguration';
+import type IReason from '#compiler/interface/IReason';
+import type { IHandlerStatement, IOptionStatement } from '#compiler/interface/THandlerNode';
 import getPropertySignatures from '#compiler/navigate/getPropertySignatures';
 import getLocalModuleInImports from '#compiler/tool/getLocalModuleInImport';
 import getResolvedModuleInImports from '#compiler/tool/getResolvedModuleInImports';
@@ -9,26 +9,25 @@ import getTypeSymbolText from '#compiler/tool/getTypeSymbolText';
 import replaceTypeReferenceInTypeLiteral from '#compiler/tool/replaceTypeReferenceInTypeLiteral';
 import validatePropertySignature from '#compiler/validation/validatePropertySignature';
 import validateTypeReferences from '#compiler/validation/validateTypeReference';
-import IConfig from '#config/interface/IConfig';
+import type IConfig from '#config/interface/IConfig';
 import dedupeImportConfiguration from '#generator/dedupeImportConfiguration';
 import getHandlerNameWithoutSquareBracket from '#generator/getHandlerNameWithoutSquareBracket';
 import getImportConfigurationFromResolutions from '#generator/getImportConfigurationFromResolutions';
-import IRouteConfiguration from '#route/interface/IRouteConfiguration';
-import IRouteHandler from '#route/interface/IRouteHandler';
+import logger from '#module/logging/logger';
+import type IRouteConfiguration from '#route/interface/IRouteConfiguration';
+import type IRouteHandler from '#route/interface/IRouteHandler';
 import appendPostfixHash from '#tool/appendPostfixHash';
-import logger from '#tool/logger';
 import castFunctionNode from '#xstate/tool/castFunctionNode';
 import chalk from 'chalk';
-import { isEmpty, isFalse, isNotEmpty } from 'my-easy-fp';
 import * as path from 'path';
-import * as tsm from 'ts-morph';
+import type { Project, SourceFile, Type } from 'ts-morph';
 import { assign, createMachine } from 'xstate';
 
 const log = logger();
 
 export interface IContextRequestHandlerAnalysisMachine {
-  project: tsm.Project;
-  source: tsm.SourceFile;
+  project: Project;
+  source: SourceFile;
   routeHandler: IRouteHandler;
   handler: IHandlerStatement;
   currentNode: number;
@@ -37,7 +36,7 @@ export interface IContextRequestHandlerAnalysisMachine {
   hash: string;
 
   useFastifyRequest: boolean;
-  typeNode?: tsm.Type;
+  typeNode?: Type;
   messages: IReason[];
   importBox: Record<string, IImportConfiguration>;
   routeBox: Record<string, IRouteConfiguration>;
@@ -254,14 +253,14 @@ const requestHandlerAnalysisMachine = (
           const [parameter] = node.getParameters();
 
           // Req arguments를 전달해야 여기로 오기 때문에 parameter는 무조건 1개 이상이다
-          if (isEmpty(parameter)) {
+          if (parameter == null) {
             throw new Error('Invalid state in assignFastifyTypeArgument: empty parameter');
           }
 
           // parameter에서 type이 없는 경우 any와 동일하게 처리하면 된다,
           // 그리고 이 상황도 없다, type 없는 경우 이미 ANY_TYPE으로 보냈다
           const parameterTypeNode = parameter.getType();
-          if (isEmpty(parameterTypeNode)) {
+          if (parameterTypeNode == null) {
             throw new Error('Invalid state in assignFastifyTypeArgument: empty parameter.type');
           }
 
@@ -274,7 +273,7 @@ const requestHandlerAnalysisMachine = (
           const [parameter] = node.getParameters();
 
           // FastifyRequest를 사용해야 여기로 오기 때문에 parameters가 무조건 1개 이상이다
-          if (isEmpty(parameter)) {
+          if (parameter == null) {
             throw new Error('Invalid state in assignFastifyTypeArgument: empty parameter');
           }
 
@@ -288,7 +287,7 @@ const requestHandlerAnalysisMachine = (
           }
 
           const [typeArgument] = typeArguments ?? [];
-          if (isEmpty(typeArgument)) {
+          if (typeArgument == null) {
             throw new Error('Invalid state in assignFastifyTypeArgument: empty parameter.type.typeArguments');
           }
 
@@ -306,14 +305,15 @@ const requestHandlerAnalysisMachine = (
           // apply filenamify, valid-filename after display IReason by warn
           const routeFileImportConfiguration: IImportConfiguration = {
             hash: next.hash,
-            namedBindings: isNotEmpty(next.routeOption)
-              ? [
-                  {
-                    name: 'option',
-                    alias: `${appendPostfixHash('option', next.hash)}`,
-                  },
-                ]
-              : [],
+            namedBindings:
+              next.routeOption != null
+                ? [
+                    {
+                      name: 'option',
+                      alias: `${appendPostfixHash('option', next.hash)}`,
+                    },
+                  ]
+                : [],
             nonNamedBinding:
               next.handler.name === 'anonymous function'
                 ? appendPostfixHash(
@@ -329,7 +329,7 @@ const requestHandlerAnalysisMachine = (
 
           const routeConfiguration: IRouteConfiguration = {
             hash: next.hash,
-            hasOption: isNotEmpty(next.routeOption),
+            hasOption: next.routeOption != null,
             method: next.routeHandler.method,
             routePath: next.routeHandler.routePath,
             handlerName:
@@ -379,10 +379,10 @@ const requestHandlerAnalysisMachine = (
 
           const notExportClassReasons = result.classes.total
             .filter((classNode) => {
-              return isFalse(
+              return (
                 result.classes.exported
                   .map((exportedClassNode) => exportedClassNode.getText())
-                  .includes(classNode.getText()),
+                  .includes(classNode.getText()) === false
               );
             })
             .map((nonExportNode) => {
@@ -405,10 +405,10 @@ const requestHandlerAnalysisMachine = (
 
           const notExportInterfaceReasons = result.interfaces.total
             .filter((interfaceNode) => {
-              return isFalse(
+              return (
                 result.interfaces.exported
                   .map((exportedClassNode) => exportedClassNode.getText())
-                  .includes(interfaceNode.getText()),
+                  .includes(interfaceNode.getText()) === false
               );
             })
             .map((nonExportNode) => {
@@ -431,10 +431,10 @@ const requestHandlerAnalysisMachine = (
 
           const notExportTypeAliasReasons = result.typeAliases.total
             .filter((typeAliasNode) => {
-              return isFalse(
+              return (
                 result.typeAliases.exported
                   .map((exportedClassNode) => exportedClassNode.getText())
-                  .includes(typeAliasNode.getText()),
+                  .includes(typeAliasNode.getText()) === false
               );
             })
             .map((nonExportNode) => {
@@ -502,14 +502,15 @@ const requestHandlerAnalysisMachine = (
 
           const routeFileImportConfiguration: IImportConfiguration = {
             hash: next.hash,
-            namedBindings: isNotEmpty(next.routeOption)
-              ? [
-                  {
-                    name: 'option',
-                    alias: `${appendPostfixHash('option', next.hash)}`,
-                  },
-                ]
-              : [],
+            namedBindings:
+              next.routeOption != null
+                ? [
+                    {
+                      name: 'option',
+                      alias: `${appendPostfixHash('option', next.hash)}`,
+                    },
+                  ]
+                : [],
             nonNamedBinding:
               next.handler.name === 'anonymous function'
                 ? appendPostfixHash(
@@ -523,7 +524,7 @@ const requestHandlerAnalysisMachine = (
 
           const routeConfiguration: IRouteConfiguration = {
             hash: next.hash,
-            hasOption: isNotEmpty(next.routeOption),
+            hasOption: next.routeOption != null,
             method: next.routeHandler.method,
             routePath: next.routeHandler.routePath,
             handlerName:
@@ -597,7 +598,7 @@ const requestHandlerAnalysisMachine = (
 
           const record = importConfigurations.reduce<Record<string, IImportConfiguration>>(
             (aggregation, importConfiguration) => {
-              if (isEmpty(aggregation[importConfiguration.importFile])) {
+              if (aggregation[importConfiguration.importFile] == null) {
                 return { ...aggregation, [importConfiguration.importFile]: importConfiguration };
               }
 
@@ -673,7 +674,7 @@ const requestHandlerAnalysisMachine = (
             typeName === 'Logger';
 
           if (
-            isFalse(isFastifyTypeName) &&
+            isFastifyTypeName === false &&
             (typeArgument.isObject() ||
               typeArgument.isClassOrInterface() ||
               typeArgument.isLiteral() ||
@@ -688,7 +689,7 @@ const requestHandlerAnalysisMachine = (
           // parameter에서 type이 없다면 any와 동일하게 처리하면 된다
           const { typeNode } = context;
 
-          if (isEmpty(typeNode)) {
+          if (typeNode == null) {
             return false;
           }
 
@@ -705,7 +706,7 @@ const requestHandlerAnalysisMachine = (
             typeName === 'Logger';
 
           if (
-            isFalse(isFastifyTypeName) &&
+            isFastifyTypeName === false &&
             (typeNode.isObject() ||
               typeNode.isClassOrInterface() ||
               typeNode.isLiteral() ||
