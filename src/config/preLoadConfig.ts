@@ -1,4 +1,4 @@
-import logger from '#tool/logger';
+import logger from '#module/logging/logger';
 import * as findUp from 'find-up';
 import * as fs from 'fs';
 import { parse } from 'jsonc-parser';

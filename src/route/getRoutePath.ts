@@ -1,7 +1,6 @@
+import logger from '#module/logging/logger';
 import getMethod from '#route/getMethod';
-import IRouteHandler from '#route/interface/IRouteHandler';
-import logger from '#tool/logger';
-import { isEmpty } from 'my-easy-fp';
+import type IRouteHandler from '#route/interface/IRouteHandler';
 import { replaceSepToPosix, startSepAppend, startSepRemove } from 'my-node-fp';
 import { isFail } from 'my-only-either';
 import * as path from 'path';
@@ -16,7 +15,7 @@ export default function getRoutePath(originFilename: string): IRouteHandler {
   const refinedFilename = startSepRemove(filename, path.posix.sep);
   const filenameRegMatched = refinedFilename.match(routePathMatchReg);
 
-  if (isEmpty(filenameRegMatched)) {
+  if (filenameRegMatched == null) {
     throw new Error(`route handler directory cannot match method with filename: ${refinedFilename}`);
   }
 
@@ -33,7 +32,7 @@ export default function getRoutePath(originFilename: string): IRouteHandler {
     .map((endpoint) => {
       const matched = endpoint.match(routePathElementMatchReg);
 
-      if (isEmpty(matched)) {
+      if (matched == null) {
         throw new Error(`invalid endpoint: ${refinedFilename} ${endpoint}`);
       }
 

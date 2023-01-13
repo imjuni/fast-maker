@@ -1,15 +1,14 @@
 import fastGlob from 'fast-glob';
-import { isEmpty, isFalse } from 'my-easy-fp';
 import { exists, replaceSepToPosix } from 'my-node-fp';
 import * as path from 'path';
 
 export default async function getHandlerFile(handlersPath?: string): Promise<string[]> {
   try {
-    if (isEmpty(handlersPath)) {
+    if (handlersPath == null) {
       return [];
     }
 
-    if (isFalse(await exists(handlersPath))) {
+    if ((await exists(handlersPath)) === false) {
       return [];
     }
 

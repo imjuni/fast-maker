@@ -1,10 +1,11 @@
-import * as tsm from 'ts-morph';
+import type { Node, SourceFile } from 'ts-morph';
+import type { LineAndCharacter } from 'typescript';
 
 export default interface IReason {
   type: 'error' | 'warn';
-  lineAndCharacter?: tsm.ts.LineAndCharacter;
+  lineAndCharacter?: LineAndCharacter;
   filePath: string;
-  source?: tsm.SourceFile;
-  node?: tsm.Node;
+  source?: SourceFile;
+  node?: Node;
   message: string;
 }

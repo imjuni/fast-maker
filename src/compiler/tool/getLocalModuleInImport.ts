@@ -1,17 +1,16 @@
-import IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
+import type IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
 import getTypeSymbolText from '#compiler/tool/getTypeSymbolText';
-import IConfig from '#config/interface/IConfig';
+import type IConfig from '#config/interface/IConfig';
 import appendPostfixHash from '#tool/appendPostfixHash';
 import getHash from '#tool/getHash';
-import { isNotEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
 import path from 'path';
-import * as tsm from 'ts-morph';
+import type { SourceFile, TypeReferenceNode } from 'ts-morph';
 
 interface IGetLocalModuleInImports {
-  source: tsm.SourceFile;
+  source: SourceFile;
   option: IConfig;
-  typeReferenceNodes: tsm.TypeReferenceNode[];
+  typeReferenceNodes: TypeReferenceNode[];
 }
 
 export default function getLocalModuleInImports({
@@ -37,7 +36,7 @@ export default function getLocalModuleInImports({
 
   const matchedClasses = classes.filter((classNode) => {
     const name = classNode.getName();
-    return isNotEmpty(name) && typeNames.includes(name);
+    return name != null && typeNames.includes(name);
   });
   const matchAndExportedClasses = matchedClasses.filter((classNode) => classNode.isExported());
 

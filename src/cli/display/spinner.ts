@@ -11,15 +11,15 @@ class Spinner {
   }
 
   start() {
-    if (this.enable === false) {
-      return;
+    if (this.enable === true) {
+      this.#spinner.start();
     }
-
-    this.#spinner.start();
   }
 
   update(message: string) {
-    this.#spinner.text = message;
+    if (this.enable === true) {
+      this.#spinner.text = message;
+    }
   }
 
   stop() {

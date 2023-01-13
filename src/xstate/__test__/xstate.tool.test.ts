@@ -1,19 +1,19 @@
-import IReason from '#compiler/interface/IReason';
-import { IHandlerStatement, IOptionStatement } from '#compiler/interface/THandlerNode';
+import type IReason from '#compiler/interface/IReason';
+import type { IHandlerStatement, IOptionStatement } from '#compiler/interface/THandlerNode';
 import getHandlerWithOption from '#compiler/navigate/getHandlerWithOption';
-import IConfig from '#config/interface/IConfig';
+import type IConfig from '#config/interface/IConfig';
 import ErrorWithMessage from '#module/ErrorWithMessage';
-import getRouteFiles from '#route/getRouteFiles';
+import logger from '#module/logging/logger';
+import proceedStage01 from '#module/proceedStage01';
+import methods from '#route/interface/methods';
 import * as env from '#test-tools/env';
 import getTestValue from '#test-tools/getTestValue';
 import getHash from '#tool/getHash';
-import logger from '#tool/logger';
 import posixJoin from '#tool/posixJoin';
 import requestHandlerAnalysisMachine, {
-  IContextRequestHandlerAnalysisMachine,
+  type IContextRequestHandlerAnalysisMachine,
 } from '#xstate/RequestHandlerAnalysisMachine';
 import 'jest';
-import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
 import path from 'path';
 import * as tsm from 'ts-morph';
@@ -52,16 +52,16 @@ test('t001-FSM-TypeLiteral', async () => {
   const handlerWithOption = getHandlerWithOption(source);
   const handler = handlerWithOption.find((node) => node.kind === 'handler');
 
-  if (isEmpty(handler)) {
+  if (handler == null) {
     throw new Error('invalid handler');
   }
 
-  const routeHandlerFiles = await getRouteFiles(share.option.handler);
+  const routeHandlerFiles = await proceedStage01(share.option.handler, methods);
   const testRouteHandlerFile = routeHandlerFiles
     .filter((routeHandlerFile) => routeHandlerFile.method === 'get')
     .find((routeHandlerFile) => routeHandlerFile.filename === routeFilePath);
 
-  if (isEmpty(testRouteHandlerFile)) {
+  if (testRouteHandlerFile == null) {
     throw new Error(`Cannot create route handler configuration: ${routeFilePath}`);
   }
 
@@ -70,7 +70,7 @@ test('t001-FSM-TypeLiteral', async () => {
   const routeHandler = nodes.find((node): node is IHandlerStatement => node.kind === 'handler');
   const routeOption = nodes.find((node): node is IOptionStatement => node.kind === 'option');
 
-  if (isEmpty(routeHandler)) {
+  if (routeHandler == null) {
     const reason: IReason = {
       type: 'error',
       filePath: source.getFilePath().toString(),
@@ -118,16 +118,16 @@ test('t002-FSM-FastifyRequest', async () => {
   const handlerWithOption = getHandlerWithOption(source);
   const handler = handlerWithOption.find((node) => node.kind === 'handler');
 
-  if (isEmpty(handler)) {
+  if (handler == null) {
     throw new Error('invalid handler');
   }
 
-  const routeHandlerFiles = await getRouteFiles(share.option.handler);
+  const routeHandlerFiles = await proceedStage01(share.option.handler, methods);
   const testRouteHandlerFile = routeHandlerFiles
     .filter((routeHandlerFile) => routeHandlerFile.method === 'get')
     .find((routeHandlerFile) => routeHandlerFile.filename === routeFilePath);
 
-  if (isEmpty(testRouteHandlerFile)) {
+  if (testRouteHandlerFile == null) {
     throw new Error(`Cannot create route handler configuration: ${routeFilePath}`);
   }
 
@@ -136,7 +136,7 @@ test('t002-FSM-FastifyRequest', async () => {
   const routeHandler = nodes.find((node): node is IHandlerStatement => node.kind === 'handler');
   const routeOption = nodes.find((node): node is IOptionStatement => node.kind === 'option');
 
-  if (isEmpty(routeHandler)) {
+  if (routeHandler == null) {
     const reason: IReason = {
       type: 'error',
       filePath: source.getFilePath().toString(),

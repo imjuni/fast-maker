@@ -48,7 +48,8 @@
         "argsIgnorePattern": "^_.+$"
       }
     ],
-    "import/extensions": ["off"]
+    "import/extensions": ["off"],
+    "@typescript-eslint/consistent-type-imports": ["error", { "prefer": "type-imports" }]
   },
   "settings": {
     "import/resolver": {

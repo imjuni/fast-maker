@@ -1,5 +1,5 @@
-import IConfig from '#config/interface/IConfig';
-import { Argv } from 'yargs';
+import type IConfig from '#config/interface/IConfig';
+import type { Argv } from 'yargs';
 
 export default function builder(args: Argv<IConfig>): Argv<IConfig> {
   args

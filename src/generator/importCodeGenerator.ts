@@ -1,8 +1,8 @@
-import IImportConfiguration from '#compiler/interface/IImportConfiguration';
-import IConfig from '#config/interface/IConfig';
+import type IImportConfiguration from '#compiler/interface/IImportConfiguration';
+import type IConfig from '#config/interface/IConfig';
 import getHashedBindingCode from '#generator/getHashedBindingCode';
 import { replaceSepToPosix } from 'my-node-fp';
-import * as path from 'path';
+import path from 'path';
 
 interface IImportCodeGeneratorParam {
   option: IConfig;

@@ -1,13 +1,12 @@
-import IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
-import logger from '#tool/logger';
-import { isEmpty } from 'my-easy-fp';
-import * as tsm from 'ts-morph';
+import type IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
+import logger from '#module/logging/logger';
+import type { TypeReferenceNode } from 'ts-morph';
 
 const log = logger();
 
 interface IReplaceTypeReferenceInTypeLiteralParam {
   resolutions: IGetModuleInImports[];
-  typeReferenceNodes: tsm.TypeReferenceNode[];
+  typeReferenceNodes: TypeReferenceNode[];
 }
 export default function replaceTypeReferenceInTypeLiteral({
   resolutions,
@@ -23,7 +22,7 @@ export default function replaceTypeReferenceInTypeLiteral({
         (importDeclaration) => importDeclaration.importModuleNameFrom,
       );
 
-      if (isEmpty(moduleNames) || moduleNames.length <= 0) {
+      if (moduleNames == null || moduleNames.length <= 0) {
         return false;
       }
 

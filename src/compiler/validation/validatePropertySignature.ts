@@ -1,10 +1,9 @@
 import validParamNames from '#compiler/validation/validParamNames';
 import fuzzyWithCase, { type IFuzzyWithCaseReturn } from '#tool/fuzzyWithCase';
-import { isFalse, isNotEmpty } from 'my-easy-fp';
-import * as tsm from 'ts-morph';
+import type { Symbol } from 'ts-morph';
 
 interface IValidatePropertySignatureParam {
-  propertySignatures: tsm.Symbol[];
+  propertySignatures: Symbol[];
   type: 'FastifyRequest' | 'ObjectType';
 }
 
@@ -13,13 +12,13 @@ export default function validatePropertySignature({ propertySignatures, type }: 
   const expectNames = type === 'FastifyRequest' ? validParamNames.fastify : validParamNames.custom;
 
   const validNames = names.filter((name) => expectNames.includes(name));
-  const anotherNames = names.filter((name) => isFalse(validNames.includes(name)));
+  const anotherNames = names.filter((name) => validNames.includes(name) === false);
 
   const fuzzyResult = anotherNames.reduce<Record<string, IFuzzyWithCaseReturn>>((aggregated, name) => {
     const fuzzyResults = fuzzyWithCase(expectNames, name).filter((fuzzied) => fuzzied.percent > 0);
     const [headFuzzyResult] = fuzzyResults;
 
-    if (isNotEmpty(headFuzzyResult)) {
+    if (headFuzzyResult != null) {
       return { ...aggregated, [name]: headFuzzyResult };
     }
 

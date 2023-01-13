@@ -1,6 +1,7 @@
+import proceedStage01 from '#module/proceedStage01';
 import getHandlerFile from '#route/getHandlerFile';
-import getRouteFiles from '#route/getRouteFiles';
 import getRoutePath from '#route/getRoutePath';
+import methods from '#route/interface/methods';
 import * as env from '#test-tools/env';
 import posixJoin from '#tool/posixJoin';
 import 'jest';
@@ -66,7 +67,7 @@ test('getRoutePath', () => {
 });
 
 test('getRouteFiles', async () => {
-  const routeFiles = await getRouteFiles(env.handlerPath);
+  const routeFiles = await proceedStage01(env.handlerPath, methods);
 
   const expectation = [
     {

@@ -1,12 +1,11 @@
-import { IHandlerStatement } from '#compiler/interface/THandlerNode';
+import type { IHandlerStatement } from '#compiler/interface/THandlerNode';
 import getArrowFunctionWithModifier from '#compiler/navigate/getArrowFunctionWithModifier';
 import getFunctionDeclarationWithModifier from '#compiler/navigate/getFunctionDeclarationWithModifier';
 import getHandlerWithOption from '#compiler/navigate/getHandlerWithOption';
 import getPropertySignatures from '#compiler/navigate/getPropertySignatures';
+import logger from '#module/logging/logger';
 import * as env from '#test-tools/env';
-import logger from '#tool/logger';
 import 'jest';
-import { isEmpty } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
 import path from 'path';
 import * as tsm from 'ts-morph';
@@ -62,7 +61,7 @@ test('getArrowFunctionModifier', async () => {
   const declarations = declarationMap.get('default') ?? [];
   const handlerStatement = getArrowFunctionWithModifier(declarations);
 
-  if (isEmpty(handlerStatement)) {
+  if (handlerStatement == null) {
     throw new Error('handler statement empty');
   }
 
@@ -87,7 +86,7 @@ test('getFunctionDeclarationWithModifier', async () => {
   const declarations = declarationMap.get('default') ?? [];
   const handlerStatement = getFunctionDeclarationWithModifier(declarations);
 
-  if (isEmpty(handlerStatement)) {
+  if (handlerStatement == null) {
     throw new Error('handler statement empty');
   }
 
@@ -113,7 +112,7 @@ test('getPropertySignatures', async () => {
   const handlerWithOption = getHandlerWithOption(source);
   const handler = handlerWithOption.find((node) => node.kind === 'handler');
 
-  if (isEmpty(handler)) {
+  if (handler == null) {
     throw new Error('invalid handler');
   }
 

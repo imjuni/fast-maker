@@ -1,9 +1,9 @@
-import IConfig from '#config/interface/IConfig';
+import type IConfig from '#config/interface/IConfig';
 import { existsSync } from 'my-node-fp';
 import path from 'path';
-import yargs from 'yargs';
+import type { Arguments } from 'yargs';
 
-export default function isValidConfig(argv: yargs.Arguments<IConfig>) {
+export default function isValidConfig(argv: Arguments<IConfig>) {
   // check project file exits
   const { project } = argv;
 

@@ -1,8 +1,9 @@
-import THandlerNode, { IOptionStatement } from '#compiler/interface/THandlerNode';
+import type THandlerNode from '#compiler/interface/THandlerNode';
+import type { IOptionStatement } from '#compiler/interface/THandlerNode';
 import getArrowFunctionWithModifier from '#compiler/navigate/getArrowFunctionWithModifier';
 import getFunctionDeclarationWithModifier from '#compiler/navigate/getFunctionDeclarationWithModifier';
-import { isEmpty, isNotEmpty } from 'my-easy-fp';
-import * as tsm from 'ts-morph';
+import type { SourceFile } from 'ts-morph';
+import { SyntaxKind } from 'ts-morph';
 
 /**
  * 파일에 선언된 http handler를 가져온다. async/sync 구분을 하고 function, arrow function을 구분한다
@@ -11,19 +12,19 @@ import * as tsm from 'ts-morph';
  * function and arrow function
  * @param sourceFile TypeScript source file object, tsm.SourceFile object
  */
-export default function getHandlerWithOption(sourceFile: tsm.SourceFile): THandlerNode[] {
+export default function getHandlerWithOption(sourceFile: SourceFile): THandlerNode[] {
   const declarationMap = sourceFile.getExportedDeclarations();
   const defaultExportedNodes = declarationMap.get('default');
   const optionNamedExportedNodes = declarationMap.get('option');
 
   const nodes = [
     (() => {
-      if (isNotEmpty(optionNamedExportedNodes)) {
+      if (optionNamedExportedNodes != null) {
         const variableDeclarationNode = optionNamedExportedNodes.find(
-          (optionNode) => optionNode.getKind() === tsm.SyntaxKind.VariableDeclaration,
+          (optionNode) => optionNode.getKind() === SyntaxKind.VariableDeclaration,
         );
 
-        if (isEmpty(variableDeclarationNode)) {
+        if (variableDeclarationNode == null) {
           return undefined;
         }
 
@@ -34,22 +35,22 @@ export default function getHandlerWithOption(sourceFile: tsm.SourceFile): THandl
       return undefined;
     })(),
     (() => {
-      if (isNotEmpty(defaultExportedNodes)) {
-        if (defaultExportedNodes.some((handlerNode) => handlerNode.getKind() === tsm.SyntaxKind.ArrowFunction)) {
+      if (defaultExportedNodes != null) {
+        if (defaultExportedNodes.some((handlerNode) => handlerNode.getKind() === SyntaxKind.ArrowFunction)) {
           return getArrowFunctionWithModifier(defaultExportedNodes);
         }
 
-        if (defaultExportedNodes.some((handlerNode) => handlerNode.getKind() === tsm.SyntaxKind.VariableDeclaration)) {
+        if (defaultExportedNodes.some((handlerNode) => handlerNode.getKind() === SyntaxKind.VariableDeclaration)) {
           const [firstNode] = defaultExportedNodes;
-          const variableDeclarationNode = firstNode.asKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
+          const variableDeclarationNode = firstNode.asKindOrThrow(SyntaxKind.VariableDeclaration);
 
           const initialiezer = variableDeclarationNode.getInitializerOrThrow();
-          const identifier = variableDeclarationNode.getNameNode().asKindOrThrow(tsm.SyntaxKind.Identifier);
+          const identifier = variableDeclarationNode.getNameNode().asKindOrThrow(SyntaxKind.Identifier);
 
           return getArrowFunctionWithModifier([identifier, initialiezer]);
         }
 
-        if (defaultExportedNodes.some((handlerNode) => handlerNode.getKind() === tsm.SyntaxKind.FunctionDeclaration)) {
+        if (defaultExportedNodes.some((handlerNode) => handlerNode.getKind() === SyntaxKind.FunctionDeclaration)) {
           return getFunctionDeclarationWithModifier(defaultExportedNodes);
         }
 
@@ -58,7 +59,7 @@ export default function getHandlerWithOption(sourceFile: tsm.SourceFile): THandl
 
       return undefined;
     })(),
-  ].filter((node): node is THandlerNode => isNotEmpty(node));
+  ].filter((node): node is THandlerNode => node != null);
 
   return nodes;
 }

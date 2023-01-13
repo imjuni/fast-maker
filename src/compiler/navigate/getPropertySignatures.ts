@@ -1,18 +1,17 @@
-import { isEmpty } from 'my-easy-fp';
-import * as tsm from 'ts-morph';
+import type { ParameterDeclaration, Symbol } from 'ts-morph';
 
 interface IGetFirstTypeArgument {
-  parameter: tsm.ParameterDeclaration;
+  parameter: ParameterDeclaration;
 }
 
-export default function getPropertySignatures({ parameter }: IGetFirstTypeArgument): tsm.Symbol[] {
+export default function getPropertySignatures({ parameter }: IGetFirstTypeArgument): Symbol[] {
   const typeName = parameter.getType().getSymbolOrThrow().getEscapedName();
 
   if (typeName === 'FastifyRequest') {
     const typeArguments = parameter.getType().getTypeArguments();
     const [headTypeArgument] = typeArguments;
 
-    if (isEmpty(headTypeArgument)) {
+    if (headTypeArgument == null) {
       throw new Error('Cannot found first type argument in parameter');
     }
 

@@ -1,6 +1,6 @@
 import validParamNames from '#compiler/validation/validParamNames';
+import logger from '#module/logging/logger';
 import fuzzyWithCase from '#tool/fuzzyWithCase';
-import logger from '#tool/logger';
 import 'jest';
 
 const log = logger();

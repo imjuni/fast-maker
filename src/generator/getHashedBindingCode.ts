@@ -1,6 +1,5 @@
-import IImportConfiguration from '#compiler/interface/IImportConfiguration';
+import type IImportConfiguration from '#compiler/interface/IImportConfiguration';
 import getHandlerNameWithoutSquareBracket from '#generator/getHandlerNameWithoutSquareBracket';
-import { isNotEmpty } from 'my-easy-fp';
 
 export default function getHashedBindingCode({
   nonNamedBinding,
@@ -9,7 +8,7 @@ export default function getHashedBindingCode({
   nonNamedBinding?: string;
   namedBindings?: IImportConfiguration['namedBindings'];
 }): string {
-  if (isNotEmpty(nonNamedBinding) && nonNamedBinding !== '' && isNotEmpty(namedBindings) && namedBindings.length > 0) {
+  if (nonNamedBinding != null && nonNamedBinding !== '' && namedBindings != null && namedBindings.length > 0) {
     const optionProcessedNamedBindings = namedBindings.map((binding) =>
       binding.name === binding.alias ? binding.name : `${binding.name} as ${binding.alias}`,
     );
@@ -18,12 +17,12 @@ export default function getHashedBindingCode({
     return `${handlerName}, { ${optionProcessedNamedBindings.join(', ')} } from`;
   }
 
-  if (isNotEmpty(nonNamedBinding) && nonNamedBinding !== '') {
+  if (nonNamedBinding != null && nonNamedBinding !== '') {
     const handlerName = getHandlerNameWithoutSquareBracket(nonNamedBinding);
     return `${handlerName} from`;
   }
 
-  if (isNotEmpty(namedBindings) && namedBindings.length > 0) {
+  if (namedBindings != null && namedBindings.length > 0) {
     const optionProcessedNamedBindings = namedBindings.map((binding) =>
       binding.name === binding.alias ? binding.name : `${binding.name} as ${binding.alias}`,
     );

@@ -1,12 +1,11 @@
-import IImportConfiguration from '#compiler/interface/IImportConfiguration';
+import type IImportConfiguration from '#compiler/interface/IImportConfiguration';
 import getTypeSymbolText from '#compiler/tool/getTypeSymbolText';
-import { isNotEmpty } from 'my-easy-fp';
-import * as tsm from 'ts-morph';
+import type { SourceFile, TypeReferenceNode } from 'ts-morph';
 
 interface IGetLocalExportStatementImport {
-  source: tsm.SourceFile;
+  source: SourceFile;
   hash: string;
-  typeReferenceNodes: tsm.TypeReferenceNode[];
+  typeReferenceNodes: TypeReferenceNode[];
 }
 
 export default function getLocalExportStatementImport({
@@ -28,7 +27,7 @@ export default function getLocalExportStatementImport({
 
   const matchedClasses = classes.filter((classNode) => {
     const name = classNode.getName();
-    return isNotEmpty(name) && typeNames.includes(name);
+    return name != null && typeNames.includes(name);
   });
   const matchAndExportedClasses = matchedClasses.filter((classNode) => classNode.isExported());
 

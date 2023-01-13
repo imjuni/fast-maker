@@ -1,5 +1,4 @@
-import { IHandlerStatement } from '#compiler/interface/THandlerNode';
-import { isEmpty } from 'my-easy-fp';
+import type { IHandlerStatement } from '#compiler/interface/THandlerNode';
 import * as tsm from 'ts-morph';
 
 export default function getFunctionDeclarationWithModifier(
@@ -25,7 +24,7 @@ export default function getFunctionDeclarationWithModifier(
     };
   }
 
-  if (isEmpty(functionDeclarationNode) || isEmpty(identifierNode)) {
+  if (functionDeclarationNode == null || identifierNode == null) {
     return undefined;
   }
 

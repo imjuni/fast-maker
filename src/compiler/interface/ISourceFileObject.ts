@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import type { Declaration, ModeAwareCache, ResolvedModuleFull, SourceFile, StringLiteralLike } from 'typescript';
 
 /*
  * https://github.com/microsoft/TypeScript/blob/main/src/services/services.ts
@@ -12,12 +12,12 @@ import ts from 'typescript';
  * imports, identifiers, resolvedModules, getNamedDeclarations를 사용하지 않으면 symbol table을 직접 구현해야하며
  * 2 pass compiler를 구현해야 하기 때문에 아래 내용은 사용하는 것이 좋다.
  */
-export default interface ISourceFileObject extends ts.SourceFile {
-  imports: readonly ts.StringLiteralLike[];
+export default interface ISourceFileObject extends SourceFile {
+  imports: readonly StringLiteralLike[];
   identifiers: Map<string, string>;
 
   // 이건 ModeAwareCache를 사용하는 것을 보면 아무래도 쓰면 안될 것 같기는 하다
-  resolvedModules: ts.ModeAwareCache<ts.ResolvedModuleFull> | undefined;
+  resolvedModules: ModeAwareCache<ResolvedModuleFull> | undefined;
 
-  getNamedDeclarations(): Map<string, ts.Declaration[]>;
+  getNamedDeclarations(): Map<string, Declaration[]>;
 }

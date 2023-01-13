@@ -1,6 +1,5 @@
-import IConfig from '#config/interface/IConfig';
-import IRouteConfiguration from '#route/interface/IRouteConfiguration';
-import { isNotEmpty } from 'my-easy-fp';
+import type IConfig from '#config/interface/IConfig';
+import type IRouteConfiguration from '#route/interface/IRouteConfiguration';
 
 interface IRouteCodeGenerator {
   option: IConfig;
@@ -11,7 +10,7 @@ export default function routeCodeGenerator({ routeConfigurations }: IRouteCodeGe
   const codes = routeConfigurations.map((routeConfiguration) => {
     const handler = routeConfiguration.handlerName;
     const typeArgument =
-      isNotEmpty(routeConfiguration.typeArgument) && routeConfiguration.typeArgument !== ''
+      routeConfiguration.typeArgument != null && routeConfiguration.typeArgument !== ''
         ? `<${routeConfiguration.typeArgument}>`
         : '';
 
