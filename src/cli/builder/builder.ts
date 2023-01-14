@@ -34,7 +34,7 @@ export default function builder(args: Argv<IConfig>): Argv<IConfig> {
       type: 'string',
       default: 'routing',
     })
-    .demandOption(['project', 'handler']);
+    .demandOption(['handler']);
 
   return args;
 }

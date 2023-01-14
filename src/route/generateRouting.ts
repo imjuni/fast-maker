@@ -1,4 +1,3 @@
-import progress from '#cli/display/progress';
 import spinner from '#cli/display/spinner';
 import getTypeScriptProject from '#compiler/tool/getTypeScriptProject';
 import type IConfig from '#config/interface/IConfig';
@@ -69,47 +68,9 @@ export default async function generateRouting(
       },
       log: logbox,
     });
-
-    // const finalCode = [
-    //   `import { FastifyInstance } from 'fastify';`,
-    //   ...importCodes,
-    //   '\n',
-    //   `export ${config.useDefaultExport ? 'default ' : ''}function ${
-    //     config.routeFunctionName
-    //   }(fastify: FastifyInstance): void {`,
-    //   ...routeCodes,
-    //   `}`,
-    // ];
-
-    // logObject.finalCode = importCodes;
-
-    // await writeDebugLog(config, routeConfigurations, logObject);
-
-    // const prettfiedEither = await prettierProcessing({ code: finalCode.join('\n') });
-
-    // log.debug('--------------------------------------------------------');
-    // log.debug(prettfiedEither);
-    // log.debug('--------------------------------------------------------');
-
-    // if (isFail(prettfiedEither)) {
-    //   throw prettfiedEither.fail;
-    // }
-
-    // progress.update(routeHandlers.length);
-
-    // return pass({ code: prettfiedEither.pass, reasons: logbox.reasons });
   } catch (catched) {
     const err = catched instanceof Error ? catched : new Error('unknown error raised');
 
-    // logObject.err = {
-    //   message: err.message,
-    //   stack: err.stack ?? '',
-    // };
-
-    // await writeDebugLog(config, [], logObject);
-
     return fail({ err, log: logbox });
-  } finally {
-    progress.stop();
   }
 }

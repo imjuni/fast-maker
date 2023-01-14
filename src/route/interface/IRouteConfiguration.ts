@@ -1,5 +1,4 @@
 import type TMethodType from '#route/interface/TMethodType';
-import type { SourceFile } from 'ts-morph';
 
 export default interface IRouteConfiguration {
   method: TMethodType;
@@ -11,5 +10,5 @@ export default interface IRouteConfiguration {
   typeArgument?: string;
 
   sourceFilePath: string;
-  source: SourceFile;
+  // source: SourceFile;
 }

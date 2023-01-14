@@ -13,7 +13,7 @@ test('fuzzy-test', () => {
   log.debug('fuzzy-test start');
 
   const examples = ['querystring', 'query-string', 'queryString', 'query_string', 'ironman'];
-  const result = examples.map((example) => fuzzyWithCase(validParamNames.fastify, example)).flatMap((f) => f);
+  const result = examples.map((example) => fuzzyWithCase(validParamNames.fastify, example)).flat();
 
   expect(result).toEqual([
     {

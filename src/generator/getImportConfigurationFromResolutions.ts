@@ -1,12 +1,9 @@
 import type IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
 import type IImportConfiguration from '#compiler/interface/IImportConfiguration';
-import type { SourceFile } from 'ts-morph';
 
 export default function getImportConfigurationFromResolutions({
-  source,
   resolutions,
 }: {
-  source: SourceFile;
   resolutions: IGetModuleInImports[];
 }): IImportConfiguration[] {
   const importConfigurations = resolutions.map((resolution) => {
@@ -24,7 +21,7 @@ export default function getImportConfigurationFromResolutions({
         })),
       nonNamedBinding: defaultImportDeclarations?.importModuleNameTo,
       importFile: resolution.exportFrom,
-      source,
+      // source,
     };
 
     return importConfiguration;
