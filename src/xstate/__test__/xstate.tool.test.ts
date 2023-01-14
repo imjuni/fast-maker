@@ -2,7 +2,6 @@ import type IReason from '#compiler/interface/IReason';
 import type { IHandlerStatement, IOptionStatement } from '#compiler/interface/THandlerNode';
 import getHandlerWithOption from '#compiler/navigate/getHandlerWithOption';
 import type IConfig from '#config/interface/IConfig';
-import ErrorWithMessage from '#module/ErrorWithMessage';
 import logger from '#module/logging/logger';
 import proceedStage01 from '#module/proceedStage01';
 import methods from '#route/interface/methods';
@@ -10,9 +9,7 @@ import * as env from '#test-tools/env';
 import getTestValue from '#test-tools/getTestValue';
 import getHash from '#tool/getHash';
 import posixJoin from '#tool/posixJoin';
-import requestHandlerAnalysisMachine, {
-  type IContextRequestHandlerAnalysisMachine,
-} from '#xstate/RequestHandlerAnalysisMachine';
+import requestHandlerAnalysisMachine, { type IAnalysisMachineContext } from '#xstate/RequestHandlerAnalysisMachine';
 import 'jest';
 import { replaceSepToPosix } from 'my-node-fp';
 import path from 'path';
@@ -78,7 +75,7 @@ test('t001-FSM-TypeLiteral', async () => {
       message: `Cannot found route handler function: ${source.getFilePath().toString()}`,
     };
 
-    throw new ErrorWithMessage(reason.message, reason);
+    throw new Error(reason.message);
   }
 
   const machine = requestHandlerAnalysisMachine({
@@ -93,12 +90,12 @@ test('t001-FSM-TypeLiteral', async () => {
 
   const service = interpret(machine);
 
-  const parsedDataBox = await new Promise<
-    Pick<IContextRequestHandlerAnalysisMachine, 'importBox' | 'routeBox' | 'messages'>
-  >((resolve) => {
-    service.onDone((data) => resolve(data.data));
-    service.start();
-  });
+  const parsedDataBox = await new Promise<Pick<IAnalysisMachineContext, 'importBox' | 'routeBox' | 'messages'>>(
+    (resolve) => {
+      service.onDone((data) => resolve(data.data));
+      service.start();
+    },
+  );
 
   const expectation = await import(path.join(__dirname, 'expects', expectFileName));
   const terminateCircularResult = getTestValue(parsedDataBox);
@@ -144,7 +141,7 @@ test('t002-FSM-FastifyRequest', async () => {
       message: `Cannot found route handler function: ${source.getFilePath().toString()}`,
     };
 
-    throw new ErrorWithMessage(reason.message, reason);
+    throw new Error(reason.message);
   }
 
   const machine = requestHandlerAnalysisMachine({
@@ -159,12 +156,12 @@ test('t002-FSM-FastifyRequest', async () => {
 
   const service = interpret(machine);
 
-  const parsedDataBox = await new Promise<
-    Pick<IContextRequestHandlerAnalysisMachine, 'importBox' | 'routeBox' | 'messages'>
-  >((resolve) => {
-    service.onDone((data) => resolve(data.data));
-    service.start();
-  });
+  const parsedDataBox = await new Promise<Pick<IAnalysisMachineContext, 'importBox' | 'routeBox' | 'messages'>>(
+    (resolve) => {
+      service.onDone((data) => resolve(data.data));
+      service.start();
+    },
+  );
 
   const expectation = await import(path.join(__dirname, 'expects', expectFileName));
   const terminateCircularResult = getTestValue(parsedDataBox);

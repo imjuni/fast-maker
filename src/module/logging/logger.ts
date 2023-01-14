@@ -65,7 +65,7 @@ export default function logger() {
       process.env.FILE_LOG_MODE !== 'true' ? stream : fileStream,
     );
 
-    log.level = 'info';
+    log.level = process.env.LOG_LEVEL ?? 'info';
   }
 
   return log;

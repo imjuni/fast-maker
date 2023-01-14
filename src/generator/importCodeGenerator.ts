@@ -5,7 +5,7 @@ import { replaceSepToPosix } from 'my-node-fp';
 import path from 'path';
 
 interface IImportCodeGeneratorParam {
-  option: IConfig;
+  config: IConfig;
   importConfigurations: IImportConfiguration[];
 }
 
@@ -24,14 +24,14 @@ function getRelativePath(outputDir: string, importPath: string, ext: boolean) {
   return `.${path.posix.sep}${replacedPath}`;
 }
 
-export default function importCodeGenerator({ importConfigurations, option }: IImportCodeGeneratorParam) {
+export default function importCodeGenerator({ importConfigurations, config }: IImportCodeGeneratorParam) {
   const importCodes = importConfigurations.map((importConfiguration) => {
     const bindingCode = getHashedBindingCode({
       nonNamedBinding: importConfiguration.nonNamedBinding,
       namedBindings: importConfiguration.namedBindings,
     });
 
-    const relativePath = getRelativePath(option.output, importConfiguration.importFile, false);
+    const relativePath = getRelativePath(config.output, importConfiguration.importFile, false);
     return `import ${bindingCode} '${relativePath}';`;
   });
 

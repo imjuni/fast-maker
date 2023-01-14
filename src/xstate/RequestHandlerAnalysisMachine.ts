@@ -25,7 +25,7 @@ import { assign, createMachine } from 'xstate';
 
 const log = logger();
 
-export interface IContextRequestHandlerAnalysisMachine {
+export interface IAnalysisMachineContext {
   project: Project;
   source: SourceFile;
   routeHandler: IRouteHandler;
@@ -69,11 +69,11 @@ enum EN_STATES {
 
 const requestHandlerAnalysisMachine = (
   rootContext: Omit<
-    IContextRequestHandlerAnalysisMachine,
+    IAnalysisMachineContext,
     'currentNode' | 'messages' | 'typeNode' | 'importBox' | 'routeBox' | 'useFastifyRequest' | 'typeAliasNode'
   >,
 ) =>
-  createMachine<IContextRequestHandlerAnalysisMachine>(
+  createMachine<IAnalysisMachineContext>(
     {
       // https://xstate.js.org/docs/guides/actions.html
       predictableActionArguments: true,
@@ -229,7 +229,7 @@ const requestHandlerAnalysisMachine = (
           entry: () => {
             log.debug('분석이 끝?? -3');
           },
-          data: (context): Pick<IContextRequestHandlerAnalysisMachine, 'importBox' | 'routeBox' | 'messages'> => {
+          data: (context): Pick<IAnalysisMachineContext, 'importBox' | 'routeBox' | 'messages'> => {
             return {
               importBox: context.importBox,
               routeBox: context.routeBox,

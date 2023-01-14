@@ -1,4 +1,5 @@
 import { CE_SEND_TO_PARENT_COMMAND } from '#worker/interface/CE_SEND_TO_PARENT_COMMAND';
+import type { IFromChildDoProgressStart } from '#worker/interface/IFromChild';
 import cliProgesss from 'cli-progress';
 
 class Progress {
@@ -25,7 +26,10 @@ class Progress {
 
   start(total: number, startValue: number) {
     if (this.cluster && this.enable) {
-      process.send?.({ command: CE_SEND_TO_PARENT_COMMAND.PROGRESS_START, data: { total, startValue } });
+      process.send?.({
+        command: CE_SEND_TO_PARENT_COMMAND.PROGRESS_START,
+        data: { total, startValue },
+      } satisfies IFromChildDoProgressStart);
     } else if (this.enable === true) {
       this.forceStart(total, startValue);
     }

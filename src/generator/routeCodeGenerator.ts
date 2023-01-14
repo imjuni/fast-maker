@@ -1,8 +1,6 @@
-import type IConfig from '#config/interface/IConfig';
 import type IRouteConfiguration from '#route/interface/IRouteConfiguration';
 
 interface IRouteCodeGenerator {
-  option: IConfig;
   routeConfigurations: IRouteConfiguration[];
 }
 

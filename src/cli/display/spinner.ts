@@ -1,5 +1,9 @@
 import { CE_SEND_TO_PARENT_COMMAND } from '#worker/interface/CE_SEND_TO_PARENT_COMMAND';
-import type IFromChildDoSpinnerUpdate from '#worker/interface/IFromChildDoSpinnerUpdate';
+import type {
+  IFromChildDoSpinnerEnd,
+  IFromChildDoSpinnerStart,
+  IFromChildDoSpinnerUpdate,
+} from '#worker/interface/IFromChild';
 import ora from 'ora';
 
 class Spinner {
@@ -17,7 +21,10 @@ class Spinner {
 
   start(message?: string) {
     if (this.cluster && this.enable) {
-      process.send?.({ command: CE_SEND_TO_PARENT_COMMAND.SPINER_START, data: { message } });
+      process.send?.({
+        command: CE_SEND_TO_PARENT_COMMAND.SPINER_START,
+        data: { message },
+      } satisfies IFromChildDoSpinnerStart);
     } else if (this.enable === true) {
       this.forceStart(message);
     }
@@ -51,7 +58,7 @@ class Spinner {
 
   stop() {
     if (this.cluster && this.enable) {
-      process.send?.({ command: CE_SEND_TO_PARENT_COMMAND.SPINER_END });
+      process.send?.({ command: CE_SEND_TO_PARENT_COMMAND.SPINER_END, data: {} } satisfies IFromChildDoSpinnerEnd);
     } else {
       this.forceStop();
     }
