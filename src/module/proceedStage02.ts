@@ -7,7 +7,7 @@ import type IConfig from '#config/interface/IConfig';
 import type IStage02Log from '#module/interface/IStage02Log';
 import type IRouteHandler from '#route/interface/IRouteHandler';
 import getHash from '#tool/getHash';
-import type { IContextRequestHandlerAnalysisMachine as IAnalysisMachineContext } from '#xstate/RequestHandlerAnalysisMachine';
+import type { IAnalysisMachineContext } from '#xstate/RequestHandlerAnalysisMachine';
 import requestHandlerAnalysisMachine from '#xstate/RequestHandlerAnalysisMachine';
 import chalk from 'chalk';
 import path from 'path';
@@ -21,8 +21,6 @@ export default async function proceedStage02(project: Project, option: IConfig, 
   const routeFileRecord = handlers.reduce<Record<string, IRouteHandler>>((aggregation, routeFile) => {
     return { ...aggregation, [routeFile.filename]: routeFile };
   }, {});
-
-  progress.start(handlers.length, 0);
 
   const { fileExists, fileNotFound } = handlers.reduce<{
     fileExists: IRouteHandler[];
@@ -142,7 +140,7 @@ export default async function proceedStage02(project: Project, option: IConfig, 
   logObject.routePathUnique = routePathUnique;
   logObject.routePathDuplicate = routePathDuplicate;
 
-  const rawRoutesAnalysised = await Promise.all(
+  const result = await Promise.all(
     routePathUnique.map(async (handlerNode) => {
       const source = project.getSourceFile(handlerNode.filename);
 
@@ -189,6 +187,6 @@ export default async function proceedStage02(project: Project, option: IConfig, 
   return {
     reasons,
     logObject,
-    routesAnalysised: rawRoutesAnalysised,
+    result,
   };
 }

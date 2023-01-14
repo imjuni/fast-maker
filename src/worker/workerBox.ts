@@ -1,115 +1,97 @@
+import progress from '#cli/display/progress';
 import logger from '#module/logging/logger';
 import { CE_SEND_TO_PARENT_COMMAND } from '#worker/interface/CE_SEND_TO_PARENT_COMMAND';
-import type IFromChildDoProgressStart from '#worker/interface/IFromChildDoProgressStart';
-import type IFromChildDoProgressStop from '#worker/interface/IFromChildDoProgressStop';
-import type IFromChildDoProgressUpdate from '#worker/interface/IFromChildDoProgressUpdate';
-import type IFromChildDoSpinnerEnd from '#worker/interface/IFromChildDoSpinnerEnd';
-import type IFromChildDoSpinnerStart from '#worker/interface/IFromChildDoSpinnerStart';
-import type IFromChildDoSpinnerUpdate from '#worker/interface/IFromChildDoSpinnerUpdate';
-import type IFromChildDoWorkReply from '#worker/interface/IFromChildDoWorkReply';
-import type IFromParentDoTerminate from '#worker/interface/IFromParentDoTerminate';
-import type IFromParentDoWork from '#worker/interface/IFromParentDoWork';
-import ParentEventEmitter from '#worker/parent';
+import type { TFromChild } from '#worker/interface/IFromChild';
+import type { TFromParent } from '#worker/interface/IFromParent';
+import replyBox from '#worker/replyBox';
 import type { Worker } from 'cluster';
 import dayjs from 'dayjs';
 
 const log = logger();
-
-type TFromChild =
-  | IFromChildDoProgressStop
-  | IFromChildDoProgressUpdate
-  | IFromChildDoProgressStart
-  | IFromChildDoSpinnerStart
-  | IFromChildDoSpinnerUpdate
-  | IFromChildDoSpinnerEnd
-  | IFromChildDoWorkReply;
 
 class WorkerBoxType {
   #workers: Worker[];
 
   #finished: number;
 
-  #progressIsStart: boolean;
+  #handlers: number;
 
-  #progress: {
-    total: number;
-    report: number;
-  };
-
-  #spinnerStart: boolean;
+  #errors: Error[];
 
   constructor() {
     this.#workers = [];
     this.#finished = 0;
-    this.#progressIsStart = false;
-    this.#spinnerStart = false;
-    this.#progress = { total: 0, report: 0 };
+    this.#handlers = 0;
+    this.#errors = [];
   }
 
   get finished() {
     return this.#finished;
   }
 
+  get handlers() {
+    return this.#handlers;
+  }
+
+  get errors() {
+    return this.#errors;
+  }
+
   add(worker: Worker) {
-    const ee = new ParentEventEmitter();
-
     worker.on('message', (message: TFromChild) => {
-      const next = { ...message };
-      log.debug(`왜 안나오지???: ${next.command}`);
-
-      if (next.command === CE_SEND_TO_PARENT_COMMAND.RECEIVE_REPLY) {
+      if (
+        message.command === CE_SEND_TO_PARENT_COMMAND.DONE_DO_INIT ||
+        message.command === CE_SEND_TO_PARENT_COMMAND.DONE_DO_INIT_PROJECT ||
+        message.command === CE_SEND_TO_PARENT_COMMAND.DONE_DO_STAGE01 ||
+        message.command === CE_SEND_TO_PARENT_COMMAND.DONE_DO_STAGE02 ||
+        message.command === CE_SEND_TO_PARENT_COMMAND.DONE_DO_STAGE03
+      ) {
         this.#finished -= 1;
-        log.debug(`작업 시작 스레드: ${this.#finished}`);
+
+        log.debug(`죽고나서 워커 개수: ${this.#finished}`);
       }
 
-      if (next.command === CE_SEND_TO_PARENT_COMMAND.PROGRESS_START && this.#progressIsStart === true) {
-        return;
+      if (
+        message.command === CE_SEND_TO_PARENT_COMMAND.FAIL_DO_INIT_PROJECT ||
+        message.command === CE_SEND_TO_PARENT_COMMAND.FAIL_DO_STAGE01 ||
+        message.command === CE_SEND_TO_PARENT_COMMAND.FAIL_DO_STAGE02 ||
+        message.command === CE_SEND_TO_PARENT_COMMAND.FAIL_DO_STAGE03
+      ) {
+        this.#errors.push(message.data.err);
+        this.#finished -= 1;
       }
 
-      if (next.command === CE_SEND_TO_PARENT_COMMAND.PROGRESS_START && this.#progressIsStart === false) {
-        log.debug(`바: ${this.#progress.total}/ ${this.#progress.report}/ ${this.#progressIsStart}`);
-
-        this.#progress.total += next.data.total;
-        this.#progress.report += 1;
-
-        if (this.#progress.report !== this.#finished) {
-          return;
-        }
-
-        next.data.total = this.#progress.total;
-        this.#progressIsStart = true;
+      if (message.command === CE_SEND_TO_PARENT_COMMAND.PROGRESS_INCREMENT) {
+        progress.forceIncrement();
       }
 
-      if (next.command === CE_SEND_TO_PARENT_COMMAND.SPINER_START && this.#spinnerStart === true) {
-        return;
+      if (message.command === CE_SEND_TO_PARENT_COMMAND.DONE_DO_STAGE01) {
+        this.#handlers += message.data.handlers;
       }
 
-      if (next.command === CE_SEND_TO_PARENT_COMMAND.SPINER_START) {
-        this.#spinnerStart = true;
+      if (message.command === CE_SEND_TO_PARENT_COMMAND.DONE_DO_STAGE03) {
+        replyBox.passBox[message.data.method] = message.data;
       }
-
-      ee.emit(next.command, next);
     });
 
     this.#workers.push(worker);
   }
 
-  send(...commands: Array<IFromParentDoWork | IFromParentDoTerminate>) {
+  send(commands: Array<TFromParent>) {
     commands.forEach((job, index) => {
       this.#workers[index % this.#workers.length].send(job);
       this.#finished += 1;
-      log.debug(`작업 시작 스레드: ${this.#finished}`);
     });
 
-    // this.#workers.forEach((worker) => worker.send({ command: 'start' }));
+    log.debug(`활성 워커 개수: ${this.#finished}`);
   }
 
-  broadcast(command: IFromParentDoWork | IFromParentDoTerminate) {
+  broadcast(command: TFromParent) {
     this.#workers.forEach((worker) => worker.send(command));
   }
 
   wait(): Promise<number> {
-    return new Promise<number>((resolve) => {
+    return new Promise<number>((resolve, reject) => {
       const startAt = dayjs();
 
       const intervalHandle = setInterval(() => {
@@ -121,9 +103,9 @@ class WorkerBoxType {
         const currentAt = dayjs();
 
         // timeout, wait 60 second
-        if (currentAt.diff(startAt, 'second') > 60) {
+        if (currentAt.diff(startAt, 'second') > 20) {
           clearInterval(intervalHandle);
-          resolve(this.#finished);
+          reject(new Error('timeout wait'));
         }
       }, 300);
     });

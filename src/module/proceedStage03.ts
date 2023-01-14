@@ -1,14 +1,10 @@
 import type IImportConfiguration from '#compiler/interface/IImportConfiguration';
-import type IConfig from '#config/interface/IConfig';
 import dedupeImportConfiguration from '#generator/dedupeImportConfiguration';
-import importCodeGenerator from '#generator/importCodeGenerator';
-import routeCodeGenerator from '#generator/routeCodeGenerator';
 import type IRouteConfiguration from '#route/interface/IRouteConfiguration';
-import type { IContextRequestHandlerAnalysisMachine as IAnalysisMachineContext } from '#xstate/RequestHandlerAnalysisMachine';
+import type { IAnalysisMachineContext } from '#xstate/RequestHandlerAnalysisMachine';
 
 export default function proceedStage03(
   routesAnalysised: Pick<IAnalysisMachineContext, 'importBox' | 'routeBox' | 'messages'>[],
-  option: IConfig,
 ) {
   const aggregatedRouteConfigurations = routesAnalysised.reduce<{
     importBox: IAnalysisMachineContext['importBox'][];
@@ -39,15 +35,11 @@ export default function proceedStage03(
     return source.concat(Object.values(target));
   }, []);
 
-  const importCodes = importCodeGenerator({ importConfigurations, option });
-  const routeCodes = routeCodeGenerator({ routeConfigurations, option });
   const reasons = aggregatedRouteConfigurations.reasons.flat();
 
   return {
     importConfigurations,
     routeConfigurations,
-    importCodes,
-    routeCodes,
     reasons,
   };
 }

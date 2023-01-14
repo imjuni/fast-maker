@@ -1,13 +1,14 @@
 import builder from '#cli/builder/builder';
 import watchBuilder from '#cli/builder/watchBuilder';
-import routeCommandHandler from '#cli/command/routeCommandHandler';
+import routeCommandClusterHandler from '#cli/command/routeCommandClusterHandler';
+import routeCommandSyncHandler from '#cli/command/routeCommandSyncHandler';
 import watchCommandHandler from '#cli/command/watchCommandHandler';
 import type IConfig from '#config/interface/IConfig';
 import type IWatchConfig from '#config/interface/IWatchConfig';
 import isValidConfig from '#config/isValidConfig';
 import preLoadConfig from '#config/preLoadConfig';
 import logger from '#module/logging/logger';
-import worker from '#worker/child';
+import worker from '#worker/worker';
 import getIsPrimary from '#xstate/tool/getIsPrimary';
 import { isError } from 'my-easy-fp';
 import yargsAnyType, { type Arguments, type Argv, type CommandModule } from 'yargs';
@@ -21,7 +22,11 @@ const routeCmd: CommandModule<IConfig, IConfig> = {
   builder,
   handler: async (args) => {
     try {
-      await routeCommandHandler(args);
+      if (process.env.SYNC_MODE === 'true') {
+        await routeCommandSyncHandler(args);
+      } else {
+        await routeCommandClusterHandler(args);
+      }
     } catch (catched) {
       const err = isError(catched) ?? new Error('unknown error raised');
       log.error(err);

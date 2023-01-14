@@ -1,5 +1,11 @@
 export const CE_SEND_TO_CHILD_COMMAND = {
-  DO_WORK: 'do-work',
+  DO_INIT: 'do-init',
+
+  DO_INIT_PROJECT: 'do-init-project',
+  DO_STAGE01: 'do-stage01',
+  DO_STAGE02: 'do-stage02',
+  DO_STAGE03: 'do-stage03',
+
   TERMINATE: 'terminate',
 } as const;
 

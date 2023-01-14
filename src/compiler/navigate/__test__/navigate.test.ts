@@ -1,6 +1,4 @@
 import type { IHandlerStatement } from '#compiler/interface/THandlerNode';
-import getArrowFunctionWithModifier from '#compiler/navigate/getArrowFunctionWithModifier';
-import getFunctionDeclarationWithModifier from '#compiler/navigate/getFunctionDeclarationWithModifier';
 import getHandlerWithOption from '#compiler/navigate/getHandlerWithOption';
 import getPropertySignatures from '#compiler/navigate/getPropertySignatures';
 import logger from '#module/logging/logger';
@@ -51,56 +49,6 @@ test('getHandlerWithOption', async () => {
   ];
 
   expect(handlerFileInfos).toMatchObject(expectation);
-});
-
-test('getArrowFunctionModifier', async () => {
-  const sourcePath = replaceSepToPosix(path.join(env.examplePath, 'handlers\\delete\\world.ts'));
-  const source = share.project.getSourceFileOrThrow(sourcePath);
-
-  const declarationMap = source.getExportedDeclarations();
-  const declarations = declarationMap.get('default') ?? [];
-  const handlerStatement = getArrowFunctionWithModifier(declarations);
-
-  if (handlerStatement == null) {
-    throw new Error('handler statement empty');
-  }
-
-  // eslint-disable-next-line
-  const { node: _node, ...processed } = handlerStatement;
-  const expectation = {
-    kind: 'handler',
-    type: 'async',
-    name: 'anonymous function',
-  };
-
-  log.info(processed);
-
-  expect(processed).toEqual(expectation);
-});
-
-test('getFunctionDeclarationWithModifier', async () => {
-  const sourcePath = replaceSepToPosix(path.join(env.examplePath, 'handlers\\get\\xman\\fastify.ts'));
-  const source = share.project.getSourceFileOrThrow(sourcePath);
-
-  const declarationMap = source.getExportedDeclarations();
-  const declarations = declarationMap.get('default') ?? [];
-  const handlerStatement = getFunctionDeclarationWithModifier(declarations);
-
-  if (handlerStatement == null) {
-    throw new Error('handler statement empty');
-  }
-
-  // eslint-disable-next-line
-  const { node: _node, ...processed } = handlerStatement;
-  const expectation = {
-    kind: 'handler',
-    type: 'sync',
-    name: 'anonymous function',
-  };
-
-  log.info(processed);
-
-  expect(processed).toEqual(expectation);
 });
 
 test('getPropertySignatures', async () => {

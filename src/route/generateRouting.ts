@@ -1,3 +1,4 @@
+import progress from '#cli/display/progress';
 import spinner from '#cli/display/spinner';
 import getTypeScriptProject from '#compiler/tool/getTypeScriptProject';
 import type IConfig from '#config/interface/IConfig';
@@ -19,23 +20,45 @@ export default async function generateRouting(
 > {
   const logbox = new LogBox();
 
+  logbox.config = config;
+
   try {
     spinner.update(`load tsconfig.json: ${config.project}`);
 
     const tsProject = await getTypeScriptProject(config.project);
 
-    spinner.update('typescript handler source complete, ...');
+    spinner.update(`load tsconfig.json: ${config.project}`, 'succeed');
 
-    const routeHandlers = await proceedStage01(config.handler, methods);
+    spinner.update('find handler files');
 
-    logbox.config = config;
-    logbox.routeHandlers = routeHandlers;
+    const stage01Result = await proceedStage01(config.handler, methods);
+
+    spinner.update('find handler files', 'succeed');
+
+    logbox.routeHandlers = stage01Result;
+
+    spinner.stop();
+
+    if (stage01Result.length <= 0) {
+      return pass({
+        route: {
+          importConfigurations: [],
+          routeConfigurations: [],
+        },
+        log: logbox,
+      });
+    }
+
+    progress.start(stage01Result.length, 0);
 
     const {
-      routesAnalysised,
-      reasons: analysisReasons,
+      result: stage02Result,
+      reasons: stage02Reasons,
       logObject: analysisLogObject,
-    } = await proceedStage02(tsProject, config, routeHandlers);
+    } = await proceedStage02(tsProject, config, stage01Result);
+
+    progress.update(stage01Result.length);
+    progress.stop();
 
     logbox.fileExists = analysisLogObject.fileExists ?? [];
     logbox.fileNotFound = analysisLogObject.fileNotFound ?? [];
@@ -44,27 +67,21 @@ export default async function generateRouting(
     logbox.routePathDuplicate = analysisLogObject.routePathDuplicate ?? [];
     logbox.routePathUnique = analysisLogObject.routePathUnique ?? [];
 
-    const {
-      importConfigurations,
-      routeConfigurations,
-      importCodes,
-      routeCodes,
-      reasons: aggregatedReasons,
-    } = proceedStage03(routesAnalysised, config);
+    spinner.start('route.ts code generation');
+
+    const { importConfigurations, routeConfigurations, reasons: stage03Reasons } = proceedStage03(stage02Result);
 
     logbox.importConfigurations = importConfigurations;
     logbox.routeConfigurations = routeConfigurations;
-    logbox.importCodes = importCodes;
-    logbox.routeCodes = routeCodes;
 
-    logbox.reasons.push(...analysisReasons, ...aggregatedReasons);
+    logbox.reasons.push(...stage02Reasons, ...stage03Reasons);
+
+    spinner.update('route.ts code generation', 'succeed');
 
     return pass({
       route: {
         importConfigurations,
         routeConfigurations,
-        importCodes,
-        routeCodes,
       },
       log: logbox,
     });

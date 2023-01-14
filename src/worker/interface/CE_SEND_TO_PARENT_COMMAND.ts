@@ -8,6 +8,16 @@ export const CE_SEND_TO_PARENT_COMMAND = {
   SPINER_END: 'spiner-end',
   SPINER_UPDATE: 'spiner-update',
 
+  DONE_DO_INIT: 'done-do-init',
+  DONE_DO_INIT_PROJECT: 'done-do-init-project',
+  FAIL_DO_INIT_PROJECT: 'fail-do-init-project',
+  DONE_DO_STAGE01: 'done-do-stage01',
+  FAIL_DO_STAGE01: 'fail-do-stage01',
+  DONE_DO_STAGE02: 'done-do-stage02',
+  FAIL_DO_STAGE02: 'fail-do-stage02',
+  DONE_DO_STAGE03: 'done-do-stage03',
+  FAIL_DO_STAGE03: 'fail-do-stage03',
+
   RECEIVE_REPLY: 'receive-reply',
 } as const;
 

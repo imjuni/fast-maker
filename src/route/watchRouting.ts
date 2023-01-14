@@ -1,8 +1,11 @@
 import type IConfig from '#config/interface/IConfig';
 import type IWatchConfig from '#config/interface/IWatchConfig';
+import importCodeGenerator from '#generator/importCodeGenerator';
 import prettierProcessing from '#generator/prettierProcessing';
+import routeCodeGenerator from '#generator/routeCodeGenerator';
 import getRoutingCode from '#module/getRoutingCode';
 import logger from '#module/logging/logger';
+import sortRoutes from '#module/sortRoutes';
 import generateRouting from '#route/generateRouting';
 import methods from '#route/interface/methods';
 import getReasonMessages from '#tool/getReasonMessages';
@@ -53,10 +56,17 @@ export default function watchRouting(config: IConfig & IWatchConfig) {
       const routing = await generateRouting(config, methods);
 
       if (isPass(routing)) {
+        const sorted = sortRoutes(routing.pass.route.routeConfigurations);
+        const routeCodes = routeCodeGenerator({ routeConfigurations: sorted });
+        const importCodes = importCodeGenerator({
+          importConfigurations: routing.pass.route.importConfigurations,
+          config,
+        });
+
         const code = getRoutingCode({
           config,
-          imports: routing.pass.route.importCodes,
-          routes: routing.pass.route.routeCodes,
+          imports: importCodes,
+          routes: routeCodes,
         });
 
         const prettfiedEither = await prettierProcessing({ code });
