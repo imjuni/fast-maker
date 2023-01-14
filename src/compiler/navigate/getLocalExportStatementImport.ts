@@ -45,7 +45,7 @@ export default function getLocalExportStatementImport({
           },
         ],
         importFile: source.getFilePath().toString(),
-        source,
+        // source,
       };
 
       return importCodeBase;
@@ -63,7 +63,7 @@ export default function getLocalExportStatementImport({
           },
         ],
         importFile: source.getFilePath().toString(),
-        source,
+        // source,
       };
 
       return importCodeBase;
@@ -82,12 +82,12 @@ export default function getLocalExportStatementImport({
           },
         ],
         importFile: source.getFilePath().toString(),
-        source,
+        // source,
       };
 
       return importCodeBase;
     }),
-  ].flatMap((importCodeBase) => importCodeBase);
+  ].flat();
 
   return importCodeBases;
 }

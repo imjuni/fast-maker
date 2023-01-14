@@ -1,5 +1,3 @@
-import type { SourceFile } from 'ts-morph';
-
 export default interface IImportConfiguration {
   /**
    * hash 난수로 생성한다
@@ -25,5 +23,5 @@ export default interface IImportConfiguration {
   importFile: string;
 
   /** 소스파일 */
-  source: SourceFile;
+  // source: SourceFile;
 }

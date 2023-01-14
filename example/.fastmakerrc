@@ -1,0 +1,5 @@
+{
+  "project": "tsconfig.json",
+  "handler": "handlers",
+  "output": "handlers"
+}

@@ -30,8 +30,8 @@ export default function preLoadConfig() {
 
     return {
       ...config,
-      p: tsconfigPath,
-      project: tsconfigPath,
+      p: config.project ?? tsconfigPath,
+      project: config.project ?? tsconfigPath,
       c: configFilePath,
       config: configFilePath,
     };

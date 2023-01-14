@@ -75,6 +75,8 @@ const requestHandlerAnalysisMachine = (
 ) =>
   createMachine<IContextRequestHandlerAnalysisMachine>(
     {
+      // https://xstate.js.org/docs/guides/actions.html
+      predictableActionArguments: true,
       id: 'request-analysis',
       initial: EN_STATES.INITIAL,
       context: { ...rootContext, currentNode: 0, messages: [], importBox: {}, routeBox: {}, useFastifyRequest: false },
@@ -322,7 +324,7 @@ const requestHandlerAnalysisMachine = (
                   )
                 : appendPostfixHash(getHandlerNameWithoutSquareBracket(next.handler.name), next.hash),
             importFile: next.source.getFilePath().toString(),
-            source: next.source,
+            // source: next.source,
           };
 
           const nextImportBox = { ...next.importBox, [sourceFilePath]: routeFileImportConfiguration };
@@ -341,7 +343,7 @@ const requestHandlerAnalysisMachine = (
                 : appendPostfixHash(getHandlerNameWithoutSquareBracket(next.handler.name), next.hash),
 
             sourceFilePath,
-            source: context.source,
+            // source: context.source,
           };
 
           const nextRouteBox = { ...next.routeBox, [sourceFilePath]: routeConfiguration };
@@ -519,7 +521,7 @@ const requestHandlerAnalysisMachine = (
                   )
                 : appendPostfixHash(getHandlerNameWithoutSquareBracket(next.handler.name), next.hash),
             importFile: next.source.getFilePath().toString(),
-            source: next.source,
+            // source: next.source,
           };
 
           const routeConfiguration: IRouteConfiguration = {
@@ -536,7 +538,7 @@ const requestHandlerAnalysisMachine = (
                 : appendPostfixHash(getHandlerNameWithoutSquareBracket(next.handler.name), next.hash),
 
             sourceFilePath,
-            source: context.source,
+            // source: context.source,
           };
 
           // TypeReference에 대한 처리를 해준다
@@ -577,7 +579,7 @@ const requestHandlerAnalysisMachine = (
             : parameter.getTypeNodeOrThrow().getFullText().trim();
 
           const localDeclarations = getImportConfigurationFromResolutions({
-            source: next.source,
+            // source: next.source,
             resolutions: localResolutions,
           });
 
@@ -587,7 +589,7 @@ const requestHandlerAnalysisMachine = (
           ]);
 
           const externalDeclarations = getImportConfigurationFromResolutions({
-            source: next.source,
+            // source: next.source,
             resolutions,
           });
 

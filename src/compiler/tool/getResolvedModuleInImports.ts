@@ -1,14 +1,11 @@
 import type IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
 import type IConfig from '#config/interface/IConfig';
-import logger from '#module/logging/logger';
 import appendPostfixHash from '#tool/appendPostfixHash';
 import getHash from '#tool/getHash';
 import { replaceSepToPosix } from 'my-node-fp';
 import * as path from 'path';
 import type { ImportClause, SourceFile, TypeReferenceNode } from 'ts-morph';
 import { SyntaxKind } from 'ts-morph';
-
-const log = logger();
 
 interface IGetResolvedModuleParam {
   source: SourceFile;
@@ -67,7 +64,7 @@ export default function getResolvedModuleInImports({
     return namedBindings.find((namedBinding) => namedBinding === textTypeName) != null;
   });
 
-  log.debug(typeNameWithImportDeclarations);
+  // log.debug(typeNameWithImportDeclarations);
 
   const nonDedupeResolutions = typeNameWithImportDeclarations.map<IGetModuleInImports>(
     (typeNameWithImportDeclaration) => {

@@ -7,6 +7,8 @@ import type IWatchConfig from '#config/interface/IWatchConfig';
 import isValidConfig from '#config/isValidConfig';
 import preLoadConfig from '#config/preLoadConfig';
 import logger from '#module/logging/logger';
+import worker from '#worker/child';
+import getIsPrimary from '#xstate/tool/getIsPrimary';
 import { isError } from 'my-easy-fp';
 import yargsAnyType, { type Arguments, type Argv, type CommandModule } from 'yargs';
 
@@ -45,12 +47,26 @@ const watchCmd: CommandModule<IConfig & IWatchConfig, IConfig & IWatchConfig> = 
   },
 };
 
-// eslint-disable-next-line
-yargs(process.argv.slice(2))
-  .command<IConfig>(routeCmd)
-  .command<IConfig & IWatchConfig>(watchCmd as any)
-  .demandCommand()
-  .recommendCommands()
-  .config(preLoadConfig())
-  .check(isValidConfig)
-  .help().argv;
+if (process.env.SYNC_MODE === 'true') {
+  // eslint-disable-next-line
+  yargs(process.argv.slice(2))
+    .command<IConfig>(routeCmd)
+    .command<IConfig & IWatchConfig>(watchCmd as any)
+    .demandCommand()
+    .recommendCommands()
+    .config(preLoadConfig())
+    .check(isValidConfig)
+    .help().argv;
+} else if (getIsPrimary()) {
+  // eslint-disable-next-line
+  yargs(process.argv.slice(2))
+    .command<IConfig>(routeCmd)
+    .command<IConfig & IWatchConfig>(watchCmd as any)
+    .demandCommand()
+    .recommendCommands()
+    .config(preLoadConfig())
+    .check(isValidConfig)
+    .help().argv;
+} else {
+  worker();
+}

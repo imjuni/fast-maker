@@ -14,7 +14,7 @@ export default function replaceTypeReferenceInTypeLiteral({
 }: IReplaceTypeReferenceInTypeLiteralParam) {
   const resolutionWithTypeReferenceNodePairs = resolutions
     .map((resolution) => typeReferenceNodes.map((typeReferenceNode) => ({ resolution, typeReferenceNode })))
-    .flatMap((resolutionWithTypeReferenceNodePair) => resolutionWithTypeReferenceNodePair)
+    .flat()
     .filter((resolutionWithTypeReferenceNodePair) => {
       const { resolution, typeReferenceNode } = resolutionWithTypeReferenceNodePair;
 

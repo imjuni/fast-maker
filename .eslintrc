@@ -41,6 +41,27 @@
       }
     ],
     "no-console": "off",
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "interface",
+        "format": ["PascalCase"],
+        "filter": "^_.+",
+        "custom": {
+          "regex": "^I[A-Z]+",
+          "match": true
+        }
+      },
+      {
+        "selector": "typeAlias",
+        "format": ["PascalCase"],
+        "filter": "^_.+",
+        "custom": {
+          "regex": "^T[A-Z]+",
+          "match": true
+        }
+      }
+    ],
     "@typescript-eslint/no-unused-vars": [
       "error",
       {

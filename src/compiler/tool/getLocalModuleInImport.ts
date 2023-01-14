@@ -101,7 +101,7 @@ export default function getLocalModuleInImports({
         ],
       };
     }),
-  ].flatMap((importCodeBase) => importCodeBase);
+  ].flat();
 
   return importCodeBases;
 }

@@ -44,6 +44,12 @@ export default function logger() {
       sync: true,
     });
 
+    const fileStream = pino.destination({
+      dest: './log/fm.log',
+      sync: false,
+      mkdir: true,
+    });
+
     log = pino(
       {
         browser: { asObject: true },
@@ -56,7 +62,7 @@ export default function logger() {
           error: pino.levels.values.error,
         },
       },
-      stream,
+      process.env.FILE_LOG_MODE !== 'true' ? stream : fileStream,
     );
 
     log.level = 'info';

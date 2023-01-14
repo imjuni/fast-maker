@@ -1,12 +1,17 @@
+import { CE_SEND_TO_PARENT_COMMAND } from '#worker/interface/CE_SEND_TO_PARENT_COMMAND';
 import cliProgesss from 'cli-progress';
 
 class Progress {
   accessor enable: boolean;
 
+  accessor cluster: boolean;
+
   #bar: cliProgesss.SingleBar;
 
   constructor() {
     this.enable = true;
+    this.cluster = false;
+
     this.#bar = new cliProgesss.SingleBar(
       {
         format: 'PROGRESS | {bar} | {value}/{total} Files',
@@ -19,24 +24,49 @@ class Progress {
   }
 
   start(total: number, startValue: number) {
-    if (this.enable === true) {
-      this.#bar.start(total, startValue);
+    if (this.cluster && this.enable) {
+      process.send?.({ command: CE_SEND_TO_PARENT_COMMAND.PROGRESS_START, data: { total, startValue } });
+    } else if (this.enable === true) {
+      this.forceStart(total, startValue);
     }
+  }
+
+  forceStart(total: number, startValue: number) {
+    this.#bar.start(total, startValue);
   }
 
   increment() {
-    if (this.enable === true) {
-      this.#bar.increment();
+    if (this.cluster && this.enable) {
+      process.send?.({ command: CE_SEND_TO_PARENT_COMMAND.PROGRESS_INCREMENT });
+    } else if (this.enable) {
+      this.forceIncrement();
     }
+  }
+
+  forceIncrement() {
+    this.#bar.increment();
   }
 
   update(updateValue: number) {
-    if (this.enable === true) {
-      this.#bar.update(updateValue);
+    if (this.cluster && this.enable) {
+      process.send?.({ command: CE_SEND_TO_PARENT_COMMAND.PROGRESS_UPDATE, data: { updateValue } });
+    } else if (this.enable) {
+      this.forceUpdate(updateValue);
     }
   }
 
+  forceUpdate(updateValue: number) {
+    this.#bar.update(updateValue);
+  }
+
   stop() {
+    if (this.cluster) {
+      process.send?.({ command: CE_SEND_TO_PARENT_COMMAND.PROGRESS_STOP });
+    }
+    this.forceStop();
+  }
+
+  forceStop() {
     this.#bar.stop();
   }
 }

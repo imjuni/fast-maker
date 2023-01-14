@@ -14,6 +14,7 @@ test('getHandlerFile', async () => {
     posixJoin(env.handlerPath, 'get', 'justice', '[dc-league]', 'hello.ts'),
     posixJoin(env.handlerPath, 'get', 'justice', '[dc-league]', 'world.ts'),
     posixJoin(env.handlerPath, 'get', 'justice', 'world.ts'),
+    posixJoin(env.handlerPath, 'get', 'justice', 'world', '[id].ts'),
     posixJoin(env.handlerPath, 'get', 'po-ke', 'hello.ts'),
     posixJoin(env.handlerPath, 'get', 'po-ke', 'world.ts'),
     posixJoin(env.handlerPath, 'get', 'xman', 'fastify.ts'),
@@ -94,6 +95,11 @@ test('getRouteFiles', async () => {
       filename: posixJoin(env.handlerPath, 'get/justice/world.ts'),
       method: 'get',
       routePath: '/justice/world',
+    },
+    {
+      filename: posixJoin(env.handlerPath, 'get/justice/world/[id].ts'),
+      method: 'get',
+      routePath: '/justice/world/:id',
     },
     {
       filename: posixJoin(env.handlerPath, 'get/po-ke/hello.ts'),
