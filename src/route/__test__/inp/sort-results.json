@@ -1,0 +1,15 @@
+[
+  "get::/justice/:dc-league/hello",
+  "get::/justice/:dc-league/world",
+  "get::/justice/world/:id",
+  "get::/justice/world",
+  "get::/po-ke/hello",
+  "get::/po-ke/world",
+  "get::/xman/fastify",
+  "get::/xman/world",
+  "post::/avengers/heros/:id/hero",
+  "post::/avengers/heros",
+  "post::/hello2",
+  "put::/hello",
+  "delete::/hello"
+]

@@ -1,5 +1,6 @@
 import { CE_SEND_TO_PARENT_COMMAND } from '#worker/interface/CE_SEND_TO_PARENT_COMMAND';
 import type { IFromChildDoProgressStart } from '#worker/interface/IFromChild';
+import chalk from 'chalk';
 import cliProgesss from 'cli-progress';
 
 class Progress {
@@ -15,10 +16,11 @@ class Progress {
 
     this.#bar = new cliProgesss.SingleBar(
       {
-        format: 'PROGRESS | {bar} | {value}/{total} Files',
+        format: `PROGRESS | ${chalk.greenBright('{bar}')} | {value}/{total} Files`,
         barCompleteChar: '\u25A0',
-        barIncompleteChar: ' ',
+        barIncompleteChar: '\u25A5',
         stopOnComplete: true,
+        barGlue: '\u001b[37m',
       },
       cliProgesss.Presets.rect,
     );
