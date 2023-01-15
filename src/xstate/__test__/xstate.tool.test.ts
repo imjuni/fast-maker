@@ -85,7 +85,7 @@ test('t001-FSM-TypeLiteral', async () => {
     routeHandler: testRouteHandlerFile,
     handler: routeHandler,
     routeOption,
-    option: share.option,
+    config: share.option,
   });
 
   const service = interpret(machine);
@@ -151,7 +151,7 @@ test('t002-FSM-FastifyRequest', async () => {
     routeHandler: testRouteHandlerFile,
     handler: routeHandler,
     routeOption,
-    option: share.option,
+    config: share.option,
   });
 
   const service = interpret(machine);

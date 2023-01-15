@@ -1,6 +1,6 @@
 {
   "name": "fast-maker",
-  "version": "2.0.0-RC4",
+  "version": "2.0.0",
   "description": "create route file on specific directory",
   "scripts": {
     "test": "jest --coverage",
@@ -9,6 +9,7 @@
     "clean": "just --config ./.configs/just.config.ts clean",
     "pub:prod": "just --config ./.configs/just.config.ts pub:prod",
     "pub": "just --config ./.configs/just.config.ts pub",
+    "repub": "just --config ./.configs/just.config.ts repub",
     "ctix:single": "just --config ./.configs/just.config.ts ctix:single",
     "ctix:remove": "just --config ./.configs/just.config.ts ctix:remove",
     "rollup:prod": "just --config ./.configs/just.config.ts rollup:prod",

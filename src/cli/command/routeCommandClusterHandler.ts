@@ -168,7 +168,7 @@ export default async function routeCommandClusterHandler(config: IConfig) {
       throw prettfiedEither.fail;
     }
 
-    await fs.promises.writeFile(path.join(config.output ?? config.handler, 'route.ts'), prettfiedEither.pass);
+    await fs.promises.writeFile(path.join(config.output, 'route.ts'), prettfiedEither.pass);
 
     console.log(getReasonMessages(logbox.reasons));
 
