@@ -1,0 +1,15 @@
+export default function routing(fastify: FastifyInstance): void {
+  fastify.get('/justice/:dc-league/hello', option_pGVJC0cP, hello_pGVJC0cP, );
+  fastify.get('/justice/:dc-league/world', option_BvbnzoJq, world_BvbnzoJq, );
+  fastify.get('/justice/world/:id', option_7oyxIuop, world_7oyxIuop, );
+  fastify.get('/justice/world', option_Ua8WhawD, world_Ua8WhawD);
+  fastify.get('/po-ke/hello', option_9dGSkUi, hello_9dGSkUiB, );
+  fastify.get('/po-ke/world', option_JtjNeTmn, world_JtjNeTmn);
+  fastify.get('/xman/fastify', option_QzzNAbc0, fastify_QzzNAbc0, );
+  fastify.get('/xman/world', world_T6h0XVQh);
+  fastify.post<{ Body: IAbility }>('/avengers/heros/:id/hero', hero_RuJhK1Hd);
+  fastify.post('/avengers/heros', heros_PDq0q2qA);
+  fastify.post('/hello2', iamhello_2g5tCoye);
+  fastify.put('/hello', hello_NUMfbXzJ);
+  fastify.delete('/hello', hello_JBEumYWp);
+}

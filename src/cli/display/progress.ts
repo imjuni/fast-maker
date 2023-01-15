@@ -18,7 +18,7 @@ class Progress {
       {
         format: `PROGRESS | ${chalk.greenBright('{bar}')} | {value}/{total} Files`,
         barCompleteChar: '\u25A0',
-        barIncompleteChar: '\u25A5',
+        barIncompleteChar: '\u25A1',
         stopOnComplete: true,
         barGlue: '\u001b[37m',
       },
