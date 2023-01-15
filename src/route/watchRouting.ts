@@ -72,7 +72,7 @@ export default function watchRouting(config: IConfig & IWatchConfig) {
         const prettfiedEither = await prettierProcessing({ code });
 
         if (prettfiedEither.type === 'pass') {
-          await fs.promises.writeFile(path.join(config.output, 'route.ts'), prettfiedEither.pass);
+          await fs.promises.writeFile(path.join(config.output ?? config.handler, 'route.ts'), prettfiedEither.pass);
           console.log(getReasonMessages(routing.pass.log.reasons));
         }
 

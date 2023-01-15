@@ -6,14 +6,15 @@ import minimist from 'minimist';
 import { getDirnameSync } from 'my-node-fp';
 
 const log = logger();
+const configFileName = '.fastmakerrc';
 
 function getConfigFilePath(argv: minimist.ParsedArgs, projectPath?: string) {
   const argvConfigFilePath = argv.c ?? argv.config;
   const projectDirPath = projectPath != null ? getDirnameSync(projectPath) : undefined;
 
-  const configFilePathSearchResultOnCwd = findUp.sync('.ctirc');
+  const configFilePathSearchResultOnCwd = findUp.sync(configFileName);
   const configFilePathSearchProjectDirPath =
-    projectDirPath != null ? findUp.sync('.ctirc', { cwd: projectDirPath }) : undefined;
+    projectDirPath != null ? findUp.sync(configFileName, { cwd: projectDirPath }) : undefined;
 
   return argvConfigFilePath ?? configFilePathSearchResultOnCwd ?? configFilePathSearchProjectDirPath;
 }
