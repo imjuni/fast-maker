@@ -67,18 +67,20 @@ task('ctix:remove', async () => {
 });
 
 task('+pub', async () => {
-  const cmd = 'npm publish --registry http://localhost:8901 --force';
+  const cmd = 'npm';
+  const option = 'publish --registry http://localhost:8901 --force';
 
-  await execa(cmd, {
+  await execa(cmd, splitArgs(option), {
     stderr: process.stderr,
     stdout: process.stdout,
   });
 });
 
 task('+pub:prod', async () => {
-  const cmd = 'npm publish --registry https://registry.npmjs.org --access=public';
+  const cmd = 'npm';
+  const option = 'publish --registry https://registry.npmjs.org --access=public';
 
-  await execa(cmd, {
+  await execa(cmd, splitArgs(option), {
     stderr: process.stderr,
     stdout: process.stdout,
   });
