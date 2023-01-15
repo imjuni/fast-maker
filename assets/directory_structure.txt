@@ -1,0 +1,25 @@
+├── delete
+│   ├── hello.ts
+├── get
+│   ├── justice
+│   │   ├── [dc-league]
+│   │   │   ├── hello.ts
+│   │   │   └── world.ts
+│   │   ├── world
+│   │   │   └── [id].ts
+│   │   └── world.ts
+│   ├── po-ke
+│   │   ├── hello.ts
+│   │   └── world.ts
+│   └── xman
+│       ├── fastify.ts
+│       └── world.ts
+├── post
+│   ├── avengers
+│   │   ├── heros
+│   │   │   ├── [id]
+│   │   │   │   └── hero.ts
+│   │   └── heros.ts
+│   └── hello2.ts
+├── put
+│   └── world.ts
