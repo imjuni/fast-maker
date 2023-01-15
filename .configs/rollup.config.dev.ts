@@ -22,7 +22,7 @@ export default [
     ],
   },
   {
-    input: 'src/fast-maker.ts',
+    input: 'src/index.ts',
     output: [
       {
         format: 'cjs',

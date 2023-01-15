@@ -119,7 +119,7 @@ task('+tsc', async () => {
 });
 
 task('build', series('clean', '+tsc'));
-task('pub', series('clean', 'lint', '+rollup:dev', '+pub'));
+task('pub', series('clean', 'lint', 'ctix:single', '+rollup:prod', 'ctix:remove', '+pub'));
 task('pub:prod', series('clean', 'lint', 'ctix:single', '+rollup:prod', 'ctix:remove', '+pub:prod'));
 task('rollup:prod', series('clean', 'lint', 'ctix:single', '+rollup:prod', 'ctix:remove'));
 task('rollup:dev', series('clean', 'lint', 'ctix:single', '+rollup:dev', 'ctix:remove'));
