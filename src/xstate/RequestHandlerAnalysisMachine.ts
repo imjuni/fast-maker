@@ -31,7 +31,7 @@ export interface IAnalysisMachineContext {
   routeHandler: IRouteHandler;
   handler: IHandlerStatement;
   currentNode: number;
-  option: IConfig;
+  config: IConfig;
   routeOption?: IOptionStatement;
   hash: string;
 
@@ -546,13 +546,13 @@ const requestHandlerAnalysisMachine = (
           const everyTypeReferenceNodes = getTypeReferences(parameter, false);
           const resolutions = getResolvedModuleInImports({
             source: context.source,
-            option: context.option,
+            option: context.config,
             typeReferenceNodes,
           });
 
           const localResolutions = getLocalModuleInImports({
             source: context.source,
-            option: context.option,
+            option: context.config,
             typeReferenceNodes,
           });
 

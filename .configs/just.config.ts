@@ -1,5 +1,6 @@
 import execa from 'execa';
 import { series, task } from 'just-task';
+import readPkg from 'read-pkg';
 import * as uuid from 'uuid';
 
 function splitArgs(args: string): string[] {
@@ -86,6 +87,21 @@ task('+pub:prod', async () => {
   });
 });
 
+task('unpub', async () => {
+  const packageJson = readPkg.sync();
+  const cmd = 'npm';
+  const option = `unpublish ${packageJson.name}@${packageJson.version} --registry http://localhost:8901`;
+
+  await execa(cmd, splitArgs(option), {
+    env: {
+      NODE_ENV: 'production',
+      RELEASE_MODE: 'true',
+    },
+    stderr: process.stderr,
+    stdout: process.stdout,
+  });
+});
+
 task('+rollup:prod', async () => {
   const cmd = 'rollup';
   const option = '--config ./.configs/rollup.config.prod.ts --configPlugin ts';
@@ -122,6 +138,7 @@ task('+tsc', async () => {
 
 task('build', series('clean', '+tsc'));
 task('pub', series('clean', 'lint', 'ctix:single', '+rollup:prod', 'ctix:remove', '+pub'));
+task('repub', series('unpub', 'pub'));
 task('pub:prod', series('clean', 'lint', 'ctix:single', '+rollup:prod', 'ctix:remove', '+pub:prod'));
 task('rollup:prod', series('clean', 'lint', 'ctix:single', '+rollup:prod', 'ctix:remove'));
 task('rollup:dev', series('clean', 'lint', 'ctix:single', '+rollup:dev', 'ctix:remove'));

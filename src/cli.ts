@@ -22,10 +22,12 @@ const routeCmd: CommandModule<IConfig, IConfig> = {
   builder,
   handler: async (args) => {
     try {
+      const output = args.output ?? args.handler;
+
       if (process.env.SYNC_MODE === 'true') {
-        await routeCommandSyncHandler(args);
+        await routeCommandSyncHandler({ ...args, output });
       } else {
-        await routeCommandClusterHandler(args);
+        await routeCommandClusterHandler({ ...args, output });
       }
     } catch (catched) {
       const err = isError(catched) ?? new Error('unknown error raised');

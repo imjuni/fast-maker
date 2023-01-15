@@ -14,7 +14,7 @@ import path from 'path';
 import { type Project } from 'ts-morph';
 import { interpret } from 'xstate';
 
-export default async function proceedStage02(project: Project, option: IConfig, handlers: IRouteHandler[]) {
+export default async function proceedStage02(project: Project, config: IConfig, handlers: IRouteHandler[]) {
   const reasons: IReason[] = [];
   const logObject: Partial<IStage02Log> = {};
 
@@ -148,7 +148,7 @@ export default async function proceedStage02(project: Project, option: IConfig, 
         throw new Error(`Source-code is empty: ${handlerNode.filename}`);
       }
 
-      const relativePath = path.relative(option.output, source.getFilePath().toString());
+      const relativePath = path.relative(config.output, source.getFilePath().toString());
       const hash = getHash(relativePath);
       const routeHandler = handlerNode.nodes.find((node): node is IHandlerStatement => node.kind === 'handler');
       const routeOption = handlerNode.nodes.find((node): node is IOptionStatement => node.kind === 'option');
@@ -166,7 +166,7 @@ export default async function proceedStage02(project: Project, option: IConfig, 
         routeHandler: routeFile,
         handler: routeHandler,
         routeOption,
-        option,
+        config,
       });
 
       const service = interpret(machine);
