@@ -18,6 +18,12 @@ function sort(routes: IRouteConfiguration[]): IRouteConfiguration[] {
       const next = { ...chunking };
 
       try {
+        // skip chunking action for root route path
+        if (current.routePath === '/') {
+          next.chunk[current.routePath] = [current];
+          return next;
+        }
+
         if (chunking.prev == null || chunking.prev === '') {
           next.prev = current.routePath;
           next.chunk[current.routePath] = [...(next.chunk[current.routePath] ?? []), current];
@@ -52,9 +58,9 @@ function sort(routes: IRouteConfiguration[]): IRouteConfiguration[] {
   );
 
   const keys = typedkey(chunked.chunk);
-  const sortedKeys = keys.sort((l, r) => l.localeCompare(r));
+  const asc = keys.sort((l, r) => l.localeCompare(r));
 
-  return sortedKeys.map((key) => chunked.chunk[key]).flat();
+  return asc.map((key) => chunked.chunk[key]).flat();
 }
 
 export default function sortRoutes(routes: IRouteConfiguration[]): IRouteConfiguration[] {
