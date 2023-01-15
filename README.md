@@ -8,6 +8,8 @@ fast-maker is micro utility for [fastify.js](https://www.fastify.io/) over 3.x. 
 1. More focus about business logic
 1. Recognize route path using by directory structure
 
+![fast-maker-showcase.gif](assets/fast-maker-showcase.gif)
+
 | directory structure                                        |     | route function                                     |
 | ---------------------------------------------------------- | --- | -------------------------------------------------- |
 | ![directory_structure.png](assets/directory_structure.png) | ➜   | ![route_config_ts.png](assets/route_config_ts.png) |
