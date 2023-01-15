@@ -19,36 +19,37 @@ let log:
 
 export default function logger() {
   if (log === undefined) {
-    const stream = pretty({
-      translateTime: 'yy-mm-dd HH:MM:ss',
-      ignore: 'pid,hostname',
-      colorize: false,
-      customPrettifiers: {
-        level: (logLevel: any) => {
-          const levelLabel = pino.levels.labels[logLevel].toLowerCase();
+    const stream =
+      process.env.FILE_LOG_MODE !== 'true'
+        ? pretty({
+            translateTime: 'yy-mm-dd HH:MM:ss',
+            ignore: 'pid,hostname',
+            colorize: false,
+            customPrettifiers: {
+              level: (logLevel: any) => {
+                const levelLabel = pino.levels.labels[logLevel].toLowerCase();
 
-          switch (levelLabel) {
-            case 'debug':
-              return `${chalk.blueBright(pino.levels.labels[logLevel])}`;
-            case 'info':
-              return `${chalk.greenBright(pino.levels.labels[logLevel])}`;
-            case 'warn':
-              return `${chalk.yellowBright(pino.levels.labels[logLevel])}`;
-            case 'error':
-              return `${chalk.redBright(pino.levels.labels[logLevel])}`;
-            default:
-              return `${chalk.greenBright(pino.levels.labels[logLevel])}`;
-          }
-        },
-      },
-      sync: true,
-    });
-
-    const fileStream = pino.destination({
-      dest: './log/fm.log',
-      sync: false,
-      mkdir: true,
-    });
+                switch (levelLabel) {
+                  case 'debug':
+                    return `${chalk.blueBright(pino.levels.labels[logLevel])}`;
+                  case 'info':
+                    return `${chalk.greenBright(pino.levels.labels[logLevel])}`;
+                  case 'warn':
+                    return `${chalk.yellowBright(pino.levels.labels[logLevel])}`;
+                  case 'error':
+                    return `${chalk.redBright(pino.levels.labels[logLevel])}`;
+                  default:
+                    return `${chalk.greenBright(pino.levels.labels[logLevel])}`;
+                }
+              },
+            },
+            sync: true,
+          })
+        : pino.destination({
+            dest: './log/fm.log',
+            sync: false,
+            mkdir: true,
+          });
 
     log = pino(
       {
@@ -62,7 +63,7 @@ export default function logger() {
           error: pino.levels.values.error,
         },
       },
-      process.env.FILE_LOG_MODE !== 'true' ? stream : fileStream,
+      stream,
     );
 
     log.level = process.env.LOG_LEVEL ?? 'info';
