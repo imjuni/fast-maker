@@ -51,7 +51,7 @@ export default async function routeCommandSyncHandler(config: IConfig) {
     throw prettfiedEither.fail;
   }
 
-  await fs.promises.writeFile(path.join(config.output, 'route.ts'), prettfiedEither.pass);
+  await fs.promises.writeFile(path.join(config.output ?? config.handler, 'route.ts'), prettfiedEither.pass);
 
   console.log(getReasonMessages(routing.pass.log.reasons));
 
