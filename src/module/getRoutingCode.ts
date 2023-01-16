@@ -10,7 +10,7 @@ export default function getRoutingCode({
   routes: string[];
 }) {
   const codes = [
-    `import { FastifyInstance } from 'fastify';`,
+    `import type { FastifyInstance } from 'fastify';`,
     ...imports,
     '\n',
     `export ${config.useDefaultExport ? 'default ' : ''}function ${

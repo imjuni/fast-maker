@@ -42,6 +42,7 @@ export default function getLocalExportStatementImport({
           {
             name: nodeName,
             alias: nodeName,
+            isPureType: true,
           },
         ],
         importFile: source.getFilePath().toString(),
@@ -60,6 +61,7 @@ export default function getLocalExportStatementImport({
           {
             name: nodeName,
             alias: nodeName,
+            isPureType: true,
           },
         ],
         importFile: source.getFilePath().toString(),
@@ -79,6 +81,7 @@ export default function getLocalExportStatementImport({
           {
             name: nodeName,
             alias: nodeName,
+            isPureType: true,
           },
         ],
         importFile: source.getFilePath().toString(),

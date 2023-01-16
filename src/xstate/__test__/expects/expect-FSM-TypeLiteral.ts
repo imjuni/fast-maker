@@ -13,18 +13,21 @@ export default {
       hash: 'SynyPSafLHaoobLmnZXzP70l78QG5PfE',
       namedBindings: [],
       nonNamedBinding: 'IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE',
+      nonNamedBindingIsPureType: true,
       importFile: posixJoin(env.handlerPath, 'get', 'interface', 'IReqPokeHello.ts'),
     },
     [posixJoin(env.examplePath, 'interface', 'TAbnormalPresident.ts')]: {
       hash: 'DS8Pg2MYm5AsqoJVltiuqlOctGQfT78w',
       namedBindings: [],
       nonNamedBinding: 'TAbnormalPresident_DS8Pg2MYm5AsqoJVltiuqlOctGQfT78w',
+      nonNamedBindingIsPureType: true,
       importFile: posixJoin(env.examplePath, 'interface', 'TAbnormalPresident.ts'),
     },
     [posixJoin(env.examplePath, 'interface', 'ICompany.ts')]: {
       hash: '6bwarMss36QHeqUXTVMxB9uAjEjVZOL1',
       namedBindings: [],
       nonNamedBinding: 'ICompany_6bwarMss36QHeqUXTVMxB9uAjEjVZOL1',
+      nonNamedBindingIsPureType: true,
       importFile: posixJoin(env.examplePath, 'interface', 'ICompany.ts'),
     },
     [posixJoin(env.examplePath, 'interface', 'IAbility.ts')]: {
@@ -33,6 +36,7 @@ export default {
         {
           name: 'IAbility',
           alias: 'IAbility',
+          isPureType: true,
         },
       ],
       importFile: posixJoin(env.examplePath, 'interface', 'IAbility.ts'),

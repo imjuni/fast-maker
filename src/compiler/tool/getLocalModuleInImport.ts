@@ -58,9 +58,10 @@ export default function getLocalModuleInImports({
             isDefaultExport: false,
             importModuleNameFrom: moduleName,
             importModuleNameTo: appendPostfixHash(moduleName, moduleHash),
+            isPureType: true,
           },
         ],
-      };
+      } satisfies IGetModuleInImports;
     }),
     matchAndExportedInterfaces.map((interfaceNode) => {
       const moduleName = getTypeSymbolText(interfaceNode.getType(), (node) =>
@@ -77,9 +78,10 @@ export default function getLocalModuleInImports({
             isDefaultExport: false,
             importModuleNameFrom: moduleName,
             importModuleNameTo: appendPostfixHash(moduleName, moduleHash),
+            isPureType: true,
           },
         ],
-      };
+      } satisfies IGetModuleInImports;
     }),
 
     matchAndExportedClasses.map((classNode) => {
@@ -97,9 +99,10 @@ export default function getLocalModuleInImports({
             isDefaultExport: false,
             importModuleNameFrom: moduleName,
             importModuleNameTo: appendPostfixHash(moduleName, moduleHash),
+            isPureType: true,
           },
         ],
-      };
+      } satisfies IGetModuleInImports;
     }),
   ].flat();
 
