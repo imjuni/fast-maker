@@ -18,8 +18,10 @@ export default function getImportConfigurationFromResolutions({
         .map((importDeclaration) => ({
           name: importDeclaration.importModuleNameFrom,
           alias: importDeclaration.importModuleNameTo,
+          isPureType: importDeclaration.isPureType,
         })),
       nonNamedBinding: defaultImportDeclarations?.importModuleNameTo,
+      nonNamedBindingIsPureType: defaultImportDeclarations?.isPureType,
       importFile: resolution.exportFrom,
       // source,
     };

@@ -313,6 +313,7 @@ const requestHandlerAnalysisMachine = (
                     {
                       name: 'option',
                       alias: `${appendPostfixHash('option', next.hash)}`,
+                      isPureType: false,
                     },
                   ]
                 : [],
@@ -510,6 +511,7 @@ const requestHandlerAnalysisMachine = (
                     {
                       name: 'option',
                       alias: `${appendPostfixHash('option', next.hash)}`,
+                      isPureType: false,
                     },
                   ]
                 : [],

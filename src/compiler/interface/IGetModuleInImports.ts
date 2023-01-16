@@ -7,5 +7,6 @@ export default interface IGetModuleInImports {
     isDefaultExport: boolean;
     importModuleNameFrom: string;
     importModuleNameTo: string;
+    isPureType: boolean;
   }>;
 }

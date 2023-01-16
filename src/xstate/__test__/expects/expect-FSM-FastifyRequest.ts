@@ -8,11 +8,12 @@ export default {
       hash: 'SynyPSafLHaoobLmnZXzP70l78QG5PfE',
       namedBindings: [],
       nonNamedBinding: 'IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE',
+      nonNamedBindingIsPureType: true,
       importFile: posixJoin(env.examplePath, 'handlers/get/interface/IReqPokeHello.ts'),
     },
     [posixJoin(env.examplePath, 'handlers/get/justice/world.ts')]: {
       hash: '11CDWg9vT2mXPbskhyeSYs3VSVczUk5a',
-      namedBindings: [{ alias: 'option_11CDWg9vT2mXPbskhyeSYs3VSVczUk5a', name: 'option' }],
+      namedBindings: [{ alias: 'option_11CDWg9vT2mXPbskhyeSYs3VSVczUk5a', name: 'option', isPureType: false }],
       nonNamedBinding: 'world_11CDWg9vT2mXPbskhyeSYs3VSVczUk5a',
       importFile: posixJoin(env.examplePath, 'handlers/get/justice/world.ts'),
     },

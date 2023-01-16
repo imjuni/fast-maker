@@ -10,12 +10,14 @@ export default interface IImportConfiguration {
   namedBindings: Array<{
     name: string;
     alias: string;
+    isPureType: boolean;
   }>;
 
   /**
    * binding 이름
    */
   nonNamedBinding?: string;
+  nonNamedBindingIsPureType?: boolean;
 
   /**
    * import 할 파일의 경로

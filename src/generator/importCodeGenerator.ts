@@ -28,6 +28,7 @@ export default function importCodeGenerator({ importConfigurations, config }: II
   const importCodes = importConfigurations.map((importConfiguration) => {
     const bindingCode = getHashedBindingCode({
       nonNamedBinding: importConfiguration.nonNamedBinding,
+      nonNamedBindingIsPureType: importConfiguration.nonNamedBindingIsPureType,
       namedBindings: importConfiguration.namedBindings,
     });
 

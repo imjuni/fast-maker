@@ -3,28 +3,36 @@ import getHandlerNameWithoutSquareBracket from '#generator/getHandlerNameWithout
 
 export default function getHashedBindingCode({
   nonNamedBinding,
+  nonNamedBindingIsPureType,
   namedBindings,
 }: {
   nonNamedBinding?: string;
+  nonNamedBindingIsPureType?: boolean;
   namedBindings?: IImportConfiguration['namedBindings'];
 }): string {
   if (nonNamedBinding != null && nonNamedBinding !== '' && namedBindings != null && namedBindings.length > 0) {
     const optionProcessedNamedBindings = namedBindings.map((binding) =>
-      binding.name === binding.alias ? binding.name : `${binding.name} as ${binding.alias}`,
+      binding.name === binding.alias
+        ? `${binding.isPureType ? 'type ' : ''}${binding.name}`
+        : `${binding.isPureType ? 'type ' : ''}${binding.name} as ${binding.alias}`,
     );
 
     const handlerName = getHandlerNameWithoutSquareBracket(nonNamedBinding);
-    return `${handlerName}, { ${optionProcessedNamedBindings.join(', ')} } from`;
+    return `${nonNamedBindingIsPureType ?? false ? 'type ' : ''}${handlerName}, { ${optionProcessedNamedBindings.join(
+      ', ',
+    )} } from`;
   }
 
   if (nonNamedBinding != null && nonNamedBinding !== '') {
     const handlerName = getHandlerNameWithoutSquareBracket(nonNamedBinding);
-    return `${handlerName} from`;
+    return `${nonNamedBindingIsPureType ?? false ? 'type ' : ''}${handlerName} from`;
   }
 
   if (namedBindings != null && namedBindings.length > 0) {
     const optionProcessedNamedBindings = namedBindings.map((binding) =>
-      binding.name === binding.alias ? binding.name : `${binding.name} as ${binding.alias}`,
+      binding.name === binding.alias
+        ? `${binding.isPureType ? 'type ' : ''}${binding.name}`
+        : `${binding.isPureType ? 'type ' : ''}${binding.name} as ${binding.alias}`,
     );
 
     return `{ ${optionProcessedNamedBindings.join(', ')} } from`;

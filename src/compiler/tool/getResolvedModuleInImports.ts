@@ -2,6 +2,7 @@ import type IGetModuleInImports from '#compiler/interface/IGetModuleInImports';
 import type IConfig from '#config/interface/IConfig';
 import appendPostfixHash from '#tool/appendPostfixHash';
 import getHash from '#tool/getHash';
+import { atOrUndefined } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
 import * as path from 'path';
 import type { ImportClause, SourceFile, TypeReferenceNode } from 'ts-morph';
@@ -64,8 +65,6 @@ export default function getResolvedModuleInImports({
     return namedBindings.find((namedBinding) => namedBinding === textTypeName) != null;
   });
 
-  // log.debug(typeNameWithImportDeclarations);
-
   const nonDedupeResolutions = typeNameWithImportDeclarations.map<IGetModuleInImports>(
     (typeNameWithImportDeclaration) => {
       const importClause = typeNameWithImportDeclaration.importDeclaration.getImportClauseOrThrow();
@@ -73,6 +72,7 @@ export default function getResolvedModuleInImports({
       const sourceFilePath = typeNameWithImportDeclaration.importDeclaration.getSourceFile().getFilePath();
       const moduleSourceFile = typeNameWithImportDeclaration.importDeclaration.getModuleSpecifierSourceFileOrThrow();
       const moduleSourceFilePath = moduleSourceFile.getFilePath();
+      const declarationMap = moduleSourceFile.getExportedDeclarations();
 
       const relativeFilePath = replaceSepToPosix(path.relative(option.output, moduleSourceFilePath));
       const moduleHash = getHash(relativeFilePath);
@@ -83,6 +83,7 @@ export default function getResolvedModuleInImports({
       // 오류 방지 차원에서 filename + hash로 처리한다
       if (defaultImport != null) {
         const baseFilename = path.basename(relativeFilePath, '.ts');
+        const defaultImportModuleType = atOrUndefined(declarationMap.get('default') ?? [], 0);
 
         return {
           isExternalLibraryImport: false,
@@ -94,10 +95,18 @@ export default function getResolvedModuleInImports({
               isDefaultExport: true,
               importModuleNameFrom: defaultImport.getText(),
               importModuleNameTo: appendPostfixHash(baseFilename, moduleHash),
+              isPureType:
+                defaultImportModuleType == null
+                  ? false
+                  : defaultImportModuleType.getKind() === SyntaxKind.TypeAliasDeclaration ||
+                    defaultImportModuleType.getKind() === SyntaxKind.ClassDeclaration ||
+                    defaultImportModuleType.getKind() === SyntaxKind.InterfaceDeclaration,
             },
           ],
         };
       }
+
+      const importModuleType = atOrUndefined(declarationMap.get(typeNameWithImportDeclaration.textTypeName) ?? [], 0);
 
       return {
         isExternalLibraryImport: false,
@@ -109,6 +118,12 @@ export default function getResolvedModuleInImports({
             isDefaultExport: false,
             importModuleNameTo: typeNameWithImportDeclaration.textTypeName,
             importModuleNameFrom: typeNameWithImportDeclaration.textTypeName,
+            isPureType:
+              importModuleType == null
+                ? false
+                : importModuleType.getKind() === SyntaxKind.TypeAliasDeclaration ||
+                  importModuleType.getKind() === SyntaxKind.ClassDeclaration ||
+                  importModuleType.getKind() === SyntaxKind.InterfaceDeclaration,
           },
         ],
       };
