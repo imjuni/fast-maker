@@ -1,4 +1,5 @@
 import proceedStage01 from '#module/proceedStage01';
+import evaluateVariablePath from '#route/evaluateVariablePath';
 import getHandlerFile from '#route/getHandlerFile';
 import getRoutePath from '#route/getRoutePath';
 import methods from '#route/interface/methods';
@@ -7,64 +8,142 @@ import posixJoin from '#tool/posixJoin';
 import 'jest';
 import path from 'path';
 
-test('getHandlerFile', async () => {
-  const files = await getHandlerFile(path.join(env.handlerPath, 'get'));
+describe('getHandlerFile', () => {
+  test('pass', async () => {
+    const files = await getHandlerFile(path.join(env.handlerPath, 'get'));
 
-  const expectation = [
-    posixJoin(env.handlerPath, 'get', 'justice', '[dc-league]', 'hello.ts'),
-    posixJoin(env.handlerPath, 'get', 'justice', '[dc-league]', 'world.ts'),
-    posixJoin(env.handlerPath, 'get', 'justice', 'world.ts'),
-    posixJoin(env.handlerPath, 'get', 'justice', 'world', '[id].ts'),
-    posixJoin(env.handlerPath, 'get', 'po-ke', 'hello.ts'),
-    posixJoin(env.handlerPath, 'get', 'po-ke', 'world.ts'),
-    posixJoin(env.handlerPath, 'get', 'xman', 'fastify.ts'),
-    posixJoin(env.handlerPath, 'get', 'xman', 'hello.ts'),
-    posixJoin(env.handlerPath, 'get', 'xman', 'world.ts'),
-  ];
+    const expectation = [
+      posixJoin(env.handlerPath, 'get', 'justice', '[dc-league]', 'hello.ts'),
+      posixJoin(env.handlerPath, 'get', 'justice', '[dc-league]', 'world.ts'),
+      posixJoin(env.handlerPath, 'get', 'justice', '[kind]-[id]', 'hello.ts'),
+      posixJoin(env.handlerPath, 'get', 'justice', 'world.ts'),
+      posixJoin(env.handlerPath, 'get', 'justice', 'world', '[id].ts'),
+      posixJoin(env.handlerPath, 'get', 'po-ke', 'hello.ts'),
+      posixJoin(env.handlerPath, 'get', 'po-ke', 'world.ts'),
+      posixJoin(env.handlerPath, 'get', 'xman', 'fastify.ts'),
+      posixJoin(env.handlerPath, 'get', 'xman', 'hello.ts'),
+      posixJoin(env.handlerPath, 'get', 'xman', 'world.ts'),
+    ];
 
-  expect(files).toEqual(expectation);
+    expect(files).toEqual(expectation);
+  });
 });
 
-test('getRoutePath', () => {
-  const inputs = [
-    posixJoin(env.handlerPath, 'post', 'avengers', 'heros', '[id]', 'hero.ts'),
-    posixJoin(env.handlerPath, 'post', 'avengers', 'heros', 'index.ts'),
-    posixJoin(env.handlerPath, 'post', 'avengers', 'heros.ts'),
-    posixJoin(env.handlerPath, 'get', 'justice', '[dc-league]', 'hello.ts'),
-    posixJoin(env.handlerPath, 'get', 'po-ke', 'hello.ts'),
-  ];
+describe('evaluateVariablePath', () => {
+  test('pass - 0 variable', async () => {
+    const variable = await evaluateVariablePath('kind');
+    expect(variable).toEqual('kind');
+  });
 
-  const routePaths = inputs.map((filename) => getRoutePath(filename));
+  test('pass - 1 variable', async () => {
+    const variable = await evaluateVariablePath('[kind]');
+    expect(variable).toEqual(':kind');
+  });
 
-  const expectation = [
-    {
-      filename: posixJoin(env.handlerPath, 'post/avengers/heros/[id]/hero.ts'),
-      method: 'post',
-      routePath: '/avengers/heros/:id/hero',
-    },
-    {
-      filename: posixJoin(env.handlerPath, 'post/avengers/heros/index.ts'),
-      method: 'post',
-      routePath: '/avengers/heros',
-    },
-    {
-      filename: posixJoin(env.handlerPath, 'post/avengers/heros.ts'),
-      method: 'post',
-      routePath: '/avengers/heros',
-    },
-    {
-      filename: posixJoin(env.handlerPath, 'get/justice/[dc-league]/hello.ts'),
-      method: 'get',
-      routePath: '/justice/:dc-league/hello',
-    },
-    {
-      filename: posixJoin(env.handlerPath, 'get/po-ke/hello.ts'),
-      method: 'get',
-      routePath: '/po-ke/hello',
-    },
-  ];
+  test('pass - 2 variable', async () => {
+    const variable = await evaluateVariablePath('[kind]-[id]');
+    expect(variable).toEqual(':kind-:id');
+  });
 
-  expect(routePaths).toEqual(expectation);
+  test('pass - 3 variable', async () => {
+    const variable = await evaluateVariablePath('[kind]-[id]-[pid]');
+    expect(variable).toEqual(':kind-:id-:pid');
+  });
+
+  test('pass - 4 variable', async () => {
+    const variable = await evaluateVariablePath('[kind]-[id]-[pid]-[name]');
+    expect(variable).toEqual(':kind-:id-:pid-:name');
+  });
+
+  test('pass - 4 variable + literal', async () => {
+    const variable = await evaluateVariablePath('[kind]-[id]-[pid]-[name]-test');
+    expect(variable).toEqual(':kind-:id-:pid-:name-test');
+  });
+
+  test('pass - literal + 4 variable', async () => {
+    const variable = await evaluateVariablePath('test-[kind]-[id]-[pid]-[name]');
+    expect(variable).toEqual('test-:kind-:id-:pid-:name');
+  });
+
+  test('invalid - 0 variable', async () => {
+    const variable = await evaluateVariablePath('[kind');
+    expect(variable).toEqual('kind');
+  });
+
+  test('invalid - 0 variable', async () => {
+    const variable = await evaluateVariablePath('[kind-[test');
+    expect(variable).toEqual('kind-[test');
+  });
+
+  test('invalid - 1 variable', async () => {
+    const variable = await evaluateVariablePath('[kind]-[test');
+    expect(variable).toEqual(':kind-test');
+  });
+
+  test('invalid - 2 variable - start bracket', async () => {
+    const variable = await evaluateVariablePath('[kind]-[test]-[[aa');
+    expect(variable).toEqual(':kind-:test-[aa');
+  });
+
+  test('invalid - 2 variable - terminal bracket', async () => {
+    const variable = await evaluateVariablePath('[kind]-[test]-aa]]');
+    expect(variable).toEqual(':kind-:test-aa]]');
+  });
+
+  test('invalid - 0 variable', async () => {
+    const variable = await evaluateVariablePath('kind]');
+    expect(variable).toEqual('kind]');
+  });
+});
+
+describe('getRoutePath', () => {
+  test('pass', async () => {
+    const inputs = [
+      posixJoin(env.handlerPath, 'post', 'avengers', 'heros', '[id]', 'hero.ts'),
+      posixJoin(env.handlerPath, 'post', 'avengers', 'heros', '[kind]-[id]', 'hero.ts'),
+      posixJoin(env.handlerPath, 'post', 'avengers', 'heros', 'index.ts'),
+      posixJoin(env.handlerPath, 'post', 'avengers', 'heros.ts'),
+      posixJoin(env.handlerPath, 'get', 'justice', '[dc-league]', 'hello.ts'),
+      posixJoin(env.handlerPath, 'get', 'po-ke', 'hello.ts'),
+    ];
+
+    const routePaths = await Promise.all(inputs.map(async (filename) => getRoutePath(filename)));
+
+    const expectation = [
+      {
+        filename: posixJoin(env.handlerPath, 'post/avengers/heros/[id]/hero.ts'),
+        method: 'post',
+        routePath: '/avengers/heros/:id/hero',
+      },
+      {
+        filename: posixJoin(env.handlerPath, 'post/avengers/heros/[kind]-[id]/hero.ts'),
+        method: 'post',
+        routePath: '/avengers/heros/:kind-:id/hero',
+      },
+      {
+        filename: posixJoin(env.handlerPath, 'post/avengers/heros/index.ts'),
+        method: 'post',
+        routePath: '/avengers/heros',
+      },
+      {
+        filename: posixJoin(env.handlerPath, 'post/avengers/heros.ts'),
+        method: 'post',
+        routePath: '/avengers/heros',
+      },
+      {
+        filename: posixJoin(env.handlerPath, 'get/justice/[dc-league]/hello.ts'),
+        method: 'get',
+        routePath: '/justice/:dc-league/hello',
+      },
+      {
+        filename: posixJoin(env.handlerPath, 'get/po-ke/hello.ts'),
+        method: 'get',
+        routePath: '/po-ke/hello',
+      },
+    ];
+
+    expect(routePaths).toEqual(expectation);
+  });
 });
 
 test('getRouteFiles', async () => {
@@ -90,6 +169,11 @@ test('getRouteFiles', async () => {
       filename: posixJoin(env.handlerPath, 'get/justice/[dc-league]/world.ts'),
       method: 'get',
       routePath: '/justice/:dc-league/world',
+    },
+    {
+      filename: posixJoin(env.handlerPath, 'get/justice/[kind]-[id]/hello.ts'),
+      method: 'get',
+      routePath: '/justice/:kind-:id/hello',
     },
     {
       filename: posixJoin(env.handlerPath, 'get/justice/world.ts'),

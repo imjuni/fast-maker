@@ -27,7 +27,7 @@ test('getHandlerWithOption', async () => {
     return handlerFileInfo;
   });
 
-  log.info(handlerFileInfos);
+  log.info(handlerFileInfos.length);
 
   const expectation = [
     [

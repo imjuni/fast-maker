@@ -83,12 +83,6 @@
     // "experimentalDecorators": true, /* Enables experimental support for ES7 decorators. */
     // "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */
   },
-  "exclude": [
-    "example/**/*",
-    "dist/**/*",
-    ".eslintrc.js",
-    ".config/just.config.ts",
-    "jest.config.cjs",
-    "jest.setup.cjs"
-  ]
+  "include": ["**/*.ts"],
+  "exclude": ["example/**/*", "dist/**", "**/.configs/**", "**/docs/**/*"]
 }

@@ -1,4 +1,21 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["src/testenv/*"]
+  "compilerOptions": {
+    "allowJs": true
+  },
+  "exclude": [
+    "src/testenv/*",
+    "**/node_modules/**",
+    "examples/**/*",
+    "dist/**",
+    "**/.configs/**",
+    "**/docs/**/*",
+    "**/__test__/**",
+    "**/__tests__/**",
+    "dist/**",
+    "**/.configs/**",
+    "**/docs/**",
+    "jest.config.cjs",
+    "prepublish.cjs"
+  ]
 }

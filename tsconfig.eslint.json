@@ -4,15 +4,13 @@
     "allowJs": true
   },
   "include": [
+    "src/**/*.ts",
     "scripts/uuid.js",
-    "src/**/*",
-    "example/**/*",
-    ".eslintrc.js",
-    "just.config.ts",
+    "examples/**/*.ts",
+    ".eslintrc.cjs",
     "jest.config.cjs",
-    "jest.setup.cjs"
+    "jest.config.js",
+    "prepublish.js"
   ],
-  "exclude": [   
-    "dist/**/*"
-  ]
+  "exclude": ["**/node_modules/**", "**/dist/**/*", "**/.configs/**", "**/docs/**"]
 }
