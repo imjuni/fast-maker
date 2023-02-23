@@ -19,7 +19,9 @@ export default async function proceedStage01(
 
   const sortedRouteHandlerFiles = routeHandlerFiles.sort();
 
-  const routeHandlerInfos = sortedRouteHandlerFiles.map((routeHandlerFile) => getRoutePath(routeHandlerFile));
+  const routeHandlerInfos = await Promise.all(
+    sortedRouteHandlerFiles.map(async (routeHandlerFile) => getRoutePath(routeHandlerFile)),
+  );
 
   return routeHandlerInfos;
 }
