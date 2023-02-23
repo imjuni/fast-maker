@@ -1,6 +1,6 @@
 {
   "name": "fast-maker",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "create route file on specific directory",
   "scripts": {
     "test": "jest --coverage",
