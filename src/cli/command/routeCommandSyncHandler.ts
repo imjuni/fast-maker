@@ -1,14 +1,14 @@
 import progress from '#cli/display/progress';
 import spinner from '#cli/display/spinner';
-import type IConfig from '#config/interface/IConfig';
-import importCodeGenerator from '#generator/importCodeGenerator';
-import prettierProcessing from '#generator/prettierProcessing';
-import routeCodeGenerator from '#generator/routeCodeGenerator';
-import getRoutingCode from '#module/getRoutingCode';
-import generateRouting from '#route/generateRouting';
-import methods from '#route/interface/methods';
-import sortRoutes from '#route/sortRoutes';
-import getReasonMessages from '#tool/getReasonMessages';
+import type IConfig from '#configs/interfaces/IConfig';
+import importCodeGenerator from '#generators/importCodeGenerator';
+import prettierProcessing from '#generators/prettierProcessing';
+import routeCodeGenerator from '#generators/routeCodeGenerator';
+import getRoutingCode from '#modules/getRoutingCode';
+import generateRouting from '#routes/generateRouting';
+import methods from '#routes/interface/methods';
+import sortRoutePaths from '#routes/sortRoutePaths';
+import getReasonMessages from '#tools/getReasonMessages';
 import fs from 'fs';
 import { isFail } from 'my-only-either';
 import path from 'node:path';
@@ -30,7 +30,7 @@ export default async function routeCommandSyncHandler(config: IConfig) {
     throw routing.fail.err;
   }
 
-  const sortedRoutes = sortRoutes(routing.pass.route.routeConfigurations);
+  const sortedRoutes = sortRoutePaths(routing.pass.route.routeConfigurations);
 
   const routeCodes = routeCodeGenerator({ routeConfigurations: sortedRoutes });
   const importCodes = importCodeGenerator({ importConfigurations: routing.pass.route.importConfigurations, config });
@@ -53,6 +53,7 @@ export default async function routeCommandSyncHandler(config: IConfig) {
 
   await fs.promises.writeFile(path.join(config.output, 'route.ts'), prettfiedEither.pass);
 
+  // eslint-disable-next-line no-console
   console.log(getReasonMessages(routing.pass.log.reasons));
 
   progress.stop();

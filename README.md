@@ -1,6 +1,13 @@
 # Introduction
 
-[![Download Status](https://img.shields.io/npm/dw/fast-maker.svg)](https://npmcharts.com/compare/fast-maker?minimal=true) [![Github Star](https://img.shields.io/github/stars/imjuni/fast-maker.svg?style=popout)](https://github.com/imjuni/fast-maker) [![Github Issues](https://img.shields.io/github/issues-raw/imjuni/fast-maker.svg)](https://github.com/imjuni/fast-maker/issues) [![NPM version](https://img.shields.io/npm/v/fast-maker.svg)](https://www.npmjs.com/package/fast-maker) [![License](https://img.shields.io/npm/l/fast-maker.svg)](https://github.com/imjuni/fast-maker/blob/master/LICENSE) [![fast-maker](https://circleci.com/gh/imjuni/fast-maker.svg?style=shield)](https://app.circleci.com/pipelines/github/imjuni/fast-maker?branch=master)
+![ts](https://flat.badgen.net/badge/Built%20With/TypeScript/blue)
+[![Download Status](https://img.shields.io/npm/dw/fast-maker.svg?style=flat-square)](https://npmcharts.com/compare/fast-maker?minimal=true)
+[![Github Star](https://img.shields.io/github/stars/imjuni/fast-maker.svg?style=flat-square)](https://github.com/imjuni/fast-maker)
+[![Github Issues](https://img.shields.io/github/issues-raw/imjuni/fast-maker.svg?style=flat-square)](https://github.com/imjuni/fast-maker/issues)
+[![NPM version](https://img.shields.io/npm/v/fast-maker.svg?style=flat-square)](https://www.npmjs.com/package/fast-maker)
+[![License](https://img.shields.io/npm/l/fast-maker.svg)](https://github.com/imjuni/fast-maker/blob/master/LICENSE?style=flat-square)
+[![fast-maker](https://circleci.com/gh/imjuni/fast-maker.svg??style=flat-square)](https://app.circleci.com/pipelines/github/imjuni/fast-maker?branch=master)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 fast-maker is micro utility for [fastify.js](https://www.fastify.io/) over 3.x. fast-maker inspired by codeigniter(in PHP) and Next.js directory structure based route system. fast-maker auto generate route.ts file using directory structure futhermore include type declaration that inheritance RequestGenericInterface. This method have varity benefits.
 

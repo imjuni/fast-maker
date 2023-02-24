@@ -5,11 +5,8 @@
     // It is faster to skip typechecking.
     // Remove if you want ts-node to do typechecking.
     "transpileOnly": true,
-
     "files": true,
-
     "require": ["tsconfig-paths/register"],
-
     "compilerOptions": {
       // compilerOptions specified here will override those declared below,
       // but *only* in ts-node.  Useful if you want ts-node and tsc to use
@@ -53,20 +50,20 @@
     "noUnusedParameters": true /* Report errors on unused parameters. */,
     "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
     "noFallthroughCasesInSwitch": true /* Report errors for fallthrough cases in switch statement. */,
+    // "noUncheckedIndexedAccess": true,
     /* Module Resolution Options */
     "moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
     "baseUrl": "." /* Base directory to resolve non-absolute module names. */,
     "paths": {
       "#cli/*": ["src/cli/*"],
-      "#compiler/*": ["src/compiler/*"],
-      "#config/*": ["src/config/*"],
-      "#generator/*": ["src/generator/*"],
-      "#module/*": ["src/module/*"],
-      "#route/*": ["src/route/*"],
-      "#test-tools/*": ["src/test-tools/*"],
-      "#tool/*": ["src/tool/*"],
+      "#compilers/*": ["src/compilers/*"],
+      "#configs/*": ["src/configs/*"],
+      "#generators/*": ["src/generators/*"],
+      "#modules/*": ["src/modules/*"],
+      "#routes/*": ["src/routes/*"],
+      "#tools/*": ["src/tools/*"],
       "#xstate/*": ["src/xstate/*"],
-      "#worker/*": ["src/worker/*"]
+      "#workers/*": ["src/workers/*"]
     } /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */,
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                       /* List of folders to include type definitions from. */
@@ -83,6 +80,6 @@
     // "experimentalDecorators": true, /* Enables experimental support for ES7 decorators. */
     // "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */
   },
-  "include": ["**/*.ts"],
-  "exclude": ["example/**/*", "dist/**", "**/.configs/**", "**/docs/**/*"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["examples/**/*", "dist/**", "**/.configs/**", "**/docs/**/*"]
 }

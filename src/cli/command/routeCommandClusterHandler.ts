@@ -1,28 +1,28 @@
 import progress from '#cli/display/progress';
 import spinner from '#cli/display/spinner';
-import type IConfig from '#config/interface/IConfig';
-import importCodeGenerator from '#generator/importCodeGenerator';
-import prettierProcessing from '#generator/prettierProcessing';
-import routeCodeGenerator from '#generator/routeCodeGenerator';
-import getRoutingCode from '#module/getRoutingCode';
-import LogBox from '#module/logging/LogBox';
-import logger from '#module/logging/logger';
-import mergeStage03Result from '#module/mergeStage03Result';
-import methods from '#route/interface/methods';
-import sortRoutes from '#route/sortRoutes';
-import getReasonMessages from '#tool/getReasonMessages';
-import loseAbleStringfiy from '#tool/loseAbleStringfiy';
-import { CE_SEND_TO_CHILD_COMMAND } from '#worker/interface/CE_SEND_TO_CHILD_COMMAND';
+import type IConfig from '#configs/interfaces/IConfig';
+import importCodeGenerator from '#generators/importCodeGenerator';
+import prettierProcessing from '#generators/prettierProcessing';
+import routeCodeGenerator from '#generators/routeCodeGenerator';
+import getRoutingCode from '#modules/getRoutingCode';
+import mergeStage03Result from '#modules/mergeStage03Result';
+import methods from '#routes/interface/methods';
+import sortRoutePaths from '#routes/sortRoutePaths';
+import getReasonMessages from '#tools/getReasonMessages';
+import LogBox from '#tools/logging/LogBox';
+import logger from '#tools/logging/logger';
+import loseAbleStringfiy from '#tools/loseAbleStringfiy';
+import { CE_SEND_TO_CHILD_COMMAND } from '#workers/interfaces/CE_SEND_TO_CHILD_COMMAND';
 import type {
   IFromParentDoInit,
   IFromParentDoInitProject,
   IFromParentDoStage01,
   IFromParentDoStage02,
   IFromParentDoStage03,
-} from '#worker/interface/IFromParent';
-import type IPassDoWorkReply from '#worker/interface/IPassDoWorkReply';
-import replyBox from '#worker/replyBox';
-import workerBox from '#worker/workerBox';
+} from '#workers/interfaces/IFromParent';
+import type IPassDoWorkReply from '#workers/interfaces/IPassDoWorkReply';
+import replyBox from '#workers/replyBox';
+import workerBox from '#workers/workerBox';
 import fs from 'fs';
 import { first, isError, populate } from 'my-easy-fp';
 import { isFail } from 'my-only-either';
@@ -148,7 +148,7 @@ export default async function routeCommandClusterHandler(config: IConfig) {
         .map((reply) => reply.pass.log),
     );
 
-    const sorted = sortRoutes(merged.routeConfigurations);
+    const sorted = sortRoutePaths(merged.routeConfigurations);
     const routeCodes = routeCodeGenerator({ routeConfigurations: sorted });
     const importCodes = importCodeGenerator({ importConfigurations: merged.importConfigurations, config });
 
@@ -170,6 +170,7 @@ export default async function routeCommandClusterHandler(config: IConfig) {
 
     await fs.promises.writeFile(path.join(config.output, 'route.ts'), prettfiedEither.pass);
 
+    // eslint-disable-next-line no-console
     console.log(getReasonMessages(logbox.reasons));
 
     return true;
