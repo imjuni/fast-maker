@@ -1,0 +1,19 @@
+[
+  {
+    "hash": "5f20072a77e145d3b900d2ba07d0fca1",
+    "hasOption": false,
+    "method": "get",
+    "routePath": "/",
+    "handlerName": "heroHandler_5f20072a77e145d3b900d2ba07d0fca1",
+    "sourceFilePath": "/route-path/handlers/get/index.ts"
+  },
+  {
+    "hash": "BvbnzoJqvrvO4vqapZSyggVC8BwnCLHI",
+    "hasOption": true,
+    "method": "get",
+    "routePath": "/justice/:dc-league/world",
+    "handlerName": "world_BvbnzoJqvrvO4vqapZSyggVC8BwnCLHI",
+    "sourceFilePath": "/route-path/handlers/get/justice/[dc-league]/world.ts",
+    "typeArgument": "IReqInvalidPokeHello_pkGeCRajiEMsgv1cIlWYRF5QNEfw9iTk"
+  }
+]

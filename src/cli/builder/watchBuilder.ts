@@ -1,5 +1,5 @@
-import type IConfig from '#config/interface/IConfig';
-import type IWatchConfig from '#config/interface/IWatchConfig';
+import type IConfig from '#configs/interfaces/IConfig';
+import type IWatchConfig from '#configs/interfaces/IWatchConfig';
 import type { Argv } from 'yargs';
 
 export default function watchBuilder(args: Argv<IConfig & IWatchConfig>): Argv<IConfig & IWatchConfig> {

@@ -1,23 +1,24 @@
-import type IImportConfiguration from '#compiler/interface/IImportConfiguration';
-import type IReason from '#compiler/interface/IReason';
-import type { IHandlerStatement, IOptionStatement } from '#compiler/interface/THandlerNode';
-import getPropertySignatures from '#compiler/navigate/getPropertySignatures';
-import getLocalModuleInImports from '#compiler/tool/getLocalModuleInImport';
-import getResolvedModuleInImports from '#compiler/tool/getResolvedModuleInImports';
-import getTypeReferences from '#compiler/tool/getTypeReferences';
-import getTypeSymbolText from '#compiler/tool/getTypeSymbolText';
-import replaceTypeReferenceInTypeLiteral from '#compiler/tool/replaceTypeReferenceInTypeLiteral';
-import validatePropertySignature from '#compiler/validation/validatePropertySignature';
-import validateTypeReferences from '#compiler/validation/validateTypeReference';
-import type IConfig from '#config/interface/IConfig';
-import dedupeImportConfiguration from '#generator/dedupeImportConfiguration';
-import getHandlerNameWithoutSquareBracket from '#generator/getHandlerNameWithoutSquareBracket';
-import getImportConfigurationFromResolutions from '#generator/getImportConfigurationFromResolutions';
-import logger from '#module/logging/logger';
-import type IRouteConfiguration from '#route/interface/IRouteConfiguration';
-import type IRouteHandler from '#route/interface/IRouteHandler';
-import appendPostfixHash from '#tool/appendPostfixHash';
-import castFunctionNode from '#xstate/tool/castFunctionNode';
+import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
+import type IReason from '#compilers/interfaces/IReason';
+import type { IHandlerStatement, IOptionStatement } from '#compilers/interfaces/THandlerNode';
+import getPropertySignatures from '#compilers/navigate/getPropertySignatures';
+import getLocalModuleInImports from '#compilers/tools/getLocalModuleInImport';
+import getResolvedModuleInImports from '#compilers/tools/getResolvedModuleInImports';
+import getTypeReferences from '#compilers/tools/getTypeReferences';
+import getTypeSymbolText from '#compilers/tools/getTypeSymbolText';
+import replaceTypeReferenceInTypeLiteral from '#compilers/tools/replaceTypeReferenceInTypeLiteral';
+import validatePropertySignature from '#compilers/validators/validatePropertySignature';
+import validateTypeReferences from '#compilers/validators/validateTypeReference';
+import type IConfig from '#configs/interfaces/IConfig';
+import dedupeImportConfiguration from '#generators/dedupeImportConfiguration';
+import getHandlerNameWithoutSquareBracket from '#generators/getHandlerNameWithoutSquareBracket';
+import getImportConfigurationFromResolutions from '#generators/getImportConfigurationFromResolutions';
+import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
+import type IRouteHandler from '#routes/interface/IRouteHandler';
+import appendPostfixHash from '#tools/appendPostfixHash';
+import logger from '#tools/logging/logger';
+import { CE_REQUEST_HANDLER_ANALYSIS_MACHINE } from '#xstate/interfaces/CE_REQUEST_HANDLER_ANALYSIS_MACHINE';
+import castFunctionNode from '#xstate/tools/castFunctionNode';
 import chalk from 'chalk';
 import * as path from 'path';
 import type { Project, SourceFile, Type } from 'ts-morph';
@@ -42,31 +43,6 @@ export interface IAnalysisMachineContext {
   routeBox: Record<string, IRouteConfiguration>;
 }
 
-// eslint-disable-next-line
-enum EN_STATES {
-  ID = 'request-analysis',
-  INITIAL = '0F60D7B1403441B98E2AF6CD47C5A94C',
-  EXPORT_OPTION = '9CE23C3B4F1A4E12B9BF51D4F77230F1',
-
-  ASYNC_FUNCTION = '31D1D7180BE24D8ABD7E9D3FAC968E01',
-  SYNC_FUNCTION = '70D615E1D33D43A494480676F093AD83',
-  HAVE_PARAMETER = '1E4A9134B7314BEA81135BD1FAC3F57E',
-
-  PREPARE_ANALYSIS = '324A1BC5B3494DB3AD4718912CE61DDB',
-  FASTIFY_REQUEST_TYPE = 'BA10BADCF2E74D0FA25B32DB2C38503F',
-  ANY_TYPE = 'AA0F757A0EA442A38157999C82C92441',
-  TYPE_ALIAS_DECLARATION_TYPE = 'C757AF29DFA04FFE85C0F0713C63591F',
-  PREPARE_CUSTOM_TYPE = '3EBFD985968C413C8320C5F0F6145575',
-  CUSTOM_TYPE = '7FAC9B6CCBB3406986BA0FDFF44711CA',
-
-  VALIDATE_EXPORTATION = '2549C1063A09475AB1A92ED43C5989D4',
-  VALIDATE_PROPERTY_SIGNATURE = '26635E161F4F496C8333B805F46A0B34',
-  COMPLETE_ANALYSIS = '9B44DFD2A936474F81C41EB95A38D4B2',
-
-  ERROR = 'D7C8DBCF493340009A1AA82E9AFEA42E',
-  COMPLETE = '3794670720C542A59D807FDB9993E101',
-}
-
 const requestHandlerAnalysisMachine = (
   rootContext: Omit<
     IAnalysisMachineContext,
@@ -78,33 +54,33 @@ const requestHandlerAnalysisMachine = (
       // https://xstate.js.org/docs/guides/actions.html
       predictableActionArguments: true,
       id: 'request-analysis',
-      initial: EN_STATES.INITIAL,
+      initial: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.INITIAL,
       context: { ...rootContext, currentNode: 0, messages: [], importBox: {}, routeBox: {}, useFastifyRequest: false },
       states: {
-        [EN_STATES.INITIAL]: {
+        [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.INITIAL]: {
           entry: (context) => {
             log.debug(`xstate 상태 기계 시작: ${context.currentNode}`);
           },
           always: [
             {
-              target: EN_STATES.ANY_TYPE,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.ANY_TYPE,
               cond: 'isAsyncZeroParameter',
               actions: 'generateAnyTypeReference',
             },
             {
-              target: EN_STATES.PREPARE_ANALYSIS,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.PREPARE_ANALYSIS,
               cond: 'isAsyncOneParameter',
             },
             {
-              target: EN_STATES.PREPARE_ANALYSIS,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.PREPARE_ANALYSIS,
               cond: 'isAsyncManyParameter',
             },
             {
-              target: EN_STATES.PREPARE_ANALYSIS,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.PREPARE_ANALYSIS,
               cond: 'isSyncManyParameter',
             },
             {
-              target: EN_STATES.ERROR,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.ERROR,
               actions: 'generateSyncNonParameterError',
               // TODO: error 로 가면서 오류를 저장한다 ,
             },
@@ -113,118 +89,118 @@ const requestHandlerAnalysisMachine = (
         // ------------------------------------------------------------------------------------------------------------
         // 내부 상태 기계 시작
         // ------------------------------------------------------------------------------------------------------------
-        [EN_STATES.PREPARE_ANALYSIS]: {
+        [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.PREPARE_ANALYSIS]: {
           always: [
             {
-              target: EN_STATES.FASTIFY_REQUEST_TYPE,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.FASTIFY_REQUEST_TYPE,
               cond: 'isFastifyRequestType',
               actions: 'assignUseFastifyRequest',
             },
             {
-              target: EN_STATES.PREPARE_CUSTOM_TYPE,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.PREPARE_CUSTOM_TYPE,
               cond: 'isParameterUseCustomType',
               actions: 'assignParameterType',
             },
             {
-              target: EN_STATES.ANY_TYPE,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.ANY_TYPE,
               actions: 'generateAnyTypeReference',
             },
           ],
         },
-        [EN_STATES.FASTIFY_REQUEST_TYPE]: {
+        [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.FASTIFY_REQUEST_TYPE]: {
           always: [
             {
-              target: EN_STATES.PREPARE_CUSTOM_TYPE,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.PREPARE_CUSTOM_TYPE,
               cond: 'isFastifyRequestWithTypeArgument',
               actions: 'assignFastifyTypeArgument',
             },
             {
-              target: EN_STATES.ANY_TYPE,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.ANY_TYPE,
               actions: 'generateAnyTypeReference',
             },
           ],
         },
-        [EN_STATES.ANY_TYPE]: {
+        [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.ANY_TYPE]: {
           always: [
             {
-              target: EN_STATES.COMPLETE_ANALYSIS,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.COMPLETE_ANALYSIS,
             },
           ],
         },
-        [EN_STATES.PREPARE_CUSTOM_TYPE]: {
+        [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.PREPARE_CUSTOM_TYPE]: {
           always: [
             // 여기서는 type alias, custom type을 테스트 해보고 안되면 any type으로
             // 보내는 것이 좀 더 오류를 적게 유발하고 합리적이다
             {
-              target: EN_STATES.CUSTOM_TYPE,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.CUSTOM_TYPE,
               cond: 'isCustomType',
             },
             {
-              target: EN_STATES.ANY_TYPE,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.ANY_TYPE,
               actions: 'generateAnyTypeReference',
             },
           ],
         },
-        [EN_STATES.CUSTOM_TYPE]: {
+        [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.CUSTOM_TYPE]: {
           always: [
             {
-              target: EN_STATES.VALIDATE_EXPORTATION,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.VALIDATE_EXPORTATION,
               cond: 'isValidTypeReferences',
             },
             {
-              target: EN_STATES.ERROR,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.ERROR,
               actions: 'generateTypeReferenceNotExportReason',
             },
           ],
         },
-        [EN_STATES.VALIDATE_EXPORTATION]: {
+        [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.VALIDATE_EXPORTATION]: {
           always: [
             {
-              target: EN_STATES.VALIDATE_PROPERTY_SIGNATURE,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.VALIDATE_PROPERTY_SIGNATURE,
               cond: 'isWarnPropertySignature',
               actions: ['generatePropertySignatureWarnReason', 'generateRouteAndImport'],
             },
             {
-              target: EN_STATES.VALIDATE_PROPERTY_SIGNATURE,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.VALIDATE_PROPERTY_SIGNATURE,
               cond: 'isPropertySignature',
               actions: 'generateRouteAndImport',
             },
             {
-              target: EN_STATES.ERROR,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.ERROR,
               actions: 'generateTypeReferenceNotExportReason',
             },
           ],
         },
-        [EN_STATES.VALIDATE_PROPERTY_SIGNATURE]: {
+        [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.VALIDATE_PROPERTY_SIGNATURE]: {
           always: [
             {
-              target: EN_STATES.COMPLETE_ANALYSIS,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.COMPLETE_ANALYSIS,
             },
             {
-              target: EN_STATES.ANY_TYPE,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.ANY_TYPE,
               actions: 'generateAnyTypeReference',
             },
           ],
         },
-        [EN_STATES.COMPLETE_ANALYSIS]: {
+        [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.COMPLETE_ANALYSIS]: {
           always: [
             {
-              target: EN_STATES.COMPLETE,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.COMPLETE,
             },
           ],
         },
         // ------------------------------------------------------------------------------------------------------------
         // 내부 상태 기계 끝
         // ------------------------------------------------------------------------------------------------------------
-        [EN_STATES.ERROR]: {
+        [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.ERROR]: {
           always: [
             {
               // node complete으로 가면서 오류를 context에 저장해야 한다
-              target: EN_STATES.COMPLETE,
+              target: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.COMPLETE,
             },
           ],
         },
-        [EN_STATES.COMPLETE]: {
+        [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.COMPLETE]: {
           type: 'final',
           entry: () => {
             log.debug('분석이 끝?? -3');
@@ -377,6 +353,8 @@ const requestHandlerAnalysisMachine = (
           const node = castFunctionNode(context.handler);
           const [parameter] = node.getParameters();
 
+          if (parameter == null) return next;
+
           const typeReferenceNodes = getTypeReferences(parameter);
           const result = validateTypeReferences({ source, typeReferenceNodes });
 
@@ -468,6 +446,9 @@ const requestHandlerAnalysisMachine = (
           const next = { ...context };
           const node = castFunctionNode(context.handler);
           const [parameter] = node.getParameters();
+
+          if (parameter == null) return next;
+
           const propertySignatures = getPropertySignatures({ parameter });
           const result = validatePropertySignature({
             propertySignatures,
@@ -499,9 +480,14 @@ const requestHandlerAnalysisMachine = (
           const node = castFunctionNode(context.handler);
           const sourceFilePath = next.source.getFilePath().toString();
           const [parameter] = node.getParameters();
+
+          if (parameter == null) return next;
+
           const [typeArgument] = context.useFastifyRequest
             ? parameter.getType().getTypeArguments()
             : [parameter.getType()];
+
+          if (typeArgument == null) return next;
 
           const routeFileImportConfiguration: IImportConfiguration = {
             hash: next.hash,
@@ -569,6 +555,9 @@ const requestHandlerAnalysisMachine = (
                   const [newTypeArgument] = context.useFastifyRequest
                     ? parameter.getType().getTypeArguments()
                     : [parameter.getType()];
+
+                  if (newTypeArgument == null) return undefined;
+
                   // https://github.com/dsherret/ts-morph/issues/202
                   // symbol을 호출하고 declaration을 호출해서 declaration에서 text를 얻어낸다
 

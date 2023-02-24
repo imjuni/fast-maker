@@ -1,9 +1,9 @@
-import { CE_SEND_TO_PARENT_COMMAND } from '#worker/interface/CE_SEND_TO_PARENT_COMMAND';
+import { CE_SEND_TO_PARENT_COMMAND } from '#workers/interfaces/CE_SEND_TO_PARENT_COMMAND';
 import type {
   IFromChildDoSpinnerEnd,
   IFromChildDoSpinnerStart,
   IFromChildDoSpinnerUpdate,
-} from '#worker/interface/IFromChild';
+} from '#workers/interfaces/IFromChild';
 import ora from 'ora';
 
 class Spinner {

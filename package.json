@@ -3,7 +3,8 @@
   "version": "2.2.0",
   "description": "create route file on specific directory",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "LOG_LEVEL=info node --trace-warnings --no-compilation-cache node_modules/.bin/jest --coverage",
+    "test:silent": "LOG_LEVEL=info node --trace-warnings --no-compilation-cache node_modules/.bin/jest --coverage --silent",
     "test:debug": "node -r ts-node/register --inspect --nolazy node_modules/jest/bin/jest",
     "dev": "ts-node ./src/cli.ts",
     "clean": "just --config ./.configs/just.config.ts clean",
@@ -124,13 +125,15 @@
     "typescript": "^4.9.5",
     "url-join": "^4.0.1",
     "uuid": "^9.0.0",
-    "xstate": "^4.35.2",
+    "xstate": "^4.36.0",
     "yargs": "^17.6.2"
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx}": [
-      "prettier --write",
-      "eslint --cache ."
+    "*.{js,jsx,ts,tsx}": [
+      "cross-env NODE_ENV=production eslint --cache"
+    ],
+    "*.{js,jsx,ts,tsx},*.json,.{eslintrc.cjs,prettierrc}": [
+      "cross-env NODE_ENV=production prettier --ignore-path .eslintignore --parser json --write"
     ]
   }
 }

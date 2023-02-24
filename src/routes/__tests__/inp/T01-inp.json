@@ -1,0 +1,115 @@
+[
+  {
+    "hash": "JBEumYWpspHJFAhjbctT6IF9XOfwQ0fj",
+    "hasOption": false,
+    "method": "delete",
+    "routePath": "/hello",
+    "handlerName": "hello_JBEumYWpspHJFAhjbctT6IF9XOfwQ0fj",
+    "sourceFilePath": "/route-path/handlers/delete/hello.ts"
+  },
+  {
+    "hash": "PDq0q2qANIHiZy5vU3VeCgIYyT8mERjU",
+    "hasOption": false,
+    "method": "post",
+    "routePath": "/avengers/heros",
+    "handlerName": "heros_PDq0q2qANIHiZy5vU3VeCgIYyT8mERjU",
+    "sourceFilePath": "/route-path/handlers/post/avengers/heros.ts"
+  },
+  {
+    "hash": "RuJhK1HdMHVoXRwjngZsoOqz0jiZsLoE",
+    "hasOption": false,
+    "method": "post",
+    "routePath": "/avengers/heros/:id/hero",
+    "handlerName": "hero_RuJhK1HdMHVoXRwjngZsoOqz0jiZsLoE",
+    "sourceFilePath": "/route-path/handlers/post/avengers/heros/[id]/hero.ts",
+    "typeArgument": "{ Body: IAbility }"
+  },
+  {
+    "hash": "2g5tCoyeRB5Sw5KVvgrn1cSAQPntZfZe",
+    "hasOption": false,
+    "method": "post",
+    "routePath": "/hello2",
+    "handlerName": "iamhello_2g5tCoyeRB5Sw5KVvgrn1cSAQPntZfZe",
+    "sourceFilePath": "/route-path/handlers/post/hello2.ts"
+  },
+  {
+    "hash": "NUMfbXzJqQqF6X6atql8X2hAZeAjTM6R",
+    "hasOption": false,
+    "method": "put",
+    "routePath": "/hello",
+    "handlerName": "hello_NUMfbXzJqQqF6X6atql8X2hAZeAjTM6R",
+    "sourceFilePath": "/route-path/handlers/put/hello.ts"
+  },
+  {
+    "hash": "pGVJC0cPxPAmRzGikdeTeu68wBLFxWHz",
+    "hasOption": true,
+    "method": "get",
+    "routePath": "/justice/:dc-league/hello",
+    "handlerName": "hello_pGVJC0cPxPAmRzGikdeTeu68wBLFxWHz",
+    "sourceFilePath": "/route-path/handlers/get/justice/[dc-league]/hello.ts",
+    "typeArgument": "IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE"
+  },
+  {
+    "hash": "BvbnzoJqvrvO4vqapZSyggVC8BwnCLHI",
+    "hasOption": true,
+    "method": "get",
+    "routePath": "/justice/:dc-league/world",
+    "handlerName": "world_BvbnzoJqvrvO4vqapZSyggVC8BwnCLHI",
+    "sourceFilePath": "/route-path/handlers/get/justice/[dc-league]/world.ts",
+    "typeArgument": "IReqInvalidPokeHello_pkGeCRajiEMsgv1cIlWYRF5QNEfw9iTk"
+  },
+  {
+    "hash": "Ua8WhawDaNixVgbF2am4uJt9QPFcfmcd",
+    "hasOption": true,
+    "method": "get",
+    "routePath": "/justice/world",
+    "handlerName": "world_Ua8WhawDaNixVgbF2am4uJt9QPFcfmcd",
+    "sourceFilePath": "/route-path/handlers/get/justice/world.ts",
+    "typeArgument": "{\n      Querysting: IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE['querystring'];\n      Body: IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE['Body'];\n      Headers: {\n        'access-token': string;\n        'refresh-token': string;\n        'expire-time': {\n          token: string;\n          expire: number;\n          site: {\n            host: string;\n            port: number;\n          };\n        };\n      };\n    }"
+  },
+  {
+    "hash": "7oyxIuopp2OGQ5hJAGyXWqu2Nx8GXdiv",
+    "hasOption": true,
+    "method": "get",
+    "routePath": "/justice/world/:id",
+    "handlerName": "world_7oyxIuopp2OGQ5hJAGyXWqu2Nx8GXdiv",
+    "sourceFilePath": "/route-path/handlers/get/justice/world/[id].ts",
+    "typeArgument": "IReqInvalidPokeHello_pkGeCRajiEMsgv1cIlWYRF5QNEfw9iTk"
+  },
+  {
+    "hash": "9dGSkUiBmIpX8YgvC1QfcqpBSAPSJ3lJ",
+    "hasOption": true,
+    "method": "get",
+    "routePath": "/po-ke/hello",
+    "handlerName": "hello_9dGSkUiBmIpX8YgvC1QfcqpBSAPSJ3lJ",
+    "sourceFilePath": "/route-path/handlers/get/po-ke/hello.ts",
+    "typeArgument": "IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE"
+  },
+  {
+    "hash": "JtjNeTmnZUEK9hGizx8AvZ0BeWmAi5oQ",
+    "hasOption": true,
+    "method": "get",
+    "routePath": "/po-ke/world",
+    "handlerName": "world_JtjNeTmnZUEK9hGizx8AvZ0BeWmAi5oQ",
+    "sourceFilePath": "/route-path/handlers/get/po-ke/world.ts",
+    "typeArgument": "{\n      Querystring: IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE['querystring'];\n      Body: IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE['Body'];\n      Headers: {\n        'access-token': string;\n        'refresh-token': string;\n        'expire-time': {\n          token: string;\n          expire: number;\n          site: {\n            host: string;\n            port: number;\n          };\n        };\n      };\n    }"
+  },
+  {
+    "hash": "QzzNAbc0AmKoQMNvlQY3EREIwKgCpwrW",
+    "hasOption": true,
+    "method": "get",
+    "routePath": "/xman/fastify",
+    "handlerName": "fastify_QzzNAbc0AmKoQMNvlQY3EREIwKgCpwrW",
+    "sourceFilePath": "/route-path/handlers/get/xman/fastify.ts",
+    "typeArgument": "IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE"
+  },
+  {
+    "hash": "T6h0XVQhU3SHYVi61Tv3RN9NTig7oSjB",
+    "hasOption": false,
+    "method": "get",
+    "routePath": "/xman/world",
+    "handlerName": "world_T6h0XVQhU3SHYVi61Tv3RN9NTig7oSjB",
+    "sourceFilePath": "/route-path/handlers/get/xman/world.ts",
+    "typeArgument": "{\n    querystring: IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE['querystring'];\n    Body:\n      | IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE['Body']\n      | {\n          help: TAbnormalPresident_DS8Pg2MYm5AsqoJVltiuqlOctGQfT78w;\n          company: ICompany_6bwarMss36QHeqUXTVMxB9uAjEjVZOL1;\n          ability: IAbility;\n        };\n    Headers: {\n      'access-token': string;\n      'refresh-token': string;\n      kind: { name: 'develop' } & { name: 'prod' } & { name: ICompany_6bwarMss36QHeqUXTVMxB9uAjEjVZOL1 };\n      'expire-time': {\n        token: string | number | boolean;\n        expire: number;\n        site: {\n          host: string;\n          port: number;\n        };\n      };\n    };\n  }"
+  }
+]

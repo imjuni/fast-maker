@@ -1,5 +1,5 @@
-import { CE_SEND_TO_PARENT_COMMAND } from '#worker/interface/CE_SEND_TO_PARENT_COMMAND';
-import type { IFromChildDoProgressStart } from '#worker/interface/IFromChild';
+import { CE_SEND_TO_PARENT_COMMAND } from '#workers/interfaces/CE_SEND_TO_PARENT_COMMAND';
+import type { IFromChildDoProgressStart } from '#workers/interfaces/IFromChild';
 import chalk from 'chalk';
 import cliProgesss from 'cli-progress';
 
