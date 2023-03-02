@@ -1,7 +1,7 @@
 import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
 import sortRoutePath from '#routes/sortRoutePath';
 import sortRoutePaths from '#routes/sortRoutePaths';
-import getData from '#tools/__tests__/getData';
+import getData from '#tools/__tests__/tools/getData';
 import 'jest';
 import * as mnf from 'my-node-fp';
 

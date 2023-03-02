@@ -1,6 +1,6 @@
 import type IGetModuleInImports from '#compilers/interfaces/IGetModuleInImports';
 import getTypeSymbolText from '#compilers/tools/getTypeSymbolText';
-import type IConfig from '#configs/interfaces/IConfig';
+import type IBaseOption from '#configs/interfaces/IBaseOption';
 import appendPostfixHash from '#tools/appendPostfixHash';
 import getHash from '#tools/getHash';
 import { replaceSepToPosix } from 'my-node-fp';
@@ -9,7 +9,7 @@ import type { SourceFile, TypeReferenceNode } from 'ts-morph';
 
 interface IGetLocalModuleInImports {
   source: SourceFile;
-  option: IConfig;
+  option: Pick<IBaseOption, 'output'>;
   typeReferenceNodes: TypeReferenceNode[];
 }
 

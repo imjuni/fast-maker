@@ -1,4 +1,4 @@
-import type IConfig from '#configs/interfaces/IConfig';
+import type IBaseOption from '#configs/interfaces/IConfig';
 import type IWatchConfig from '#configs/interfaces/IWatchConfig';
 import importCodeGenerator from '#generators/importCodeGenerator';
 import prettierProcessing from '#generators/prettierProcessing';
@@ -21,7 +21,7 @@ import { debounceTime } from 'rxjs/operators';
 
 const log = logger();
 
-export default function watchRouting(config: IConfig & IWatchConfig) {
+export default function watchRouting(config: IBaseOption & IWatchConfig) {
   const cwd = replaceSepToPosix(path.resolve(getDirnameSync(config.handler)));
   const watchDebounceTime = config.debounceTime;
 
@@ -60,7 +60,7 @@ export default function watchRouting(config: IConfig & IWatchConfig) {
         const routeCodes = routeCodeGenerator({ routeConfigurations: sorted });
         const importCodes = importCodeGenerator({
           importConfigurations: routing.pass.route.importConfigurations,
-          config,
+          option: config,
         });
 
         const code = getRoutingCode({

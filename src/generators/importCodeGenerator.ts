@@ -1,11 +1,12 @@
 import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
-import type IConfig from '#configs/interfaces/IConfig';
+import type { TRouteOption } from '#configs/interfaces/TRouteOption';
+import type { TWatchOption } from '#configs/interfaces/TWatchOption';
 import getHashedBindingCode from '#generators/getHashedBindingCode';
 import { replaceSepToPosix } from 'my-node-fp';
 import path from 'path';
 
 interface IImportCodeGeneratorParam {
-  config: IConfig;
+  option: Pick<TRouteOption, 'output'> | Pick<TWatchOption, 'output'>;
   importConfigurations: IImportConfiguration[];
 }
 
@@ -24,7 +25,7 @@ function getRelativePath(outputDir: string, importPath: string, ext: boolean) {
   return `.${path.posix.sep}${replacedPath}`;
 }
 
-export default function importCodeGenerator({ importConfigurations, config }: IImportCodeGeneratorParam) {
+export default function importCodeGenerator({ importConfigurations, option }: IImportCodeGeneratorParam) {
   const importCodes = importConfigurations.map((importConfiguration) => {
     const bindingCode = getHashedBindingCode({
       nonNamedBinding: importConfiguration.nonNamedBinding,
@@ -32,7 +33,7 @@ export default function importCodeGenerator({ importConfigurations, config }: II
       namedBindings: importConfiguration.namedBindings,
     });
 
-    const relativePath = getRelativePath(config.output, importConfiguration.importFile, false);
+    const relativePath = getRelativePath(option.output, importConfiguration.importFile, false);
     return `import ${bindingCode} '${relativePath}';`;
   });
 

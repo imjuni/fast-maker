@@ -22,7 +22,7 @@ export default function replaceTypeReferenceInTypeLiteral({
         (importDeclaration) => importDeclaration.importModuleNameFrom,
       );
 
-      if (moduleNames == null || moduleNames.length <= 0) {
+      if (moduleNames.length <= 0) {
         return false;
       }
 

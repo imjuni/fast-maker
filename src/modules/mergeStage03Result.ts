@@ -1,8 +1,8 @@
-import type proceedStage03 from '#modules/proceedStage03';
+import type doDedupeRouting from '#modules/doDedupeRouting';
 
 export default function mergeStage03Result(
-  routes: Array<Omit<ReturnType<typeof proceedStage03>, 'reasons'>>,
-): Omit<ReturnType<typeof proceedStage03>, 'reasons'> {
+  routes: ReturnType<typeof doDedupeRouting>[],
+): ReturnType<typeof doDedupeRouting> {
   return {
     importConfigurations: routes.map((route) => route.importConfigurations).flat(),
     routeConfigurations: routes.map((route) => route.routeConfigurations).flat(),

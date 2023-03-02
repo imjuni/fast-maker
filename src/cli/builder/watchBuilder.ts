@@ -1,13 +1,12 @@
-import type IConfig from '#configs/interfaces/IConfig';
-import type IWatchConfig from '#configs/interfaces/IWatchConfig';
+import type { TWatchOption } from '#configs/interfaces/TWatchOption';
 import type { Argv } from 'yargs';
 
-export default function watchBuilder(args: Argv<IConfig & IWatchConfig>): Argv<IConfig & IWatchConfig> {
-  args.option('debounceTime', {
+export default function watchBuilder(argv: Argv) {
+  argv.option('debounceTime', {
     description: 'watch file debounceTime',
     type: 'number',
     default: 1000,
   });
 
-  return args;
+  return argv as Argv<TWatchOption>;
 }

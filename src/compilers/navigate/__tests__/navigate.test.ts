@@ -1,6 +1,6 @@
 import getHandlerWithOption from '#compilers/navigate/getHandlerWithOption';
 import getPropertySignatures from '#compilers/navigate/getPropertySignatures';
-import JestContext from '#tools/__tests__/context';
+import JestContext from '#tools/__tests__/tools/context';
 import 'jest';
 import { atOrThrow } from 'my-easy-fp';
 import { Project, SyntaxKind } from 'ts-morph';

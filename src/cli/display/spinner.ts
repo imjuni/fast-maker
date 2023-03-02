@@ -1,71 +1,75 @@
-import { CE_SEND_TO_PARENT_COMMAND } from '#workers/interfaces/CE_SEND_TO_PARENT_COMMAND';
-import type {
-  IFromChildDoSpinnerEnd,
-  IFromChildDoSpinnerStart,
-  IFromChildDoSpinnerUpdate,
-} from '#workers/interfaces/IFromChild';
+import { CE_STREAM_TYPE } from '#cli/interfaces/CE_STREAM_TYPE';
 import ora from 'ora';
 
 class Spinner {
-  accessor enable: boolean;
-
-  accessor cluster: boolean;
-
   #spinner: ora.Ora;
 
-  constructor() {
-    this.enable = true;
-    this.cluster = false;
-    this.#spinner = ora();
+  #stream: CE_STREAM_TYPE;
+
+  accessor isEnable: boolean;
+
+  constructor(stream?: CE_STREAM_TYPE) {
+    this.#spinner = ora({ text: '', stream: process.stdout });
+    this.isEnable = false;
+    this.#stream = stream ?? CE_STREAM_TYPE.STDOUT;
+  }
+
+  set stream(value: CE_STREAM_TYPE) {
+    if (value === this.#stream) {
+      this.#spinner.stop();
+      this.#spinner = ora({ text: this.#spinner.text });
+    } else {
+      this.#spinner.stop();
+      this.#spinner = ora({
+        text: this.#spinner.text,
+        stream: value === CE_STREAM_TYPE.STDOUT ? process.stdout : process.stderr,
+      });
+      this.#stream = value;
+    }
   }
 
   start(message?: string) {
-    if (this.cluster && this.enable) {
-      process.send?.({
-        command: CE_SEND_TO_PARENT_COMMAND.SPINER_START,
-        data: { message },
-      } satisfies IFromChildDoSpinnerStart);
-    } else if (this.enable === true) {
-      this.forceStart(message);
-    }
-  }
+    if (this.isEnable === false) return;
 
-  forceStart(message?: string) {
-    this.#spinner.start(message);
-  }
-
-  update(message: string, type?: Extract<keyof ora.Ora, 'info' | 'fail' | 'warn' | 'succeed'>) {
-    if (this.cluster && this.enable) {
-      process.send?.({
-        command: CE_SEND_TO_PARENT_COMMAND.SPINER_UPDATE,
-        data: {
-          message,
-          type,
-        },
-      } satisfies IFromChildDoSpinnerUpdate);
-    } else if (this.enable === true) {
-      this.forceUpdate(message, type);
-    }
-  }
-
-  forceUpdate(message: string, type?: Extract<keyof ora.Ora, 'info' | 'fail' | 'warn' | 'succeed'>) {
-    if (type == null) {
-      this.#spinner.text = message;
+    if (message != null) {
+      this.#spinner.start(message);
     } else {
-      this.#spinner[type](message);
+      this.#spinner.start();
     }
   }
 
-  stop() {
-    if (this.cluster && this.enable) {
-      process.send?.({ command: CE_SEND_TO_PARENT_COMMAND.SPINER_END, data: {} } satisfies IFromChildDoSpinnerEnd);
+  static getColor(channel: keyof Pick<ora.Ora, 'succeed' | 'fail' | 'info'>): ora.Color {
+    if (channel === 'fail') {
+      return 'red';
+    }
+
+    if (channel === 'succeed') {
+      return 'green';
+    }
+
+    return 'cyan';
+  }
+
+  update(message: string, channel?: keyof Pick<ora.Ora, 'succeed' | 'fail' | 'info'>) {
+    if (this.isEnable === false) return;
+
+    if (channel != null) {
+      this.#spinner[channel](message);
     } else {
-      this.forceStop();
+      setImmediate(() => {
+        this.#spinner.text = message;
+      });
     }
   }
 
-  forceStop() {
-    this.#spinner.stop();
+  stop(display?: { message: string; channel: keyof Pick<ora.Ora, 'succeed' | 'fail' | 'info'> }) {
+    if (this.isEnable === false) return;
+
+    if (display != null) {
+      this.#spinner[display.channel](display.message);
+    } else {
+      this.#spinner.stop();
+    }
   }
 }
 

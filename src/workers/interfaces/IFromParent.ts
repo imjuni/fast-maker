@@ -1,5 +1,5 @@
-import type IConfig from '#configs/interfaces/IConfig';
-import type TMethodType from '#routes/interface/TMethodType';
+import type IBaseOption from '#configs/interfaces/IBaseOption';
+import type { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
 import type { CE_SEND_TO_CHILD_COMMAND } from '#workers/interfaces/CE_SEND_TO_CHILD_COMMAND';
 
 interface IFromParentBase {
@@ -10,7 +10,7 @@ interface IFromParentBase {
 export interface IFromParentDoInit extends IFromParentBase {
   command: typeof CE_SEND_TO_CHILD_COMMAND.DO_INIT;
   data: {
-    config: IConfig;
+    config: IBaseOption;
   };
 }
 
@@ -22,7 +22,7 @@ export interface IFromParentDoInitProject extends IFromParentBase {
 export interface IFromParentDoStage01 extends IFromParentBase {
   command: typeof CE_SEND_TO_CHILD_COMMAND.DO_STAGE01;
   data: {
-    method: TMethodType;
+    method: CE_ROUTE_METHOD;
   };
 }
 

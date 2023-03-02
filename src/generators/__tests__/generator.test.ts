@@ -1,60 +1,39 @@
-import type { IHandlerStatement } from '#compilers/interfaces/THandlerNode';
 import getHandlerWithOption from '#compilers/navigate/getHandlerWithOption';
 import getInternalImportTypeReference from '#compilers/tools/getInternalImportTypeReference';
 import getResolvedModuleInImports from '#compilers/tools/getResolvedModuleInImports';
 import getTypeReferences from '#compilers/tools/getTypeReferences';
 import replaceTypeReferenceInTypeLiteral from '#compilers/tools/replaceTypeReferenceInTypeLiteral';
-import type IConfig from '#configs/interfaces/IConfig';
 import logger from '#tools/logging/logger';
-import * as env from '#tools/__tests__/env';
+import * as env from '#tools/__tests__/tools/env';
 import 'jest';
+import { atOrThrow } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
 import path from 'path';
 import * as tsm from 'ts-morph';
 
-const share: { projectPath: string; project: tsm.Project; option: IConfig } = {} as any;
+const share: { projectPath: string; project: tsm.Project } = {} as any;
 const log = logger();
 
+beforeAll(async () => {
+  share.projectPath = path.join(env.examplePath, 'tsconfig.json');
+  share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
+});
+
 describe('navigate', () => {
-  beforeAll(async () => {
-    share.projectPath = path.join(env.examplePath, 'tsconfig.json');
-
-    share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
-    share.option = {
-      project: share.projectPath,
-      v: false,
-      verbose: false,
-      debugLog: false,
-      p: share.projectPath,
-      h: env.handlerPath,
-      handler: env.handlerPath,
-      o: env.handlerPath,
-      output: env.handlerPath,
-      useDefaultExport: true,
-      routeFunctionName: 'routing',
-    };
-  });
-
   test('generateRouteFunctionCode', async () => {
     // project://example/handlers/get/justice/world.ts
     const routeFilePath = replaceSepToPosix(path.join(env.handlerPath, 'get\\justice\\world.ts'));
     const source = share.project.getSourceFileOrThrow(routeFilePath);
-    const handlerWithOption = getHandlerWithOption(source);
-    const handler = handlerWithOption.find((node) => node.kind === 'handler');
-
-    if (handler == null) {
-      throw new Error('invalid handler');
-    }
-
-    const functionNode = handler as IHandlerStatement;
+    const routing = getHandlerWithOption(source);
+    const handler = routing.handler!;
 
     const casted =
-      functionNode.node.getKind() === tsm.SyntaxKind.FunctionDeclaration
-        ? functionNode.node.asKindOrThrow(tsm.SyntaxKind.FunctionDeclaration)
-        : functionNode.node.asKindOrThrow(tsm.SyntaxKind.ArrowFunction);
+      handler.node.getKind() === tsm.SyntaxKind.FunctionDeclaration
+        ? handler.node.asKindOrThrow(tsm.SyntaxKind.FunctionDeclaration)
+        : handler.node.asKindOrThrow(tsm.SyntaxKind.ArrowFunction);
 
     const parameters = casted.getParameters();
-    const [parameter] = parameters;
+    const parameter = atOrThrow(parameters, 0);
 
     // 결국 resolve module을 하는 이유가, parameter 또는 typeArgument를 위해서인데
     // state-machine을 좀 더 단순화 하려면 resolvemoulde이, parameter 또는 typeArgument를
@@ -65,7 +44,7 @@ describe('navigate', () => {
     const resolutions = getResolvedModuleInImports({
       source,
       typeReferenceNodes: internalTypeReferenceNodes,
-      option: share.option,
+      option: env.option,
     });
 
     replaceTypeReferenceInTypeLiteral({ resolutions, typeReferenceNodes: fullTypeReferenceNodes });
@@ -75,7 +54,7 @@ describe('navigate', () => {
 
     const replacedTypeLiteral = parameter.getTypeNode()?.getFullText();
     const typeName = parameter.getType().getSymbolOrThrow().getEscapedName();
-    const typeContent = parameter.getType().getTypeArguments()[0].getText();
+    const typeContent = atOrThrow(parameter.getType().getTypeArguments(), 0).getText();
 
     log.debug('1: ', typeName);
     log.debug('2: ', typeContent);

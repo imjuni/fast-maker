@@ -1,60 +1,81 @@
 import progress from '#cli/display/progress';
+import show from '#cli/display/show';
 import spinner from '#cli/display/spinner';
-import type IConfig from '#configs/interfaces/IConfig';
+import getTypeScriptProject from '#compilers/tools/getTypeScriptProject';
+import getResolvedPaths from '#configs/getResolvedPaths';
+import type { TRouteBaseOption, TRouteOption } from '#configs/interfaces/TRouteOption';
 import importCodeGenerator from '#generators/importCodeGenerator';
 import prettierProcessing from '#generators/prettierProcessing';
 import routeCodeGenerator from '#generators/routeCodeGenerator';
+import doDedupeRouting from '#modules/doDedupeRouting';
+import doMethodAggregator from '#modules/doMethodAggregator';
+import doStateMachine from '#modules/doStateMachine';
 import getRoutingCode from '#modules/getRoutingCode';
-import generateRouting from '#routes/generateRouting';
-import methods from '#routes/interface/methods';
+import getValidRoutePath from '#modules/getValidRoutePath';
+import reasons from '#modules/reasons';
 import sortRoutePaths from '#routes/sortRoutePaths';
 import getReasonMessages from '#tools/getReasonMessages';
+import logger from '#tools/logging/logger';
 import fs from 'fs';
-import { isFail } from 'my-only-either';
 import path from 'node:path';
 
-export default async function routeCommandSyncHandler(config: IConfig) {
-  progress.enable = true;
-  progress.cluster = false;
+const log = logger();
 
-  spinner.enable = true;
-  spinner.cluster = false;
+export default async function routeCommandSyncHandler(baseOption: TRouteBaseOption) {
+  const resolvedPaths = getResolvedPaths(baseOption);
+  const option: TRouteOption = { ...baseOption, ...resolvedPaths };
 
-  const routing = await generateRouting(config, methods);
+  spinner.update(`load tsconfig.json: ${option.project}`);
 
-  if (isFail(routing)) {
-    if (config.debugLog != null && config.debugLog === false) {
-      await fs.promises.writeFile('fast-maker.debug.info.log', routing.fail.log.toString());
-    }
+  const project = await getTypeScriptProject(option.project);
 
-    throw routing.fail.err;
+  spinner.update(`load tsconfig.json: ${option.project}`, 'succeed');
+
+  spinner.update('find handler files');
+
+  const sourceFilePaths = project.getSourceFiles().map((sourceFile) => sourceFile.getFilePath());
+
+  log.debug(`count: ${sourceFilePaths.length}`);
+
+  const handlerMap = await doMethodAggregator(sourceFilePaths, option);
+
+  spinner.update('find handler files', 'succeed');
+
+  const validationMap = getValidRoutePath(handlerMap);
+
+  spinner.stop();
+
+  const count = Object.values(validationMap.valid).reduce((sum, handlers) => sum + handlers.length, 0);
+
+  log.debug(`count: ${count}`);
+
+  if (count <= 0) {
+    return false;
   }
 
-  const sortedRoutes = sortRoutePaths(routing.pass.route.routeConfigurations);
+  progress.start(count, 0);
 
-  const routeCodes = routeCodeGenerator({ routeConfigurations: sortedRoutes });
-  const importCodes = importCodeGenerator({ importConfigurations: routing.pass.route.importConfigurations, config });
+  const stateMachineApplied = await doStateMachine(project, option, handlerMap);
 
-  const code = getRoutingCode({
-    config,
-    imports: importCodes,
-    routes: routeCodes,
-  });
+  progress.update(count);
+  progress.stop();
 
-  const prettfiedEither = await prettierProcessing({ code });
+  spinner.start('route.ts code generation');
 
-  if (isFail(prettfiedEither)) {
-    if (config.debugLog != null && config.debugLog === false) {
-      await fs.promises.writeFile('fast-maker.debug.info.log', routing.pass.log.toString());
-    }
+  const { importConfigurations, routeConfigurations } = doDedupeRouting(stateMachineApplied);
 
-    throw prettfiedEither.fail;
-  }
+  spinner.update('route.ts code generation', 'succeed');
 
-  await fs.promises.writeFile(path.join(config.output, 'route.ts'), prettfiedEither.pass);
+  const routeCodes = routeCodeGenerator({ routeConfigurations: sortRoutePaths(routeConfigurations) });
+  const importCodes = importCodeGenerator({ importConfigurations, option });
 
-  // eslint-disable-next-line no-console
-  console.log(getReasonMessages(routing.pass.log.reasons));
+  const code = getRoutingCode({ config: option, imports: importCodes, routes: routeCodes });
+
+  const prettfied = await prettierProcessing({ code });
+
+  await fs.promises.writeFile(path.join(option.output, 'route.ts'), prettfied);
+
+  show(getReasonMessages(reasons.reasons));
 
   progress.stop();
   spinner.stop();
