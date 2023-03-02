@@ -1,11 +1,11 @@
-import type IConfig from '#configs/interfaces/IConfig';
+import type IBaseOption from '#configs/interfaces/IBaseOption';
 
 export default function getRoutingCode({
   config,
   imports,
   routes,
 }: {
-  config: IConfig;
+  config: IBaseOption;
   imports: string[];
   routes: string[];
 }) {

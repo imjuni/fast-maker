@@ -1,5 +1,6 @@
 import type IGetModuleInImports from '#compilers/interfaces/IGetModuleInImports';
-import type IConfig from '#configs/interfaces/IConfig';
+import type { TRouteOption } from '#configs/interfaces/TRouteOption';
+import type { TWatchOption } from '#configs/interfaces/TWatchOption';
 import appendPostfixHash from '#tools/appendPostfixHash';
 import getHash from '#tools/getHash';
 import { atOrUndefined } from 'my-easy-fp';
@@ -10,7 +11,7 @@ import { SyntaxKind } from 'ts-morph';
 
 interface IGetResolvedModuleParam {
   source: SourceFile;
-  option: IConfig;
+  option: Pick<TWatchOption, 'output'> | Pick<TRouteOption, 'output'>;
   typeReferenceNodes: TypeReferenceNode[];
 }
 
@@ -131,10 +132,12 @@ export default function getResolvedModuleInImports({
   );
 
   const resolutionRecord = nonDedupeResolutions.reduce<Record<string, IGetModuleInImports>>((aggregation, current) => {
-    if (aggregation[current.exportFrom] != null) {
+    const moduleInImports = aggregation[current.exportFrom];
+
+    if (moduleInImports != null) {
       const concatedImportDeclarations: IGetModuleInImports['importDeclarations'] = [
         ...current.importDeclarations,
-        ...aggregation[current.exportFrom].importDeclarations,
+        ...moduleInImports.importDeclarations,
       ];
 
       concatedImportDeclarations.sort((left, right) => {
@@ -152,13 +155,13 @@ export default function getResolvedModuleInImports({
       return {
         ...aggregation,
         [current.exportFrom]: {
-          ...aggregation[current.exportFrom],
+          ...moduleInImports,
           importDeclarations: concatedImportDeclarations,
-        },
-      };
+        } satisfies IGetModuleInImports,
+      } satisfies Record<string, IGetModuleInImports>;
     }
 
-    return { ...aggregation, [current.exportFrom]: current };
+    return { ...aggregation, [current.exportFrom]: current } satisfies Record<string, IGetModuleInImports>;
   }, {});
 
   const resolutions = Object.values(resolutionRecord);

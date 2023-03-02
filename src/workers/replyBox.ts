@@ -1,11 +1,11 @@
-import type TMethodType from '#routes/interface/TMethodType';
+import type { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
 import type IFailDoWorkReply from '#workers/interfaces/IFailDoWorkReply';
 import type IPassDoWorkReply from '#workers/interfaces/IPassDoWorkReply';
 
 class ReplyBoxType {
-  accessor passBox: Partial<Record<TMethodType, IPassDoWorkReply>>;
+  accessor passBox: Partial<Record<CE_ROUTE_METHOD, IPassDoWorkReply>>;
 
-  accessor failBox: Partial<Record<TMethodType, IFailDoWorkReply>>;
+  accessor failBox: Partial<Record<CE_ROUTE_METHOD, IFailDoWorkReply>>;
 
   constructor() {
     this.passBox = {};

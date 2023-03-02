@@ -1,14 +1,14 @@
 import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
 import type IReason from '#compilers/interfaces/IReason';
 import type { THandlerWithoutNode } from '#compilers/interfaces/THandlerNode';
-import type IConfig from '#configs/interfaces/IConfig';
-import type IWatchConfig from '#configs/interfaces/IWatchConfig';
+import type { TRouteOption } from '#configs/interfaces/TRouteOption';
+import type { TWatchOption } from '#configs/interfaces/TWatchOption';
 import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
 import type IRouteHandler from '#routes/interface/IRouteHandler';
 import type { Merge } from 'type-fest';
 
 export default interface ILogBox {
-  config: IConfig | Merge<IConfig, IWatchConfig> | undefined;
+  config: TRouteOption | Merge<TRouteOption, TWatchOption> | undefined;
   routeHandlers: IRouteHandler[];
   reasons: IReason[];
   importConfigurations: IImportConfiguration[];

@@ -1,45 +1,45 @@
 import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
 import dedupeImportConfiguration from '#generators/dedupeImportConfiguration';
+import reasons from '#modules/reasons';
 import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
 import type { IAnalysisMachineContext } from '#xstate/RequestHandlerAnalysisMachine';
 
-export default function proceedStage03(
-  routesAnalysised: Pick<IAnalysisMachineContext, 'importBox' | 'routeBox' | 'messages'>[],
+export default function doDedupeRouting(
+  routesAnalysised: Pick<IAnalysisMachineContext, 'importMap' | 'routeMap' | 'messages'>[],
 ) {
   const aggregatedRouteConfigurations = routesAnalysised.reduce<{
-    importBox: IAnalysisMachineContext['importBox'][];
-    routeBox: IAnalysisMachineContext['routeBox'][];
+    importMap: IAnalysisMachineContext['importMap'][];
+    routeMap: IAnalysisMachineContext['routeMap'][];
     reasons: IAnalysisMachineContext['messages'][];
   }>(
     (aggregated, current) => {
       return {
-        importBox: [...aggregated.importBox, current.importBox],
-        routeBox: [...aggregated.routeBox, current.routeBox],
+        importMap: [...aggregated.importMap, current.importMap],
+        routeMap: [...aggregated.routeMap, current.routeMap],
         reasons: [...aggregated.reasons, current.messages],
       };
     },
     {
-      importBox: [],
-      routeBox: [],
+      importMap: [],
+      routeMap: [],
       reasons: [],
     },
   );
 
   const importConfigurations = dedupeImportConfiguration(
-    aggregatedRouteConfigurations.importBox.reduce<IImportConfiguration[]>((source, target) => {
+    aggregatedRouteConfigurations.importMap.reduce<IImportConfiguration[]>((source, target) => {
       return source.concat(Object.values(target));
     }, []),
   );
 
-  const routeConfigurations = aggregatedRouteConfigurations.routeBox.reduce<IRouteConfiguration[]>((source, target) => {
+  const routeConfigurations = aggregatedRouteConfigurations.routeMap.reduce<IRouteConfiguration[]>((source, target) => {
     return source.concat(Object.values(target));
   }, []);
 
-  const reasons = aggregatedRouteConfigurations.reasons.flat();
+  reasons.add(...aggregatedRouteConfigurations.reasons.flat());
 
   return {
     importConfigurations,
     routeConfigurations,
-    reasons,
   };
 }

@@ -6,8 +6,8 @@ module.exports = {
   },
   extends: [
     'plugin:@typescript-eslint/eslint-recommended',
-    // 'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    // 'plugin:@typescript-eslint/strict',
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    'plugin:@typescript-eslint/strict',
     'airbnb-base',
     'airbnb-typescript/base',
     'plugin:prettier/recommended',

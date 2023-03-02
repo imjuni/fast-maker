@@ -3,10 +3,10 @@ export default interface IGetModuleInImports {
   importAt: string;
   exportFrom: string;
   hash: string;
-  importDeclarations: Array<{
+  importDeclarations: {
     isDefaultExport: boolean;
     importModuleNameFrom: string;
     importModuleNameTo: string;
     isPureType: boolean;
-  }>;
+  }[];
 }

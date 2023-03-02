@@ -1,79 +1,109 @@
 import builder from '#cli/builder/builder';
+import routeBuilder from '#cli/builder/routeBuilder';
 import watchBuilder from '#cli/builder/watchBuilder';
-import routeCommandClusterHandler from '#cli/command/routeCommandClusterHandler';
 import routeCommandSyncHandler from '#cli/command/routeCommandSyncHandler';
 import watchCommandHandler from '#cli/command/watchCommandHandler';
-import type IConfig from '#configs/interfaces/IConfig';
-import type IWatchConfig from '#configs/interfaces/IWatchConfig';
+import progress from '#cli/display/progress';
+import spinner from '#cli/display/spinner';
+import type { TRouteOption } from '#configs/interfaces/TRouteOption';
+import type { TWatchOption } from '#configs/interfaces/TWatchOption';
 import isValidConfig from '#configs/isValidConfig';
 import preLoadConfig from '#configs/preLoadConfig';
 import logger from '#tools/logging/logger';
 import worker from '#workers/worker';
 import getIsPrimary from '#xstate/tools/getIsPrimary';
 import { isError } from 'my-easy-fp';
-import yargsAnyType, { type Arguments, type Argv, type CommandModule } from 'yargs';
+import yargs, { type CommandModule } from 'yargs';
 
-const yargs: Argv<IConfig> = yargsAnyType as any;
 const log = logger();
 
-const routeCmd: CommandModule<IConfig, IConfig> = {
+const routeCmd: CommandModule<TRouteOption, TRouteOption> = {
   command: 'route',
   describe: 'create route.ts file in your directory using by tsconfig.json',
-  builder,
-  handler: async (args) => {
+  builder: (argv) => routeBuilder(builder(argv)),
+  handler: async (argv) => {
     try {
-      const output = args.output ?? args.handler;
+      progress.isEnable = true;
+      spinner.isEnable = true;
 
-      if (process.env.SYNC_MODE === 'true') {
-        await routeCommandSyncHandler({ ...args, output });
-      } else {
-        await routeCommandClusterHandler({ ...args, output });
-      }
-    } catch (catched) {
-      const err = isError(catched) ?? new Error('unknown error raised');
+      await routeCommandSyncHandler(argv);
+      // if (process.env.SYNC_MODE === 'true') {
+      // } else {
+      //   await routeCommandClusterHandler(argv);
+      // }
+    } catch (caught) {
+      const err = isError(caught, new Error('unknown error raised'));
       log.error(err);
     }
   },
 };
 
-const watchCmd: CommandModule<IConfig & IWatchConfig, IConfig & IWatchConfig> = {
+const watchCmd: CommandModule<TWatchOption, TWatchOption> = {
   command: 'watch',
   describe: 'watch for create route.ts file in your directory using by tsconfig.json',
-  builder: (args) => {
-    return [builder, watchBuilder].reduce((nextArgs, currentBuilder) => {
-      return currentBuilder(nextArgs);
-    }, args as any);
-  },
-  handler: async (args: Arguments<IConfig & IWatchConfig>) => {
+  builder: (argv) => watchBuilder(builder(argv)),
+  handler: async (argv) => {
     try {
-      watchCommandHandler(args);
-    } catch (catched) {
-      const err = isError(catched) ?? Error('unknown error raised');
+      await watchCommandHandler(argv);
+    } catch (caught) {
+      const err = isError(caught, new Error('unknown error raised'));
       log.error(err);
     }
   },
 };
 
 if (process.env.SYNC_MODE === 'true') {
-  // eslint-disable-next-line
-  yargs(process.argv.slice(2))
-    .command<IConfig>(routeCmd)
-    .command<IConfig & IWatchConfig>(watchCmd as any)
+  const parser = yargs(process.argv.slice(2));
+
+  parser
+    .command(routeCmd as CommandModule<{}, TRouteOption>)
+    .command(watchCmd as CommandModule<{}, TWatchOption>)
     .demandCommand()
     .recommendCommands()
     .config(preLoadConfig())
     .check(isValidConfig)
-    .help().argv;
+    .help();
+
+  const handler = async () => {
+    await parser.argv;
+  };
+
+  handler().catch((caught) => {
+    const err = isError(caught, new Error('unknown error raised'));
+    log.error(err.message);
+    log.error(err.stack);
+
+    process.exit(1);
+  });
 } else if (getIsPrimary()) {
-  // eslint-disable-next-line
-  yargs(process.argv.slice(2))
-    .command<IConfig>(routeCmd)
-    .command<IConfig & IWatchConfig>(watchCmd as any)
+  const parser = yargs(process.argv.slice(2));
+
+  parser
+    .command(routeCmd as CommandModule<{}, TRouteOption>)
+    .command(watchCmd as CommandModule<{}, TWatchOption>)
     .demandCommand()
     .recommendCommands()
     .config(preLoadConfig())
     .check(isValidConfig)
-    .help().argv;
+    .help();
+
+  const handler = async () => {
+    await parser.argv;
+  };
+
+  handler().catch((caught) => {
+    const err = isError(caught, new Error('unknown error raised'));
+    log.error(err.message);
+    log.error(err.stack);
+
+    process.exit(1);
+  });
 } else {
-  worker();
+  worker().catch((caught) => {
+    const err = isError(caught, new Error('unknown error raised'));
+    log.error(err.message);
+    log.error(err.stack);
+
+    process.exit(1);
+  });
 }

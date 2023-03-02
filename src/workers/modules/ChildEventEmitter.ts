@@ -1,12 +1,12 @@
 import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
 import getTypeScriptProject from '#compilers/tools/getTypeScriptProject';
-import type IConfig from '#configs/interfaces/IConfig';
-import proceedStage01 from '#modules/proceedStage01';
-import proceedStage02 from '#modules/proceedStage02';
-import proceedStage03 from '#modules/proceedStage03';
+import type IBaseOption from '#configs/interfaces/IBaseOption';
+import doDedupeRouting from '#modules/doDedupeRouting';
+import doMethodAggregator from '#modules/doMethodAggregator';
+import doStateMachine from '#modules/doStateMachine';
+import type { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
 import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
 import type IRouteHandler from '#routes/interface/IRouteHandler';
-import type TMethodType from '#routes/interface/TMethodType';
 import LogBox from '#tools/logging/LogBox';
 import logger from '#tools/logging/logger';
 import { CE_SEND_TO_CHILD_COMMAND } from '#workers/interfaces/CE_SEND_TO_CHILD_COMMAND';
@@ -31,13 +31,13 @@ import type { AsyncReturnType } from 'type-fest';
 const log = logger();
 
 export default class ChildEventEmitter extends EventEmitter {
-  #config: IConfig | undefined;
+  #config: IBaseOption | undefined;
 
   #project: Project | undefined;
 
-  #method: TMethodType | undefined;
+  #method: CE_ROUTE_METHOD | undefined;
 
-  #machined: AsyncReturnType<typeof proceedStage02>['result'] | undefined;
+  #machined: AsyncReturnType<typeof doStateMachine>['result'] | undefined;
 
   #handlers: IRouteHandler[];
 
@@ -59,11 +59,38 @@ export default class ChildEventEmitter extends EventEmitter {
     this.#routes = [];
     this.#log = new LogBox();
 
-    this.on(CE_SEND_TO_CHILD_COMMAND.DO_INIT, this.doInitHandler);
-    this.on(CE_SEND_TO_CHILD_COMMAND.DO_INIT_PROJECT, this.doInitProjectHandler);
-    this.on(CE_SEND_TO_CHILD_COMMAND.DO_STAGE01, this.doStage01);
-    this.on(CE_SEND_TO_CHILD_COMMAND.DO_STAGE02, this.doStage02);
-    this.on(CE_SEND_TO_CHILD_COMMAND.DO_STAGE03, this.doStage03);
+    this.on(CE_SEND_TO_CHILD_COMMAND.DO_INIT, this.doInitHandler.bind(this));
+    this.on(CE_SEND_TO_CHILD_COMMAND.DO_INIT_PROJECT, () => {
+      this.doInitProjectHandler().catch((caught) => {
+        const err = isError(caught, new Error('unknown error raised: doInitProjectHandler'));
+        log.error(err.message);
+        log.error(err.stack);
+      });
+    });
+
+    this.on(CE_SEND_TO_CHILD_COMMAND.DO_STAGE01, (message: IFromParentDoStage01) => {
+      this.doStage01(message).catch((caught) => {
+        const err = isError(caught, new Error('unknown error raised: doStage01'));
+        log.error(err.message);
+        log.error(err.stack);
+      });
+    });
+
+    this.on(CE_SEND_TO_CHILD_COMMAND.DO_STAGE02, () => {
+      this.doStage02().catch((caught) => {
+        const err = isError(caught, new Error('unknown error raised: doStage02'));
+        log.error(err.message);
+        log.error(err.stack);
+      });
+    });
+
+    this.on(CE_SEND_TO_CHILD_COMMAND.DO_STAGE03, () => {
+      this.doStage03().catch((caught) => {
+        const err = isError(caught, new Error('unknown error raised: doStage02'));
+        log.error(err.message);
+        log.error(err.stack);
+      });
+    });
   }
 
   doInitHandler(message: IFromParentDoInit) {
@@ -112,7 +139,7 @@ export default class ChildEventEmitter extends EventEmitter {
 
       this.#method = message.data.method;
 
-      const result = await proceedStage01(this.#config.handler, [message.data.method]);
+      const result = await doMethodAggregator(this.#config.handler, [message.data.method]);
 
       this.#handlers.push(...result);
 
@@ -151,7 +178,7 @@ export default class ChildEventEmitter extends EventEmitter {
         result,
         reasons: stage02Reasons,
         logObject: stage02Log,
-      } = await proceedStage02(this.#project, this.#config, this.#handlers);
+      } = await doStateMachine(this.#project, this.#config, this.#handlers);
 
       this.#machined = result;
 
@@ -208,7 +235,7 @@ export default class ChildEventEmitter extends EventEmitter {
         throw new Error('uninitialize child cluster');
       }
 
-      const { importConfigurations, routeConfigurations, reasons: stage03Reasons } = proceedStage03(this.#machined);
+      const { importConfigurations, routeConfigurations, reasons: stage03Reasons } = doDedupeRouting(this.#machined);
 
       this.#imports.push(...importConfigurations);
       this.#routes.push(...routeConfigurations);

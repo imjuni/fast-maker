@@ -4,7 +4,6 @@ import type IRouteHandler from '#routes/interface/IRouteHandler';
 import logger from '#tools/logging/logger';
 import { atOrThrow } from 'my-easy-fp';
 import { replaceSepToPosix, startSepAppend, startSepRemove } from 'my-node-fp';
-import { isFail } from 'my-only-either';
 import path from 'path';
 import urljoin from 'url-join';
 
@@ -12,8 +11,8 @@ const log = logger();
 
 const routePathMatchReg = /(.*)(\/|)(get|post|put|delete|options|head|patch|all)(\/|)(.+)(\.ts)/;
 
-export default async function getRoutePath(originFilename: string): Promise<IRouteHandler> {
-  const filename = replaceSepToPosix(originFilename);
+export default async function getRoutePath(filePath: string): Promise<IRouteHandler> {
+  const filename = replaceSepToPosix(filePath);
   const refinedFilename = startSepRemove(filename, path.posix.sep);
   const filenameRegMatched = refinedFilename.match(routePathMatchReg);
 
@@ -22,34 +21,28 @@ export default async function getRoutePath(originFilename: string): Promise<IRou
   }
 
   const routePathByDir = `${atOrThrow(filenameRegMatched, 5)}${atOrThrow(filenameRegMatched, 6)}`;
-  const methodEither = getMethod(atOrThrow(filenameRegMatched, 3));
+  const method = getMethod(atOrThrow(filenameRegMatched, 3));
 
-  if (isFail(methodEither)) {
-    throw methodEither.fail;
-  }
+  const paramsAppliedRouteElements = await Promise.all(
+    routePathByDir
+      .split(path.posix.sep)
+      .filter((endpoint) => endpoint !== '')
+      .map(async (endpoint) => {
+        const refined = startSepRemove(endpoint, path.posix.sep);
 
-  const paramsAppliedRouteElements = (
-    await Promise.all(
-      routePathByDir
-        .split(path.posix.sep)
-        .filter((endpoint) => endpoint !== '')
-        .map(async (endpoint) => {
-          const refined = startSepRemove(endpoint, path.posix.sep);
+        if (refined === 'index.ts') {
+          return '';
+        }
 
-          if (refined === 'index.ts') {
-            return '';
-          }
-
-          const basename = path.basename(endpoint, path.extname(endpoint));
-          const variablePath = await evaluateVariablePath(basename);
-          return variablePath;
-        }),
-    )
-  ).filter((item): item is string => item !== undefined);
+        const basename = path.basename(endpoint, path.extname(endpoint));
+        const variablePath = await evaluateVariablePath(basename);
+        return variablePath;
+      }),
+  );
 
   const joined = urljoin(paramsAppliedRouteElements);
 
   log.debug(' >>> ', joined);
 
-  return { filename, method: methodEither.pass, routePath: startSepAppend(joined, path.posix.sep) };
+  return { filePath: filename, method, routePath: startSepAppend(joined, path.posix.sep) };
 }

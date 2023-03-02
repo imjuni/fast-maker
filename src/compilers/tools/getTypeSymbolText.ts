@@ -1,3 +1,4 @@
+import { atOrThrow } from 'my-easy-fp';
 import type { Node, Type } from 'ts-morph';
 
 export default function getTypeSymbolText(
@@ -8,7 +9,7 @@ export default function getTypeSymbolText(
   const aliasSymbol = typeNode.getAliasSymbol();
 
   if (symbol != null) {
-    const [declarationNode] = symbol.getDeclarations();
+    const declarationNode = atOrThrow(symbol.getDeclarations(), 0);
     return declarationNodeCallback == null ? declarationNode.getText() : declarationNodeCallback(declarationNode);
   }
 

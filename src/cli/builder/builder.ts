@@ -1,7 +1,9 @@
-import type IConfig from '#configs/interfaces/IConfig';
 import type { Argv } from 'yargs';
 
-export default function builder(args: Argv<IConfig>): Argv<IConfig> {
+export default function builder(args: Argv): Argv {
+  // ------------------------------------------------------------------------
+  // with alias
+  // ------------------------------------------------------------------------
   args
     .option('handler', {
       alias: 'h',
@@ -23,13 +25,18 @@ export default function builder(args: Argv<IConfig>): Argv<IConfig> {
       description: 'display verbose message',
       type: 'boolean',
       default: false,
-    })
-    .option('useDefaultExport', {
+    });
+
+  // ------------------------------------------------------------------------
+  // without alias
+  // ------------------------------------------------------------------------
+  args
+    .option('use-default-export', {
       description: 'route function in output file that use default export',
       type: 'boolean',
       default: true,
     })
-    .option('routeFunctionName', {
+    .option('route-function-name', {
       description: 'rotue function name',
       type: 'string',
       default: 'routing',

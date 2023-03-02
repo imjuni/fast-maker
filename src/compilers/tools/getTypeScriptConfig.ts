@@ -13,13 +13,18 @@ export default async function getTypeScriptConfig(tsconfigPath: string): Promise
   log.debug(`tsconfig file load from "${tsconfigPath}"`);
 
   const parseConfigHost: ts.ParseConfigHost = {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     fileExists: ts.sys.fileExists,
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     readFile: ts.sys.readFile,
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     readDirectory: ts.sys.readDirectory,
     useCaseSensitiveFileNames: true,
   };
 
-  const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
+  const configFile = ts.readConfigFile(tsconfigPath, (filePath: string, encoding?: string) =>
+    ts.sys.readFile(filePath, encoding),
+  );
 
   const tsconfig = ts.parseJsonConfigFileContent(configFile.config, parseConfigHost, path.dirname(tsconfigPath));
 

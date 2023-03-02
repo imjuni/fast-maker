@@ -1,171 +1,119 @@
-import type IReason from '#compilers/interfaces/IReason';
-import type { IHandlerStatement, IOptionStatement } from '#compilers/interfaces/THandlerNode';
 import getHandlerWithOption from '#compilers/navigate/getHandlerWithOption';
-import type IConfig from '#configs/interfaces/IConfig';
-import proceedStage01 from '#modules/proceedStage01';
-import methods from '#routes/interface/methods';
+import getResolvedPaths from '#configs/getResolvedPaths';
+import doMethodAggregator from '#modules/doMethodAggregator';
+import { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
 import getHash from '#tools/getHash';
+import getRelativeCwd from '#tools/getRelativeCwd';
 import logger from '#tools/logging/logger';
 import posixJoin from '#tools/posixJoin';
-import * as env from '#tools/__tests__/env';
-import getTestValue from '#tools/__tests__/getTestValue';
-import requestHandlerAnalysisMachine, { type IAnalysisMachineContext } from '#xstate/RequestHandlerAnalysisMachine';
+import JestContext from '#tools/__tests__/tools/context';
+import * as env from '#tools/__tests__/tools/env';
+import getTestValue from '#tools/__tests__/tools/getTestValue';
+import loadData from '#tools/__tests__/tools/loadData';
+import { CE_REQUEST_HANDLER_ANALYSIS_MACHINE } from '#xstate/interfaces/CE_REQUEST_HANDLER_ANALYSIS_MACHINE';
+import requestHandlerAnalysisMachine from '#xstate/RequestHandlerAnalysisMachine';
 import 'jest';
-import { replaceSepToPosix } from 'my-node-fp';
+import { findOrThrow, isError } from 'my-easy-fp';
 import path from 'path';
 import * as tsm from 'ts-morph';
 import { interpret } from 'xstate';
+import { waitFor } from 'xstate/lib/waitFor';
 
-const share: { projectPath: string; project: tsm.Project; option: IConfig } = {} as any;
+const context = new JestContext();
 const log = logger();
 
 beforeAll(async () => {
-  share.projectPath = path.join(env.examplePath, 'tsconfig.json');
-
-  share.project = new tsm.Project({ tsConfigFilePath: share.projectPath });
-  share.option = {
-    project: share.projectPath,
-    v: false,
-    verbose: false,
-    debugLog: false,
-    p: share.projectPath,
-    h: env.handlerPath,
-    handler: env.handlerPath,
-    o: env.handlerPath,
-    output: env.handlerPath,
-    useDefaultExport: true,
-    routeFunctionName: 'routing',
+  context.projectPath = path.join(env.examplePath, 'tsconfig.json');
+  context.project = new tsm.Project({ tsConfigFilePath: context.projectPath });
+  context.routeOption = {
+    ...env.routeOption,
+    ...getResolvedPaths({ project: context.projectPath, output: env.examplePath }),
   };
 });
 
-test('t001-FSM-TypeLiteral', async () => {
-  const expectFileName = expect.getState().currentTestName?.replace(/^([tT][0-9]+)(-.+)/, 'expect$2.ts') ?? 'N/A';
+describe('requestHandlerAnalysisMachine', () => {
+  test('t001-FSM-TypeLiteral', async () => {
+    try {
+      // project://example\handlers\get\justice\world.ts
+      // project://example\handlers\get\xman\world.ts
+      const routeFilePath = posixJoin(env.handlerPath, 'get', 'xman', 'world.ts');
+      const sourceFile = context.project.getSourceFileOrThrow(routeFilePath);
 
-  // project://example\handlers\get\justice\world.ts
-  // project://example\handlers\get\xman\world.ts
-  const routeFilePath = posixJoin(env.handlerPath, 'get', 'xman', 'world.ts');
-  const source = share.project.getSourceFileOrThrow(routeFilePath);
-  const handlerWithOption = getHandlerWithOption(source);
-  const handler = handlerWithOption.find((node) => node.kind === 'handler');
+      const methodAggregated = await doMethodAggregator(
+        context.project.getSourceFiles().map((sf) => sf.getFilePath()),
+        { ...env.routeOption, cwd: path.join(env.examplePath) },
+      );
 
-  if (handler == null) {
-    throw new Error('invalid handler');
-  }
+      const route = findOrThrow(methodAggregated[CE_ROUTE_METHOD.GET], (handler) => handler.filePath === routeFilePath);
+      const routing = getHandlerWithOption(sourceFile);
+      const hash = getHash(getRelativeCwd(env.handlerPath, route.filePath));
 
-  const routeHandlerFiles = await proceedStage01(share.option.handler, methods);
-  const testRouteHandlerFile = routeHandlerFiles
-    .filter((routeHandlerFile) => routeHandlerFile.method === 'get')
-    .find((routeHandlerFile) => routeHandlerFile.filename === routeFilePath);
+      const machine = requestHandlerAnalysisMachine({
+        project: context.project,
+        source: sourceFile,
+        hash,
+        routing: route,
+        routeHandler: routing.handler!,
+        routeOption: routing.option,
+        option: context.routeOption,
+      });
 
-  if (testRouteHandlerFile == null) {
-    throw new Error(`Cannot create route handler configuration: ${routeFilePath}`);
-  }
+      const interpretor = interpret(machine);
+      const actor = interpretor.start();
+      await waitFor(actor, (state) => state.matches(CE_REQUEST_HANDLER_ANALYSIS_MACHINE.DONE));
+      const { messages, importMap: importBox, routeMap: routeBox } = interpretor.getSnapshot().context;
 
-  const hash = getHash(replaceSepToPosix(path.relative(env.examplePath, source.getFilePath().toString())));
-  const nodes = getHandlerWithOption(source);
-  const routeHandler = nodes.find((node): node is IHandlerStatement => node.kind === 'handler');
-  const routeOption = nodes.find((node): node is IOptionStatement => node.kind === 'option');
+      const expectation = await loadData<any>('default', path.join(__dirname, 'expects', 'expect.out.01.ts'));
+      const terminateCircularResult = getTestValue({ messages, importBox, routeBox });
 
-  if (routeHandler == null) {
-    const reason: IReason = {
-      type: 'error',
-      filePath: source.getFilePath().toString(),
-      source,
-      message: `Cannot found route handler function: ${source.getFilePath().toString()}`,
-    };
+      log.debug(terminateCircularResult);
 
-    throw new Error(reason.message);
-  }
+      expect(terminateCircularResult).toMatchObject(expectation);
+    } catch (caught) {
+      const err = isError(caught, new Error('unknown error raised'));
 
-  const machine = requestHandlerAnalysisMachine({
-    project: share.project,
-    source,
-    hash,
-    routeHandler: testRouteHandlerFile,
-    handler: routeHandler,
-    routeOption,
-    config: share.option,
+      console.error(err.message);
+      console.error(err.stack);
+
+      expect(caught).toBeUndefined();
+    }
   });
 
-  const service = interpret(machine);
+  test('t002-FSM-FastifyRequest', async () => {
+    // project://example\handlers\get\justice\world.ts
+    // project://example\handlers\get\xman\world.ts
+    const routeFilePath = posixJoin(env.handlerPath, 'get', 'justice', 'world.ts');
+    const sourceFile = context.project.getSourceFileOrThrow(routeFilePath);
 
-  const parsedDataBox = await new Promise<Pick<IAnalysisMachineContext, 'importBox' | 'routeBox' | 'messages'>>(
-    (resolve) => {
-      service.onDone((data) => resolve(data.data));
-      service.start();
-    },
-  );
+    const methodAggregated = await doMethodAggregator(
+      context.project.getSourceFiles().map((sf) => sf.getFilePath()),
+      { ...env.routeOption, cwd: path.join(env.examplePath) },
+    );
 
-  const expectation = await import(path.join(__dirname, 'expects', expectFileName));
-  const terminateCircularResult = getTestValue(parsedDataBox);
+    const route = findOrThrow(methodAggregated[CE_ROUTE_METHOD.GET], (handler) => handler.filePath === routeFilePath);
+    const routing = getHandlerWithOption(sourceFile);
+    const hash = getHash(getRelativeCwd(env.handlerPath, route.filePath));
 
-  log.debug(terminateCircularResult);
+    const machine = requestHandlerAnalysisMachine({
+      project: context.project,
+      source: sourceFile,
+      hash,
+      routing: route,
+      routeHandler: routing.handler!,
+      routeOption: routing.option,
+      option: context.routeOption,
+    });
 
-  expect(terminateCircularResult).toEqual(expectation.default);
-});
+    const interpretor = interpret(machine);
+    const actor = interpretor.start();
+    await waitFor(actor, (state) => state.matches(CE_REQUEST_HANDLER_ANALYSIS_MACHINE.DONE));
+    const { messages, importMap: importBox, routeMap: routeBox } = interpretor.getSnapshot().context;
 
-test('t002-FSM-FastifyRequest', async () => {
-  const expectFileName = expect.getState().currentTestName?.replace(/^([tT][0-9]+)(-.+)/, 'expect$2.ts') ?? 'N/A';
+    const expectation = await loadData<any>('default', path.join(__dirname, 'expects', 'expect.out.02.ts'));
+    const terminateCircularResult = getTestValue({ messages, importBox, routeBox });
 
-  // project://example\handlers\get\justice\world.ts
-  // project://example\handlers\get\xman\world.ts
-  const routeFilePath = posixJoin(env.handlerPath, 'get', 'justice', 'world.ts');
-  const source = share.project.getSourceFileOrThrow(routeFilePath);
-  const handlerWithOption = getHandlerWithOption(source);
-  const handler = handlerWithOption.find((node) => node.kind === 'handler');
+    log.debug(terminateCircularResult);
 
-  if (handler == null) {
-    throw new Error('invalid handler');
-  }
-
-  const routeHandlerFiles = await proceedStage01(share.option.handler, methods);
-  const testRouteHandlerFile = routeHandlerFiles
-    .filter((routeHandlerFile) => routeHandlerFile.method === 'get')
-    .find((routeHandlerFile) => routeHandlerFile.filename === routeFilePath);
-
-  if (testRouteHandlerFile == null) {
-    throw new Error(`Cannot create route handler configuration: ${routeFilePath}`);
-  }
-
-  const hash = getHash(replaceSepToPosix(path.relative(env.examplePath, source.getFilePath().toString())));
-  const nodes = getHandlerWithOption(source);
-  const routeHandler = nodes.find((node): node is IHandlerStatement => node.kind === 'handler');
-  const routeOption = nodes.find((node): node is IOptionStatement => node.kind === 'option');
-
-  if (routeHandler == null) {
-    const reason: IReason = {
-      type: 'error',
-      filePath: source.getFilePath().toString(),
-      source,
-      message: `Cannot found route handler function: ${source.getFilePath().toString()}`,
-    };
-
-    throw new Error(reason.message);
-  }
-
-  const machine = requestHandlerAnalysisMachine({
-    project: share.project,
-    source,
-    hash,
-    routeHandler: testRouteHandlerFile,
-    handler: routeHandler,
-    routeOption,
-    config: share.option,
+    expect(terminateCircularResult).toEqual(expectation);
   });
-
-  const service = interpret(machine);
-
-  const parsedDataBox = await new Promise<Pick<IAnalysisMachineContext, 'importBox' | 'routeBox' | 'messages'>>(
-    (resolve) => {
-      service.onDone((data) => resolve(data.data));
-      service.start();
-    },
-  );
-
-  const expectation = await import(path.join(__dirname, 'expects', expectFileName));
-  const terminateCircularResult = getTestValue(parsedDataBox);
-
-  log.debug(terminateCircularResult);
-
-  expect(terminateCircularResult).toEqual(expectation.default);
 });

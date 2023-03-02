@@ -1,6 +1,6 @@
 import getHandlerStatement from '#compilers/navigate/getHandlerStatement';
 import getOptionStatement from '#compilers/navigate/getOptionStatement';
-import JestContext from '#tools/__tests__/context';
+import JestContext from '#tools/__tests__/tools/context';
 import 'jest';
 import { Project } from 'ts-morph';
 

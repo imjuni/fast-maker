@@ -1,4 +1,4 @@
-import type THandlerNode from '#compilers/interfaces/THandlerNode';
+import type { IHandlerStatement, IOptionStatement } from '#compilers/interfaces/THandlerNode';
 import getHandlerStatement from '#compilers/navigate/getHandlerStatement';
 import getOptionStatement from '#compilers/navigate/getOptionStatement';
 import type { SourceFile } from 'ts-morph';
@@ -10,14 +10,18 @@ import type { SourceFile } from 'ts-morph';
  * function and arrow function
  * @param sourceFile TypeScript source file object, tsm.SourceFile object
  */
-export default function getHandlerWithOption(sourceFile: SourceFile): THandlerNode[] {
+export default function getHandlerWithOption(sourceFile: SourceFile): {
+  option?: IOptionStatement;
+  handler?: IHandlerStatement;
+} {
   const declarationMap = sourceFile.getExportedDeclarations();
   const defaultExportedNodes = declarationMap.get('default');
   const optionNamedExportedNodes = declarationMap.get('option');
 
-  const nodes = [getOptionStatement(optionNamedExportedNodes), getHandlerStatement(defaultExportedNodes)].filter(
-    (node): node is THandlerNode => node != null,
-  );
+  const { option, handler } = {
+    option: getOptionStatement(optionNamedExportedNodes),
+    handler: getHandlerStatement(defaultExportedNodes),
+  };
 
-  return nodes;
+  return { option, handler };
 }

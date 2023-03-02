@@ -1,22 +1,17 @@
-import { CE_SEND_TO_PARENT_COMMAND } from '#workers/interfaces/CE_SEND_TO_PARENT_COMMAND';
-import type { IFromChildDoProgressStart } from '#workers/interfaces/IFromChild';
 import chalk from 'chalk';
 import cliProgesss from 'cli-progress';
 
 class Progress {
-  accessor enable: boolean;
-
-  accessor cluster: boolean;
+  accessor isEnable: boolean;
 
   #bar: cliProgesss.SingleBar;
 
   constructor() {
-    this.enable = true;
-    this.cluster = false;
+    this.isEnable = true;
 
     this.#bar = new cliProgesss.SingleBar(
       {
-        format: `PROGRESS | ${chalk.greenBright('{bar}')} | {value}/{total} Files`,
+        format: `PROGRESS | ${chalk.greenBright('{bar}')} | {value}/{total} Files {routeFile}`,
         barCompleteChar: '\u25A0',
         barIncompleteChar: '\u25A1',
         stopOnComplete: true,
@@ -26,54 +21,30 @@ class Progress {
     );
   }
 
-  start(total: number, startValue: number) {
-    if (this.cluster && this.enable) {
-      process.send?.({
-        command: CE_SEND_TO_PARENT_COMMAND.PROGRESS_START,
-        data: { total, startValue },
-      } satisfies IFromChildDoProgressStart);
-    } else if (this.enable === true) {
-      this.forceStart(total, startValue);
+  start(total: number, startValue: number, schemaName?: string) {
+    if (this.isEnable) {
+      this.#bar.start(total, startValue, {
+        schemaName: schemaName != null ? ` - ${schemaName}` : '',
+      });
     }
   }
 
-  forceStart(total: number, startValue: number) {
-    this.#bar.start(total, startValue);
-  }
-
-  increment() {
-    if (this.cluster && this.enable) {
-      process.send?.({ command: CE_SEND_TO_PARENT_COMMAND.PROGRESS_INCREMENT });
-    } else if (this.enable) {
-      this.forceIncrement();
+  increment(routeFile?: string) {
+    if (this.isEnable) {
+      this.#bar.increment(undefined, { routeFile: routeFile != null ? ` - ${routeFile}` : '' });
     }
   }
 
-  forceIncrement() {
-    this.#bar.increment();
-  }
-
-  update(updateValue: number) {
-    if (this.cluster && this.enable) {
-      process.send?.({ command: CE_SEND_TO_PARENT_COMMAND.PROGRESS_UPDATE, data: { updateValue } });
-    } else if (this.enable) {
-      this.forceUpdate(updateValue);
+  update(updateValue: number, schemaName?: string) {
+    if (this.isEnable) {
+      this.#bar.update(updateValue, { schemaName: schemaName != null ? ` - ${schemaName}` : '' });
     }
-  }
-
-  forceUpdate(updateValue: number) {
-    this.#bar.update(updateValue);
   }
 
   stop() {
-    if (this.cluster) {
-      process.send?.({ command: CE_SEND_TO_PARENT_COMMAND.PROGRESS_STOP });
+    if (this.isEnable) {
+      this.#bar.stop();
     }
-    this.forceStop();
-  }
-
-  forceStop() {
-    this.#bar.stop();
   }
 }
 

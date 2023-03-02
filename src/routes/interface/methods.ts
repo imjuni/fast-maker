@@ -1,5 +1,14 @@
-import type TMethodType from '#routes/interface/TMethodType';
+import { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
 
-const methods: Readonly<TMethodType[]> = ['get', 'post', 'put', 'delete', 'options', 'head', 'patch', 'all'];
+const methods: Readonly<CE_ROUTE_METHOD[]> = [
+  CE_ROUTE_METHOD.GET,
+  CE_ROUTE_METHOD.POST,
+  CE_ROUTE_METHOD.PUT,
+  CE_ROUTE_METHOD.DELETE,
+  CE_ROUTE_METHOD.OPTIONS,
+  CE_ROUTE_METHOD.HEAD,
+  CE_ROUTE_METHOD.PATCH,
+  CE_ROUTE_METHOD.ALL,
+];
 
 export default methods;

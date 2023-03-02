@@ -1,4 +1,4 @@
-import { fail, pass, type PassFailEither } from 'my-only-either';
+import getCwd from '#tools/getCwd';
 import prettier, { type Options } from 'prettier';
 
 export interface IPrettierProcessingParam {
@@ -6,29 +6,21 @@ export interface IPrettierProcessingParam {
   optionPath?: string;
 }
 
-export default async function prettierProcessing({
-  code,
-  optionPath,
-}: IPrettierProcessingParam): Promise<PassFailEither<Error, string>> {
-  try {
-    const rawOption = await prettier.resolveConfig(optionPath ?? process.cwd(), { editorconfig: true });
+export default async function prettierProcessing({ code, optionPath }: IPrettierProcessingParam): Promise<string> {
+  const userOption = await prettier.resolveConfig(optionPath ?? getCwd(process.env), { editorconfig: true });
 
-    const option: Options =
-      rawOption === null
-        ? {
-            singleQuote: true,
-            trailingComma: 'all',
-            printWidth: 80,
-            arrowParens: 'always',
-            parser: 'typescript',
-          }
-        : { ...rawOption, parser: rawOption.parser ?? 'typescript' };
+  const option: Options =
+    userOption == null
+      ? {
+          singleQuote: true,
+          trailingComma: 'all',
+          printWidth: 80,
+          arrowParens: 'always',
+          parser: 'typescript',
+        }
+      : { ...userOption, parser: userOption.parser ?? 'typescript' };
 
-    const prettfied = prettier.format(code, option);
+  const prettfied = prettier.format(code, option);
 
-    return pass(prettfied);
-  } catch (catched) {
-    const err = catched instanceof Error ? catched : new Error('unknown error raised');
-    return fail(err);
-  }
+  return prettfied;
 }

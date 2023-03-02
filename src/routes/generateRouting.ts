@@ -1,80 +1,72 @@
 import progress from '#cli/display/progress';
 import spinner from '#cli/display/spinner';
+import type IReason from '#compilers/interfaces/IReason';
 import getTypeScriptProject from '#compilers/tools/getTypeScriptProject';
-import type IConfig from '#configs/interfaces/IConfig';
-import proceedStage01 from '#modules/proceedStage01';
-import proceedStage02 from '#modules/proceedStage02';
-import proceedStage03 from '#modules/proceedStage03';
-import type TMethodType from '#routes/interface/TMethodType';
-import LogBox from '#tools/logging/LogBox';
+import type { TRouteOption } from '#configs/interfaces/TRouteOption';
+import type { TWatchOption } from '#configs/interfaces/TWatchOption';
+import doDedupeRouting from '#modules/doDedupeRouting';
+import doMethodAggregator from '#modules/doMethodAggregator';
+import doStateMachine from '#modules/doStateMachine';
+import getValidRoutePath from '#modules/getValidRoutePath';
+import reasons from '#modules/reasons';
+import chalk from 'chalk';
 import { fail, pass, type PassFailEither } from 'my-only-either';
 
 export default async function generateRouting(
-  config: IConfig,
-  methods: readonly TMethodType[],
-): Promise<
-  PassFailEither<
-    { log: LogBox; err: Error },
-    { route: Omit<ReturnType<typeof proceedStage03>, 'reasons'>; log: LogBox }
-  >
-> {
-  const logbox = new LogBox();
-
-  logbox.config = config;
-
+  option: TRouteOption | TWatchOption,
+): Promise<PassFailEither<{ err: Error }, { route: Omit<ReturnType<typeof doDedupeRouting>, 'reasons'> }>> {
   try {
-    spinner.update(`load tsconfig.json: ${config.project}`);
+    spinner.update(`load tsconfig.json: ${option.project}`);
 
-    const tsProject = await getTypeScriptProject(config.project);
+    const project = await getTypeScriptProject(option.project);
 
-    spinner.update(`load tsconfig.json: ${config.project}`, 'succeed');
+    spinner.update(`load tsconfig.json: ${option.project}`, 'succeed');
 
     spinner.update('find handler files');
 
-    const stage01Result = await proceedStage01(config.handler, methods);
+    const sourceFilePaths = project.getSourceFiles().map((sourceFile) => sourceFile.getFilePath());
+
+    const handlerMap = await doMethodAggregator(sourceFilePaths, option);
 
     spinner.update('find handler files', 'succeed');
 
-    logbox.routeHandlers = stage01Result;
+    const validationMap = getValidRoutePath(handlerMap);
+
+    reasons.add(
+      ...validationMap.duplicate.map((duplicate) => {
+        return {
+          type: 'error',
+          message: `Found duplicated routePath(${chalk.red(`[${duplicate.method}] ${duplicate.routePath}`)}): ${
+            duplicate.filePath
+          }`,
+          filePath: duplicate.filePath,
+        } satisfies IReason;
+      }),
+    );
 
     spinner.stop();
 
-    if (stage01Result.length <= 0) {
+    const count = Object.values(validationMap.valid).reduce((sum, handlers) => sum + handlers.length, 0);
+
+    if (count <= 0) {
       return pass({
         route: {
           importConfigurations: [],
           routeConfigurations: [],
         },
-        log: logbox,
       });
     }
 
-    progress.start(stage01Result.length, 0);
+    progress.start(count, 0);
 
-    const {
-      result: stage02Result,
-      reasons: stage02Reasons,
-      logObject: analysisLogObject,
-    } = await proceedStage02(tsProject, config, stage01Result);
+    const stateMachineApplied = await doStateMachine(project, option, handlerMap);
 
-    progress.update(stage01Result.length);
+    progress.update(count);
     progress.stop();
-
-    logbox.fileExists = analysisLogObject.fileExists ?? [];
-    logbox.fileNotFound = analysisLogObject.fileNotFound ?? [];
-    logbox.functionExists = analysisLogObject.functionExists ?? [];
-    logbox.functionNotFound = analysisLogObject.functionNotFound ?? [];
-    logbox.routePathDuplicate = analysisLogObject.routePathDuplicate ?? [];
-    logbox.routePathUnique = analysisLogObject.routePathUnique ?? [];
 
     spinner.start('route.ts code generation');
 
-    const { importConfigurations, routeConfigurations, reasons: stage03Reasons } = proceedStage03(stage02Result);
-
-    logbox.importConfigurations = importConfigurations;
-    logbox.routeConfigurations = routeConfigurations;
-
-    logbox.reasons.push(...stage02Reasons, ...stage03Reasons);
+    const { importConfigurations, routeConfigurations } = doDedupeRouting(stateMachineApplied);
 
     spinner.update('route.ts code generation', 'succeed');
 
@@ -83,11 +75,10 @@ export default async function generateRouting(
         importConfigurations,
         routeConfigurations,
       },
-      log: logbox,
     });
   } catch (catched) {
     const err = catched instanceof Error ? catched : new Error('unknown error raised');
 
-    return fail({ err, log: logbox });
+    return fail({ err });
   }
 }

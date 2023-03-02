@@ -1,33 +1,37 @@
-import fastGlob from 'fast-glob';
-import { exists, replaceSepToPosix } from 'my-node-fp';
+import type { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
+import { atOrThrow } from 'my-easy-fp';
+import { exists } from 'my-node-fp';
 import * as path from 'path';
 
-export default async function getHandlerFile(handlersPath?: string): Promise<string[]> {
+export default async function getHandlerFile(
+  filePaths: string[],
+  handlerRoot: string,
+  method: CE_ROUTE_METHOD,
+): Promise<string[]> {
   try {
-    if (handlersPath == null) {
-      return [];
-    }
+    const handlerPaths = await Promise.all(
+      filePaths.map(async (filePath) => {
+        if ((await exists(filePath)) === false) {
+          return undefined;
+        }
 
-    if ((await exists(handlersPath)) === false) {
-      return [];
-    }
+        if (filePath.includes(handlerRoot)) {
+          const handlerFilePath = filePath.replace(handlerRoot, '');
+          const methodOfFilePath = atOrThrow(handlerFilePath.split(path.posix.sep), 0).toLowerCase();
 
-    const tsfileGlobs = replaceSepToPosix(path.resolve(handlersPath, '**', '*.ts'));
-    const ignoreFileGlobs = [
-      replaceSepToPosix(path.resolve(handlersPath, '**', 'interface')),
-      replaceSepToPosix(path.resolve(handlersPath, '**', 'interfaces')),
-      replaceSepToPosix(path.resolve(handlersPath, '**', '*.d.ts')),
-      replaceSepToPosix(path.resolve(handlersPath, '**', 'JSC_*')),
-      replaceSepToPosix(path.resolve(handlersPath, '**', 'test')),
-      replaceSepToPosix(path.resolve(handlersPath, '**', 'tests')),
-      replaceSepToPosix(path.resolve(handlersPath, '**', '__test__')),
-      replaceSepToPosix(path.resolve(handlersPath, '**', '__tests__')),
-    ];
+          if (methodOfFilePath.toLowerCase() !== method) {
+            return undefined;
+          }
 
-    const globResult = await fastGlob(tsfileGlobs, { ignore: ignoreFileGlobs });
-    const sortedGlobResult = globResult.sort();
+          return filePath;
+        }
 
-    return sortedGlobResult;
+        return undefined;
+      }),
+    );
+
+    const nonNullables = handlerPaths.filter((handlerPath): handlerPath is string => handlerPath != null);
+    return nonNullables;
   } catch (err) {
     return [];
   }

@@ -1,6 +1,6 @@
 import getArrowFunctionWithModifier from '#compilers/navigate/getArrowFunctionWithModifier';
-import JestContext from '#tools/__tests__/context';
-import * as env from '#tools/__tests__/env';
+import JestContext from '#tools/__tests__/tools/context';
+import * as env from '#tools/__tests__/tools/env';
 import 'jest';
 import { atOrThrow } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';

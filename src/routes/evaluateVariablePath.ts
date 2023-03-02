@@ -10,8 +10,9 @@ export default async function evaluateVariablePath(routePath: string): Promise<s
 
   const result = await new Promise<{ variableMap: Record<string, boolean>; variables: string[] }>((resolve, reject) => {
     let isVariableStart: boolean = false;
-    const routePaths = routePath.split('');
     let temp: string[] = [];
+
+    const routePaths = routePath.split('');
     const variables: string[] = [];
     const variableMap: Record<string, boolean> = {};
     const startedAt = dayjs();
@@ -26,16 +27,13 @@ export default async function evaluateVariablePath(routePath: string): Promise<s
           variables.push(temp.join(''));
         }
 
-        resolve({
-          variableMap,
-          variables,
-        });
+        resolve({ variableMap, variables });
 
         return;
       }
 
       const endedAt = dayjs();
-      if (endedAt.diff(startedAt, 'seconds') > 10) {
+      if (endedAt.diff(startedAt, 'seconds') > 30) {
         clearInterval(intervalHandle);
         reject(new Error(`timeout reach from evaluate variable path: ${routePath}`));
 

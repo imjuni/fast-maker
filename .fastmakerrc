@@ -1,5 +1,0 @@
-{
-  "project": "./example/tsconfig.json",
-  "handler": "./example/handlers",
-  "output": "./example/handlers"
-}

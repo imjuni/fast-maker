@@ -1,18 +1,18 @@
-import type IConfig from '#configs/interfaces/IConfig';
-import { existsSync } from 'my-node-fp';
-import path from 'path';
+import getResolvePath from '#configs/getResolvePath';
+import type { TRouteBaseOption } from '#configs/interfaces/TRouteOption';
+import type { TWatchBaseOption } from '#configs/interfaces/TWatchOption';
 import type { Arguments } from 'yargs';
 
-export default function isValidConfig(argv: Arguments<IConfig>) {
+export default function isValidConfig(argv: Arguments<TRouteBaseOption | TWatchBaseOption>) {
   // check project file exits
   const { project, handler } = argv;
 
-  if (handler == null || existsSync(path.resolve(handler)) === false) {
-    throw new Error(`Invalid handler path: ${handler == null ? handler : path.resolve(handler)}`);
+  if (getResolvePath(handler) === false) {
+    throw new Error(`Invalid handler path: ${handler}`);
   }
 
-  if (project == null || existsSync(path.resolve(project)) === false) {
-    throw new Error(`Invalid project path: ${project == null ? project : path.resolve(project)}`);
+  if (getResolvePath(project) === false) {
+    throw new Error(`Invalid project path: ${project}`);
   }
 
   return true;

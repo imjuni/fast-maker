@@ -1,21 +1,20 @@
-import type TMethodType from '#routes/interface/TMethodType';
-import { fail, pass, type PassFailEither } from 'my-only-either';
+import { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
 
-export default function getMethod(method: string): PassFailEither<Error, TMethodType> {
+export default function getMethod(method: string): CE_ROUTE_METHOD {
   const toLoweredMethod = method.toLowerCase();
 
   if (
-    toLoweredMethod === 'get' ||
-    toLoweredMethod === 'post' ||
-    toLoweredMethod === 'put' ||
-    toLoweredMethod === 'delete' ||
-    toLoweredMethod === 'head' ||
-    toLoweredMethod === 'options' ||
-    toLoweredMethod === 'patch' ||
-    toLoweredMethod === 'all'
+    toLoweredMethod === CE_ROUTE_METHOD.GET ||
+    toLoweredMethod === CE_ROUTE_METHOD.POST ||
+    toLoweredMethod === CE_ROUTE_METHOD.PUT ||
+    toLoweredMethod === CE_ROUTE_METHOD.DELETE ||
+    toLoweredMethod === CE_ROUTE_METHOD.HEAD ||
+    toLoweredMethod === CE_ROUTE_METHOD.OPTIONS ||
+    toLoweredMethod === CE_ROUTE_METHOD.PATCH ||
+    toLoweredMethod === CE_ROUTE_METHOD.ALL
   ) {
-    return pass(toLoweredMethod);
+    return toLoweredMethod;
   }
 
-  return fail(new Error(`Invalid method type: ${method}`));
+  throw new Error(`Invalid method type: ${method}`);
 }

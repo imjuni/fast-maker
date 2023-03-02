@@ -1,17 +1,17 @@
 import progress from '#cli/display/progress';
+import show from '#cli/display/show';
 import spinner from '#cli/display/spinner';
-import type IConfig from '#configs/interfaces/IConfig';
+import type IBaseOption from '#configs/interfaces/IBaseOption';
 import importCodeGenerator from '#generators/importCodeGenerator';
 import prettierProcessing from '#generators/prettierProcessing';
 import routeCodeGenerator from '#generators/routeCodeGenerator';
 import getRoutingCode from '#modules/getRoutingCode';
 import mergeStage03Result from '#modules/mergeStage03Result';
+import reasons from '#modules/reasons';
 import methods from '#routes/interface/methods';
 import sortRoutePaths from '#routes/sortRoutePaths';
 import getReasonMessages from '#tools/getReasonMessages';
-import LogBox from '#tools/logging/LogBox';
 import logger from '#tools/logging/logger';
-import loseAbleStringfiy from '#tools/loseAbleStringfiy';
 import { CE_SEND_TO_CHILD_COMMAND } from '#workers/interfaces/CE_SEND_TO_CHILD_COMMAND';
 import type {
   IFromParentDoInit,
@@ -20,12 +20,10 @@ import type {
   IFromParentDoStage02,
   IFromParentDoStage03,
 } from '#workers/interfaces/IFromParent';
-import type IPassDoWorkReply from '#workers/interfaces/IPassDoWorkReply';
 import replyBox from '#workers/replyBox';
 import workerBox from '#workers/workerBox';
 import fs from 'fs';
 import { first, isError, populate } from 'my-easy-fp';
-import { isFail } from 'my-only-either';
 import cluster from 'node:cluster';
 import path from 'node:path';
 
@@ -34,7 +32,7 @@ const log = logger();
 function checkChildrenError() {
   if (workerBox.errors.length > 0) {
     workerBox.errors.forEach((err) => {
-      spinner.forceUpdate(err.message, 'fail');
+      spinner.update(err.message, 'fail');
     });
 
     const firstError = first(workerBox.errors);
@@ -42,15 +40,12 @@ function checkChildrenError() {
   }
 }
 
-export default async function routeCommandClusterHandler(config: IConfig) {
+export default async function routeCommandClusterHandler(config: IBaseOption) {
   try {
-    progress.enable = true;
-    progress.cluster = true;
+    progress.isEnable = true;
+    spinner.isEnable = true;
 
-    spinner.enable = true;
-    spinner.cluster = true;
-
-    spinner.forceStart('start route.ts file generation');
+    spinner.start('start route.ts file generation');
 
     await Promise.all(
       populate(methods.length).map(() => {
@@ -58,7 +53,7 @@ export default async function routeCommandClusterHandler(config: IConfig) {
       }),
     );
 
-    spinner.forceUpdate(`load tsconfig.json: ${config.project}`);
+    spinner.update(`load tsconfig.json: ${config.project}`);
 
     workerBox.send(
       methods.map(() => {
@@ -81,8 +76,8 @@ export default async function routeCommandClusterHandler(config: IConfig) {
 
     checkChildrenError();
 
-    spinner.forceUpdate(`load tsconfig.json: ${config.project}`, 'succeed');
-    spinner.forceUpdate('find handler files');
+    spinner.update(`load tsconfig.json: ${config.project}`, 'succeed');
+    spinner.update('find handler files');
 
     workerBox.send(
       methods.map((method) => {
@@ -95,8 +90,8 @@ export default async function routeCommandClusterHandler(config: IConfig) {
 
     await workerBox.wait();
 
-    spinner.forceUpdate('find handler files', 'succeed');
-    progress.forceStart(workerBox.handlers, 0);
+    spinner.update('find handler files', 'succeed');
+    progress.start(workerBox.handlers, 0);
 
     checkChildrenError();
 
@@ -111,11 +106,11 @@ export default async function routeCommandClusterHandler(config: IConfig) {
 
     await workerBox.wait();
 
-    progress.forceUpdate(workerBox.handlers);
+    progress.update(workerBox.handlers);
 
     checkChildrenError();
 
-    spinner.forceStart('route.ts code generation');
+    spinner.start('route.ts code generation');
 
     workerBox.send(
       methods.map(() => {
@@ -128,7 +123,7 @@ export default async function routeCommandClusterHandler(config: IConfig) {
 
     await workerBox.wait();
 
-    spinner.forceUpdate('route.ts code generation', 'succeed');
+    spinner.update('route.ts code generation', 'succeed');
 
     checkChildrenError();
 
@@ -136,21 +131,11 @@ export default async function routeCommandClusterHandler(config: IConfig) {
 
     log.debug('worker 스레드를 모두 종료시킴');
 
-    const merged = mergeStage03Result(
-      Object.values(replyBox.passBox)
-        .filter((reply): reply is IPassDoWorkReply => reply != null)
-        .map((reply) => reply.pass.route),
-    );
-
-    const logbox = LogBox.merge(
-      ...Object.values(replyBox.passBox)
-        .filter((reply): reply is IPassDoWorkReply => reply != null)
-        .map((reply) => reply.pass.log),
-    );
+    const merged = mergeStage03Result(Object.values(replyBox.passBox).map((reply) => reply.pass.route));
 
     const sorted = sortRoutePaths(merged.routeConfigurations);
     const routeCodes = routeCodeGenerator({ routeConfigurations: sorted });
-    const importCodes = importCodeGenerator({ importConfigurations: merged.importConfigurations, config });
+    const importCodes = importCodeGenerator({ importConfigurations: merged.importConfigurations, option: config });
 
     const code = getRoutingCode({
       config,
@@ -158,20 +143,11 @@ export default async function routeCommandClusterHandler(config: IConfig) {
       routes: routeCodes,
     });
 
-    const prettfiedEither = await prettierProcessing({ code });
+    const prettfied = await prettierProcessing({ code });
 
-    if (isFail(prettfiedEither)) {
-      if (config.debugLog != null && config.debugLog === false) {
-        await fs.promises.writeFile('fast-maker.debug.info.log', loseAbleStringfiy(logbox));
-      }
+    await fs.promises.writeFile(path.join(config.output, 'route.ts'), prettfied);
 
-      throw prettfiedEither.fail;
-    }
-
-    await fs.promises.writeFile(path.join(config.output, 'route.ts'), prettfiedEither.pass);
-
-    // eslint-disable-next-line no-console
-    console.log(getReasonMessages(logbox.reasons));
+    show(getReasonMessages(reasons.reasons));
 
     return true;
   } catch (catched) {
@@ -185,7 +161,7 @@ export default async function routeCommandClusterHandler(config: IConfig) {
 
     return false;
   } finally {
-    spinner.forceStop();
-    progress.forceStop();
+    spinner.stop();
+    progress.stop();
   }
 }

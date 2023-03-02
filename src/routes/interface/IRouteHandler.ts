@@ -1,7 +1,7 @@
-import type TMethodType from '#routes/interface/TMethodType';
+import type { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
 
 export default interface IRouteHandler {
-  filename: string;
-  method: TMethodType;
+  method: CE_ROUTE_METHOD;
+  filePath: string;
   routePath: string;
 }
