@@ -63,6 +63,7 @@ artifact/
 
 # Exclude registry congiruation
 .npmrc
+.swc
 
 # vscode 
 .vscode
