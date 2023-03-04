@@ -1,4 +1,4 @@
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import * as path from 'path';
 import ts from 'typescript';
 

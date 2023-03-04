@@ -8,23 +8,23 @@ import path from 'path';
 import type { SourceFile, TypeReferenceNode } from 'ts-morph';
 
 interface IGetLocalModuleInImports {
-  source: SourceFile;
+  sourceFile: SourceFile;
   option: Pick<IBaseOption, 'output'>;
   typeReferenceNodes: TypeReferenceNode[];
 }
 
 export default function getLocalModuleInImports({
-  source,
+  sourceFile,
   option,
   typeReferenceNodes,
 }: IGetLocalModuleInImports): IGetModuleInImports[] {
-  const typeAliases = source.getTypeAliases();
-  const interfaces = source.getInterfaces();
-  const classes = source.getClasses();
+  const typeAliases = sourceFile.getTypeAliases();
+  const interfaces = sourceFile.getInterfaces();
+  const classes = sourceFile.getClasses();
 
   const typeNames = typeReferenceNodes.map((typeReferenceNode) => typeReferenceNode.getTypeName().getText());
 
-  const moduleSourceFilePath = source.getFilePath().toString();
+  const moduleSourceFilePath = sourceFile.getFilePath().toString();
   const relativeFilePath = replaceSepToPosix(path.relative(option.output, moduleSourceFilePath));
   const moduleHash = getHash(relativeFilePath);
 

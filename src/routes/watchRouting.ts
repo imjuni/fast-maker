@@ -1,5 +1,5 @@
 import type { TWatchOption } from '#configs/interfaces/TWatchOption';
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
 import { isError } from 'my-easy-fp';

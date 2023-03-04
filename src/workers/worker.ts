@@ -1,4 +1,4 @@
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import FastMakerEmitter from '#workers/FastMakerEmitter';
 import type TSendMasterToWorkerMessage from '#workers/interfaces/TSendMasterToWorkerMessage';
 import { isError } from 'my-easy-fp';

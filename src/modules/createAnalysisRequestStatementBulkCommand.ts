@@ -1,5 +1,5 @@
 import type IRouteHandler from '#routes/interface/IRouteHandler';
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import { CE_WORKER_ACTION } from '#workers/interfaces/CE_WORKER_ACTION';
 import type { TPickSendMasterToWorkerMessage } from '#workers/interfaces/TSendMasterToWorkerMessage';
 import { chunk } from 'my-easy-fp';

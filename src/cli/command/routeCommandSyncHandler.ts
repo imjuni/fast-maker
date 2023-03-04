@@ -17,7 +17,7 @@ import summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
 import writeOutputFile from '#modules/writeOutputFile';
 import sortRoutePaths from '#routes/sortRoutePaths';
 import getReasonMessages from '#tools/getReasonMessages';
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import { isDescendant } from 'my-node-fp';
 
 const log = logger();

@@ -6,11 +6,12 @@ import routeCommandSyncHandler from '#cli/command/routeCommandSyncHandler';
 import watchCommandHandler from '#cli/command/watchCommandHandler';
 import progress from '#cli/display/progress';
 import spinner from '#cli/display/spinner';
+import { CE_COMMAND_LIST } from '#cli/interfaces/CE_COMMAND_LIST';
 import type { TRouteOption } from '#configs/interfaces/TRouteOption';
 import type { TWatchOption } from '#configs/interfaces/TWatchOption';
 import isValidConfig from '#configs/isValidConfig';
 import preLoadConfig from '#configs/preLoadConfig';
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import worker from '#workers/worker';
 import getIsPrimary from '#xstate/tools/getIsPrimary';
 import { isError } from 'my-easy-fp';
@@ -19,7 +20,8 @@ import yargs, { type CommandModule } from 'yargs';
 const log = logger();
 
 const routeCmd: CommandModule<TRouteOption, TRouteOption> = {
-  command: 'route',
+  command: CE_COMMAND_LIST.ROUTE,
+  aliases: CE_COMMAND_LIST.ROUTE_ALIAS,
   describe: 'create route.ts file in your directory using by tsconfig.json',
   builder: (argv) => routeBuilder(builder(argv)),
   handler: async (argv) => {
@@ -40,7 +42,8 @@ const routeCmd: CommandModule<TRouteOption, TRouteOption> = {
 };
 
 const watchCmd: CommandModule<TWatchOption, TWatchOption> = {
-  command: 'watch',
+  command: CE_COMMAND_LIST.WATCH,
+  aliases: CE_COMMAND_LIST.WATCH_ALIAS,
   describe: 'watch for create route.ts file in your directory using by tsconfig.json',
   builder: (argv) => watchBuilder(builder(argv)),
   handler: async (argv) => {

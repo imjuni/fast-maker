@@ -1,5 +1,5 @@
 import type IGetModuleInImports from '#compilers/interfaces/IGetModuleInImports';
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import type { TypeReferenceNode } from 'ts-morph';
 
 const log = logger();

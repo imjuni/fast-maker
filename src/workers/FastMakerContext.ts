@@ -1,11 +1,8 @@
-import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
 import type { TRouteOption } from '#configs/interfaces/TRouteOption';
 import type { TWatchOption } from '#configs/interfaces/TWatchOption';
 import type { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
-import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
 import type TRouteInfo from '#routes/interface/TRouteInfo';
 import type { TPickRouteInfo } from '#routes/interface/TRouteInfo';
-import type { PassFailEither } from 'my-only-either';
 import type { Project } from 'ts-morph';
 
 export default class FastMakerContext {
@@ -14,11 +11,6 @@ export default class FastMakerContext {
   #option: { kind: 'route'; option: TRouteOption } | { kind: 'watch'; option: TWatchOption } | undefined;
 
   #handler: TRouteInfo | undefined;
-
-  #statements: PassFailEither<
-    Error,
-    { imports: Record<string, IImportConfiguration>; routes: Record<string, IRouteConfiguration> }
-  >[] = [];
 
   get project(): Project {
     if (this.#project == null) throw new Error('Empty project in fast-maker-context');
@@ -45,15 +37,6 @@ export default class FastMakerContext {
 
   set handler(value: TRouteInfo) {
     this.#handler = value;
-  }
-
-  addStatement(
-    statement: PassFailEither<
-      Error,
-      { imports: Record<string, IImportConfiguration>; routes: Record<string, IRouteConfiguration> }
-    >,
-  ) {
-    this.#statements.push(statement);
   }
 
   getHandler(

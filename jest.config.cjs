@@ -14,7 +14,7 @@ module.exports = {
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', { isolateModules: true }, '@swc/jest'],
   },
-  testMatch: ['**/__tests__/*.(ts|tsx)', '**/__test__/*.(ts|tsx)'],
+  testMatch: ['**/__tests__/*.(ts|tsx)', '!**/__tests__/expects/*.(ts|tsx)'],
   testPathIgnorePatterns: [
     '/node_modules/',
     'example/',

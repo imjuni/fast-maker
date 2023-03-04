@@ -17,7 +17,12 @@ export default function getTypeReferences(parameter: ParameterDeclaration, dedup
 
   const typeReferenceRecord = typeReferenceNodes.reduce<Record<string, TypeReferenceNode>>((aggregated, node) => {
     const type = node.getText();
-    return aggregated[type] == null ? { ...aggregated, [type]: node } : { ...aggregated };
+
+    if (aggregated[type] == null) {
+      return { ...aggregated, [type]: node };
+    }
+
+    return aggregated;
   }, {});
 
   const dedupedTypeReferenceNodes = Object.values(typeReferenceRecord);

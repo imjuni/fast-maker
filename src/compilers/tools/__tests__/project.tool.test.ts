@@ -6,7 +6,7 @@ import path from 'path';
 
 describe('getTypeScriptProject', () => {
   test('pass', async () => {
-    const project = await getTypeScriptProject(path.join(env.examplePath, 'tsconfig.json'));
+    const project = getTypeScriptProject(path.join(env.examplePath, 'tsconfig.json'));
     expect(project).toBeTruthy();
   });
 });
