@@ -1,3 +1,4 @@
+import { getLogLabel, getLogLevel } from '#tools/loggerModule';
 import chalk from 'chalk';
 import pino, { type Logger } from 'pino';
 import pretty from 'pino-pretty';
@@ -17,23 +18,8 @@ let log:
     }>
   | undefined;
 
-export function getLogLevel(level: unknown): number {
-  try {
-    if (typeof level === 'number') {
-      return level;
-    }
-
-    if (typeof level === 'string') {
-      const parsed = Number.parseInt(level, 10);
-      return parsed;
-    }
-
-    // level of debug
-    return 20;
-  } catch {
-    // level of debug
-    return 20;
-  }
+export function loggerClear() {
+  log = undefined;
 }
 
 export default function logger() {
@@ -45,7 +31,7 @@ export default function logger() {
       customPrettifiers: {
         level: (unknownLevel: unknown) => {
           const levelCode = getLogLevel(unknownLevel);
-          const levelLabel = pino.levels.labels[levelCode]!.toLowerCase();
+          const levelLabel = getLogLabel(levelCode);
 
           switch (levelLabel) {
             case 'debug':

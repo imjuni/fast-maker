@@ -6,9 +6,7 @@ export default function getNamedBindingName(bindings: ReturnType<ImportClause['g
     return [];
   }
 
-  // namespace import에 대한 내용을 정리해야한다
   if (bindings.getKind() === SyntaxKind.NamespaceImport) {
-    // const namespaceImport = bindings.asKindOrThrow(tsm.SyntaxKind.NamespaceImport);
     return [];
   }
 

@@ -16,7 +16,7 @@ import getImportConfigurationFromResolutions from '#generators/getImportConfigur
 import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
 import type IRouteHandler from '#routes/interface/IRouteHandler';
 import appendPostfixHash from '#tools/appendPostfixHash';
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import { CE_REQUEST_HANDLER_ANALYSIS_MACHINE } from '#xstate/interfaces/CE_REQUEST_HANDLER_ANALYSIS_MACHINE';
 import castFunctionNode from '#xstate/tools/castFunctionNode';
 import chalk from 'chalk';
@@ -474,13 +474,13 @@ const requestHandlerAnalysisMachine = (
           const next = { ...context };
           const node = castFunctionNode(context.routeHandler);
           const sourceFilePath = next.source.getFilePath().toString();
-          const [parameter] = node.getParameters();
+          const parameter = atOrUndefined(node.getParameters(), 0);
 
           if (parameter == null) return next;
 
-          const [typeArgument] = context.useFastifyRequest
-            ? parameter.getType().getTypeArguments()
-            : [parameter.getType()];
+          const typeArgument = context.useFastifyRequest
+            ? atOrUndefined(parameter.getType().getTypeArguments(), 0)
+            : parameter.getType();
 
           if (typeArgument == null) return next;
 
@@ -534,7 +534,7 @@ const requestHandlerAnalysisMachine = (
           });
 
           const localResolutions = getLocalModuleInImports({
-            source: context.source,
+            sourceFile: context.source,
             option: context.option,
             typeReferenceNodes,
           });

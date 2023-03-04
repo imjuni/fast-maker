@@ -1,5 +1,5 @@
 import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import { isError, type PartialRecord } from 'my-easy-fp';
 import { isDescendant } from 'my-node-fp';
 

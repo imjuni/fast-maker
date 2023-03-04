@@ -3,7 +3,7 @@ import getPropertySignatures from '#compilers/navigate/getPropertySignatures';
 import getTypeReferences from '#compilers/tools/getTypeReferences';
 import validatePropertySignature from '#compilers/validators/validatePropertySignature';
 import validateTypeReferences from '#compilers/validators/validateTypeReference';
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import posixJoin from '#tools/posixJoin';
 import JestContext from '#tools/__tests__/tools/context';
 import * as env from '#tools/__tests__/tools/env';

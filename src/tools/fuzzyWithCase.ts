@@ -3,8 +3,8 @@
  * 아예 매칭이 되지 않기 때문에 아래와 같이 caseSensitive는 false로 처리하되, case가 다른 경우
  * matchCase를 별도로 전달한다
  */
+import { getNumber, getPercentNumber } from '#tools/getNumber';
 import Fuse from 'fuse.js';
-import { bignumber } from 'mathjs';
 
 export interface IFuzzyWithCaseReturn {
   target: string;
@@ -23,22 +23,8 @@ export default function fuzzyWithCase(sources: string | string[], target: string
     target,
     origin: fuzzinessResult.item,
     expectName: fuzzinessResult.item,
-
-    score: bignumber(fuzzinessResult.score ?? 0)
-      .mul(1000)
-      .floor()
-      .div(1000)
-      .toNumber(),
-
-    percent: bignumber(1)
-      .sub(fuzzinessResult.score ?? 0)
-      .div(1)
-      .mul(100)
-      .mul(1000)
-      .floor()
-      .div(1000)
-      .toNumber(),
-
+    score: getNumber(fuzzinessResult.score),
+    percent: getPercentNumber(fuzzinessResult.score),
     matchCase: fuzzinessResult.item.localeCompare(target) === 0,
   }));
 

@@ -4,7 +4,7 @@ import summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
 import { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
 import getHash from '#tools/getHash';
 import getRelativeCwd from '#tools/getRelativeCwd';
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import posixJoin from '#tools/posixJoin';
 import JestContext from '#tools/__tests__/tools/context';
 import * as env from '#tools/__tests__/tools/env';

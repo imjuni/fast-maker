@@ -1,4 +1,5 @@
 import type IGetModuleInImports from '#compilers/interfaces/IGetModuleInImports';
+import getNamedBindingName from '#compilers/tools/getNamedBindingName';
 import type { TRouteOption } from '#configs/interfaces/TRouteOption';
 import type { TWatchOption } from '#configs/interfaces/TWatchOption';
 import appendPostfixHash from '#tools/appendPostfixHash';
@@ -6,29 +7,13 @@ import getHash from '#tools/getHash';
 import { atOrUndefined } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
 import * as path from 'path';
-import type { ImportClause, SourceFile, TypeReferenceNode } from 'ts-morph';
+import type { SourceFile, TypeReferenceNode } from 'ts-morph';
 import { SyntaxKind } from 'ts-morph';
 
 interface IGetResolvedModuleParam {
   source: SourceFile;
   option: Pick<TWatchOption, 'output'> | Pick<TRouteOption, 'output'>;
   typeReferenceNodes: TypeReferenceNode[];
-}
-
-function getNamedBindingName(bindings: ReturnType<ImportClause['getNamedBindings']>) {
-  if (bindings == null) {
-    return [];
-  }
-
-  // namespace import에 대한 내용을 정리해야한다
-  if (bindings.getKind() === SyntaxKind.NamespaceImport) {
-    // const namespaceImport = bindings.asKindOrThrow(SyntaxKind.NamespaceImport);
-    return [];
-  }
-
-  const namedImports = bindings.asKindOrThrow(SyntaxKind.NamedImports);
-  const names = namedImports.getElements().map((element) => element.getName());
-  return names;
 }
 
 export default function getResolvedModuleInImports({

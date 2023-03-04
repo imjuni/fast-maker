@@ -1,6 +1,6 @@
 import progress from '#cli/display/progress';
 import { CE_DEFAULT_VALUE } from '#configs/interfaces/CE_DEFAULT_VALUE';
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import type { CE_MASTER_ACTION } from '#workers/interfaces/CE_MASTER_ACTION';
 import { CE_WORKER_ACTION } from '#workers/interfaces/CE_WORKER_ACTION';
 import type TSendMasterToWorkerMessage from '#workers/interfaces/TSendMasterToWorkerMessage';

@@ -3,7 +3,7 @@ import getInternalImportTypeReference from '#compilers/tools/getInternalImportTy
 import getResolvedModuleInImports from '#compilers/tools/getResolvedModuleInImports';
 import getTypeReferences from '#compilers/tools/getTypeReferences';
 import replaceTypeReferenceInTypeLiteral from '#compilers/tools/replaceTypeReferenceInTypeLiteral';
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import posixJoin from '#tools/posixJoin';
 import JestContext from '#tools/__tests__/tools/context';
 import * as env from '#tools/__tests__/tools/env';

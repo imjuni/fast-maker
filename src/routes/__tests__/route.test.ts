@@ -8,6 +8,7 @@ import * as env from '#tools/__tests__/tools/env';
 import loadSourceData from '#tools/__tests__/tools/loadSourceData';
 import dayjs from 'dayjs';
 import 'jest';
+import * as mnf from 'my-node-fp';
 
 describe('getHandlerFile', () => {
   test('pass', async () => {
@@ -42,6 +43,56 @@ describe('getHandlerFile', () => {
     ];
 
     expect(files).toEqual(expectation);
+  });
+
+  test('fail - not exists', async () => {
+    const files = await getHandlerFile(
+      [posixJoin(env.handlerPath, 'get', 'justice2', '[dc-league]', 'hello.ts')],
+      env.handlerPath,
+      CE_ROUTE_METHOD.GET,
+    );
+
+    expect(files).toMatchObject([]);
+  });
+
+  test('pass - not descendant', async () => {
+    const files = await getHandlerFile(
+      [posixJoin(env.handlerPath, 'get', 'justice', '[dc-league]', 'hello.ts')],
+      'A',
+      CE_ROUTE_METHOD.GET,
+    );
+
+    expect(files).toMatchObject([]);
+  });
+
+  test('pass - invalid method', async () => {
+    const spy = jest.spyOn(mnf, 'exists').mockImplementationOnce(() => Promise.resolve(true));
+
+    const files = await getHandlerFile(
+      [posixJoin(env.handlerPath, 'ggg', 'justice', '[dc-league]', 'hello.ts')],
+      env.handlerPath,
+      CE_ROUTE_METHOD.GET,
+    );
+
+    spy.mockRestore();
+
+    expect(files).toMatchObject([]);
+  });
+
+  test('pass - exception', async () => {
+    const spy = jest.spyOn(mnf, 'exists').mockImplementationOnce(() => {
+      throw new Error('want to raise error');
+    });
+
+    const files = await getHandlerFile(
+      [posixJoin(env.handlerPath, 'ggg', 'justice', '[dc-league]', 'hello.ts')],
+      env.handlerPath,
+      CE_ROUTE_METHOD.GET,
+    );
+
+    spy.mockRestore();
+
+    expect(files).toMatchObject([]);
   });
 });
 

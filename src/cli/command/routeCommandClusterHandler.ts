@@ -16,7 +16,7 @@ import reasons from '#modules/reasons';
 import writeOutputFile from '#modules/writeOutputFile';
 import sortRoutePaths from '#routes/sortRoutePaths';
 import getReasonMessages from '#tools/getReasonMessages';
-import logger from '#tools/logging/logger';
+import logger from '#tools/logger';
 import { CE_WORKER_ACTION } from '#workers/interfaces/CE_WORKER_ACTION';
 import type TSendMasterToWorkerMessage from '#workers/interfaces/TSendMasterToWorkerMessage';
 import {

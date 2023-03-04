@@ -1,6 +1,7 @@
 import { CE_DEFAULT_VALUE } from '#configs/interfaces/CE_DEFAULT_VALUE';
 import type { TRouteOption } from '#configs/interfaces/TRouteOption';
 import type { TWatchOption } from '#configs/interfaces/TWatchOption';
+import { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
 import * as env from '#tools/__tests__/tools/env';
 import FastMakerContext from '#workers/FastMakerContext';
 import 'jest';
@@ -41,6 +42,34 @@ describe('FastMakerContext', () => {
     try {
       const context = new FastMakerContext();
       console.log(context.option);
+    } catch (caught) {
+      expect(caught).toBeTruthy();
+    }
+  });
+
+  test('pass - handler', () => {
+    const context = new FastMakerContext();
+    context.handler = {
+      kind: CE_ROUTE_INFO_KIND.SUMMARY_ROUTE_HANDLER_FILE,
+      summary: {
+        get: [],
+        post: [],
+        put: [],
+        delete: [],
+        options: [],
+        head: [],
+        patch: [],
+        all: [],
+      },
+    };
+
+    expect(context.getHandler(CE_ROUTE_INFO_KIND.SUMMARY_ROUTE_HANDLER_FILE)).toBeTruthy();
+  });
+
+  test('fail - handler exception', () => {
+    try {
+      const context = new FastMakerContext();
+      context.getHandler(CE_ROUTE_INFO_KIND.SUMMARY_ROUTE_HANDLER_FILE);
     } catch (caught) {
       expect(caught).toBeTruthy();
     }

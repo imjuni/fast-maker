@@ -1,16 +1,10 @@
 export const CE_COMMAND_LIST = {
-  ADD: 'add',
-  DEL: 'del',
-  REFRESH: 'refresh',
-  TRUNCATE: 'truncate',
-  INIT: 'init',
+  ROUTE: 'route',
   WATCH: 'watch',
-  ADD_ALIAS: 'a',
-  DEL_ALIAS: 'd',
-  REFRESH_ALIAS: 'r',
-  TRUNCATE_ALIAS: 't',
-  INIT_ALIAS: 'i',
+  INIT: 'init',
+  ROUTE_ALIAS: 'r',
   WATCH_ALIAS: 'w',
+  INIT_ALIAS: 'i',
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare, @typescript-eslint/naming-convention

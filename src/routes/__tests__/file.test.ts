@@ -1,4 +1,5 @@
 import summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
+import getMethod from '#routes/getMethod';
 import getSummaryByMethod from '#routes/getSummaryByMethod';
 import * as env from '#tools/__tests__/tools/env';
 import loadSourceData from '#tools/__tests__/tools/loadSourceData';
@@ -23,5 +24,15 @@ describe('summaryRouteHandlerFile', () => {
     const expectation = await loadSourceData<any>('default', __dirname, 'expects', 'expect.out.02.ts');
 
     expect(r).toMatchObject(expectation);
+  });
+});
+
+describe('getMethod', () => {
+  test('pass', async () => {
+    try {
+      getMethod('A');
+    } catch (caught) {
+      expect(caught).toBeTruthy();
+    }
   });
 });
