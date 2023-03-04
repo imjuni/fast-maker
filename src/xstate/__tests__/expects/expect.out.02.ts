@@ -10,7 +10,6 @@ export default {
         line: 14,
         character: 16,
       },
-      message: 'Do you want Querystring? "\u001b[33mQuerysting\u001b[39m" in source code',
     },
   ],
   importBox: {

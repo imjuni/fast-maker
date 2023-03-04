@@ -1,6 +1,7 @@
 import evaluateVariablePath from '#routes/evaluateVariablePath';
 import getMethod from '#routes/getMethod';
-import type IRouteHandler from '#routes/interface/IRouteHandler';
+import { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
+import type { TPickRouteInfo } from '#routes/interface/TRouteInfo';
 import logger from '#tools/logging/logger';
 import { atOrThrow } from 'my-easy-fp';
 import { replaceSepToPosix, startSepAppend, startSepRemove } from 'my-node-fp';
@@ -11,7 +12,7 @@ const log = logger();
 
 const routePathMatchReg = /(.*)(\/|)(get|post|put|delete|options|head|patch|all)(\/|)(.+)(\.ts)/;
 
-export default async function getRoutePath(filePath: string): Promise<IRouteHandler> {
+export default async function getRoutePath(filePath: string): Promise<TPickRouteInfo<typeof CE_ROUTE_INFO_KIND.ROUTE>> {
   const filename = replaceSepToPosix(filePath);
   const refinedFilename = startSepRemove(filename, path.posix.sep);
   const filenameRegMatched = refinedFilename.match(routePathMatchReg);
@@ -42,7 +43,12 @@ export default async function getRoutePath(filePath: string): Promise<IRouteHand
 
   const joined = urljoin(paramsAppliedRouteElements);
 
-  log.debug(' >>> ', joined);
+  log.trace(`>>> ${filePath}  <> ${joined}`);
 
-  return { filePath: filename, method, routePath: startSepAppend(joined, path.posix.sep) };
+  return {
+    kind: CE_ROUTE_INFO_KIND.ROUTE,
+    filePath: filename,
+    method,
+    routePath: startSepAppend(joined, path.posix.sep),
+  };
 }

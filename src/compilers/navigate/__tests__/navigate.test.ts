@@ -1,9 +1,10 @@
 import getHandlerWithOption from '#compilers/navigate/getHandlerWithOption';
 import getPropertySignatures from '#compilers/navigate/getPropertySignatures';
 import JestContext from '#tools/__tests__/tools/context';
+import { getExpectValue } from '@maeum/test-utility';
 import 'jest';
 import { atOrThrow } from 'my-easy-fp';
-import { Project, SyntaxKind } from 'ts-morph';
+import { Node, Project, SyntaxKind } from 'ts-morph';
 
 const context = new JestContext();
 
@@ -13,22 +14,31 @@ beforeAll(() => {
 
 describe('getHandlerWithOption', () => {
   test('pass', async () => {
-    const handlerFileInfos = [
-      {
-        name: 't1.ts',
-        content: 'export const option = {}; export default async function hello() { console.log("1"); }',
-      },
-      { name: 't2.ts', content: 'export const option = {}; export default async function () { console.log("1"); }' },
-    ].map((source) => {
-      const sourceFile = context.project.createSourceFile(source.name, source.content);
-      const handlerFileInfo = getHandlerWithOption(sourceFile);
+    const handlerFileInfos = getExpectValue(
+      [
+        {
+          name: 't1.ts',
+          content: 'export const option = {}; export default async function hello() { console.log("1"); }',
+        },
+        { name: 't2.ts', content: 'export const option = {}; export default async function () { console.log("1"); }' },
+      ].map((source) => {
+        const sourceFile = context.project.createSourceFile(source.name, source.content);
+        const handlerFileInfo = getHandlerWithOption(sourceFile);
 
-      return handlerFileInfo;
-    });
+        return handlerFileInfo;
+      }),
+      (_, value: any) => {
+        if (value === '[Circular]') return undefined;
+        if (value instanceof Node) return undefined;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return value;
+      },
+      2,
+    );
 
     const expectation = [
-      [{ kind: 'option' }, { kind: 'handler', type: 'async', name: 'hello' }],
-      [{ kind: 'option' }, { kind: 'handler', type: 'async', name: 'anonymous function' }],
+      { option: { kind: 'option' }, handler: { kind: 'handler', type: 'async', name: 'hello' } },
+      { option: { kind: 'option' }, handler: { kind: 'handler', type: 'async', name: 'anonymous function' } },
     ];
 
     expect(handlerFileInfos).toMatchObject(expectation);

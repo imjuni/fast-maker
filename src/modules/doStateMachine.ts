@@ -20,7 +20,7 @@ import { waitFor } from 'xstate/lib/waitFor';
 
 export default async function doStateMachine(
   project: Project,
-  config: TRouteOption | TWatchOption,
+  option: TRouteOption | TWatchOption,
   handlerMap: Record<CE_ROUTE_METHOD, IRouteHandler[]>,
 ) {
   const handlerWithNodes = (Object.entries(handlerMap) as Entries<typeof handlerMap>)
@@ -66,7 +66,7 @@ export default async function doStateMachine(
   const results = await Promise.all(
     handlerWithNodes.nonNullable.map(async (withNode) => {
       const sourceFile = withNode.handler.node.getSourceFile();
-      const relativePath = path.relative(config.output, sourceFile.getFilePath().toString());
+      const relativePath = path.relative(option.output, sourceFile.getFilePath().toString());
       const hash = getHash(relativePath);
 
       const machine = requestHandlerAnalysisMachine({
@@ -76,7 +76,7 @@ export default async function doStateMachine(
         routing: withNode.route,
         routeHandler: withNode.handler,
         routeOption: withNode.option,
-        option: config,
+        option,
       });
 
       const interpretor = interpret(machine);
@@ -86,7 +86,7 @@ export default async function doStateMachine(
       const methorColorStr = chalk[getMethodColor(withNode.route.method, 'foreground')](withNode.route.method);
       progress.increment(`${methorColorStr} ${withNode.route.routePath}`);
 
-      const { messages, importMap, routeMap } = interpretor.getSnapshot().context;
+      const { reasons: messages, importMap, routeMap } = interpretor.getSnapshot().context;
       return { messages, importMap, routeMap };
     }),
   );

@@ -141,29 +141,29 @@ describe('replaceTypeReferenceInTypeLiteral', () => {
 
     const replacedTypeLiteral = parameter.getTypeNode()?.getFullText();
     const expectation = `
-    {
-      querystring: IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE['querystring'];
-      Body:
-        | IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE['Body']
-        | {
-            help: TAbnormalPresident_DS8Pg2MYm5AsqoJVltiuqlOctGQfT78w;
-            company: ICompany_6bwarMss36QHeqUXTVMxB9uAjEjVZOL1;
-            ability: IAbility;
-          };
-      Headers: {
-        'access-token': string;
-        'refresh-token': string;
-        kind: { name: 'develop' } & { name: 'prod' } & { name: ICompany_6bwarMss36QHeqUXTVMxB9uAjEjVZOL1 };
-        'expire-time': {
-          token: string | number | boolean;
-          expire: number;
-          site: {
-            host: string;
-            port: number;
-          };
+  {
+    querystring: IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE['querystring'];
+    Body:
+      | IReqPokeHello_SynyPSafLHaoobLmnZXzP70l78QG5PfE['Body']
+      | {
+          help: TAbnormalPresident_DS8Pg2MYm5AsqoJVltiuqlOctGQfT78w;
+          company: ICompany_6bwarMss36QHeqUXTVMxB9uAjEjVZOL1;
+          ability: IAbility;
+        };
+    Headers: {
+      'access-token': string;
+      'refresh-token': string;
+      kind: { name: 'develop' } & { name: 'prod' } & { name: ICompany_6bwarMss36QHeqUXTVMxB9uAjEjVZOL1 };
+      'expire-time': {
+        token: string | number | boolean;
+        expire: number;
+        site: {
+          host: string;
+          port: number;
         };
       };
-    }`;
+    };
+  }`;
 
     expect(replacedTypeLiteral?.trim()).toBe(expectation.trim());
   });

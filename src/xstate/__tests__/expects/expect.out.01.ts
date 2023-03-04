@@ -11,7 +11,6 @@ export default {
         line: 7,
         character: 1,
       },
-      message: 'Do you want Querystring? "\u001b[33mquerystring\u001b[39m" in source code',
     },
   ],
   importBox: {
@@ -51,7 +50,7 @@ export default {
           isPureType: true,
         },
       ],
-      importFile: '/home/imjuni/github/fast-maker/examples/interface/IAbility.ts',
+      importFile: posixJoin(env.examplePath, 'interface/IAbility.ts'),
     },
   },
   routeBox: {

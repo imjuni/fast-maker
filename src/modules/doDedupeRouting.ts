@@ -1,45 +1,44 @@
 import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
 import dedupeImportConfiguration from '#generators/dedupeImportConfiguration';
-import reasons from '#modules/reasons';
+import type doAnalysisRequestStatement from '#modules/doAnalysisRequestStatement';
+import { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
 import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
-import type { IAnalysisMachineContext } from '#xstate/RequestHandlerAnalysisMachine';
+import type { TPickRouteInfo } from '#routes/interface/TRouteInfo';
+import type { TPickPass } from 'my-only-either';
+import type { AsyncReturnType } from 'type-fest';
 
 export default function doDedupeRouting(
-  routesAnalysised: Pick<IAnalysisMachineContext, 'importMap' | 'routeMap' | 'messages'>[],
+  routesAnalysised: TPickPass<AsyncReturnType<typeof doAnalysisRequestStatement>>[],
 ) {
   const aggregatedRouteConfigurations = routesAnalysised.reduce<{
-    importMap: IAnalysisMachineContext['importMap'][];
-    routeMap: IAnalysisMachineContext['routeMap'][];
-    reasons: IAnalysisMachineContext['messages'][];
+    imports: TPickPass<AsyncReturnType<typeof doAnalysisRequestStatement>>['imports'][];
+    routes: TPickPass<AsyncReturnType<typeof doAnalysisRequestStatement>>['routes'][];
   }>(
     (aggregated, current) => {
       return {
-        importMap: [...aggregated.importMap, current.importMap],
-        routeMap: [...aggregated.routeMap, current.routeMap],
-        reasons: [...aggregated.reasons, current.messages],
+        imports: [...aggregated.imports, current.imports],
+        routes: [...aggregated.routes, current.routes],
       };
     },
     {
-      importMap: [],
-      routeMap: [],
-      reasons: [],
+      imports: [],
+      routes: [],
     },
   );
 
   const importConfigurations = dedupeImportConfiguration(
-    aggregatedRouteConfigurations.importMap.reduce<IImportConfiguration[]>((source, target) => {
+    aggregatedRouteConfigurations.imports.reduce<IImportConfiguration[]>((source, target) => {
       return source.concat(Object.values(target));
     }, []),
   );
 
-  const routeConfigurations = aggregatedRouteConfigurations.routeMap.reduce<IRouteConfiguration[]>((source, target) => {
+  const routeConfigurations = aggregatedRouteConfigurations.routes.reduce<IRouteConfiguration[]>((source, target) => {
     return source.concat(Object.values(target));
   }, []);
 
-  reasons.add(...aggregatedRouteConfigurations.reasons.flat());
-
   return {
-    importConfigurations,
-    routeConfigurations,
-  };
+    kind: CE_ROUTE_INFO_KIND.ANALYSIS,
+    imports: importConfigurations,
+    routes: routeConfigurations,
+  } satisfies TPickRouteInfo<typeof CE_ROUTE_INFO_KIND.ANALYSIS>;
 }

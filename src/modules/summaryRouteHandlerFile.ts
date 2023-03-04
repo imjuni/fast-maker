@@ -2,13 +2,14 @@ import type { TRouteOption } from '#configs/interfaces/TRouteOption';
 import type { TWatchOption } from '#configs/interfaces/TWatchOption';
 import getRoutePath from '#routes/getRoutePath';
 import getSummaryByMethod from '#routes/getSummaryByMethod';
+import { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
 import { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
-import type IRouteHandler from '#routes/interface/IRouteHandler';
+import type { TPickRouteInfo } from '#routes/interface/TRouteInfo';
 
-export default async function doMethodAggregator(
+export default async function summaryRouteHandlerFile(
   filePaths: string[],
   option: Pick<TRouteOption, 'handler' | 'cwd'> | Pick<TWatchOption, 'handler' | 'cwd'>,
-): Promise<Record<CE_ROUTE_METHOD, IRouteHandler[]>> {
+): Promise<TPickRouteInfo<typeof CE_ROUTE_INFO_KIND.SUMMARY_ROUTE_HANDLER_FILE>> {
   const summary = getSummaryByMethod(filePaths, option);
 
   const [
@@ -31,7 +32,7 @@ export default async function doMethodAggregator(
     Promise.all(summary[CE_ROUTE_METHOD.ALL].map(async (handler) => getRoutePath(handler.filePath))),
   ]);
 
-  const handlerMap: Record<CE_ROUTE_METHOD, IRouteHandler[]> = {
+  const handlerMap: Record<CE_ROUTE_METHOD, TPickRouteInfo<typeof CE_ROUTE_INFO_KIND.ROUTE>[]> = {
     get: getHandlers,
     post: postHandlers,
     put: putHandlers,
@@ -42,5 +43,5 @@ export default async function doMethodAggregator(
     all: allHandlers,
   };
 
-  return handlerMap;
+  return { kind: CE_ROUTE_INFO_KIND.SUMMARY_ROUTE_HANDLER_FILE, summary: handlerMap };
 }

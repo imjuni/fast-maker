@@ -1,6 +1,6 @@
-import path from 'path';
+import path from 'node:path';
 
-export default async function loadData<T = unknown>(module: string, ...filePaths: string[]): Promise<T> {
+export default async function loadSourceData<T = unknown>(module: string, ...filePaths: string[]): Promise<T> {
   const filePath = path.join(...filePaths);
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

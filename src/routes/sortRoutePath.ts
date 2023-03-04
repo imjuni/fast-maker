@@ -43,8 +43,8 @@ export default function sortRoutePath(routes: IRouteConfiguration[]): IRouteConf
         next.chunk[current.routePath] = [current];
 
         return next;
-      } catch (catched) {
-        const err = isError(catched, new Error('unknown error raised'));
+      } catch (caught) {
+        const err = isError(caught, new Error('unknown error raised'));
 
         log.debug(err.message);
         log.debug(err.stack);

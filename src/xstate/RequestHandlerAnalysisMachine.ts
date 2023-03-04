@@ -34,12 +34,12 @@ export interface IAnalysisMachineContext {
   routeHandler: IHandlerStatement;
   routeOption?: IOptionStatement;
   currentNode: number;
-  option: IBaseOption;
+  option: Pick<IBaseOption, 'output'>;
   hash: string;
 
   useFastifyRequest: boolean;
   typeNode?: Type;
-  messages: IReason[];
+  reasons: IReason[];
   importMap: Record<string, IImportConfiguration>;
   routeMap: Record<string, IRouteConfiguration>;
 }
@@ -47,7 +47,7 @@ export interface IAnalysisMachineContext {
 const requestHandlerAnalysisMachine = (
   rootContext: Omit<
     IAnalysisMachineContext,
-    'currentNode' | 'messages' | 'typeNode' | 'importMap' | 'routeMap' | 'useFastifyRequest' | 'typeAliasNode'
+    'currentNode' | 'reasons' | 'typeNode' | 'importMap' | 'routeMap' | 'useFastifyRequest' | 'typeAliasNode'
   >,
 ) =>
   createMachine<IAnalysisMachineContext>(
@@ -56,7 +56,7 @@ const requestHandlerAnalysisMachine = (
       predictableActionArguments: true,
       id: 'request-analysis',
       initial: CE_REQUEST_HANDLER_ANALYSIS_MACHINE.INITIAL,
-      context: { ...rootContext, currentNode: 0, messages: [], importMap: {}, routeMap: {}, useFastifyRequest: false },
+      context: { ...rootContext, currentNode: 0, reasons: [], importMap: {}, routeMap: {}, useFastifyRequest: false },
       states: {
         [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.INITIAL]: {
           entry: (context) => {
@@ -205,11 +205,11 @@ const requestHandlerAnalysisMachine = (
         },
         [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.DONE]: {
           type: 'final',
-          data: (context): Pick<IAnalysisMachineContext, 'importMap' | 'routeMap' | 'messages'> => {
+          data: (context): Pick<IAnalysisMachineContext, 'importMap' | 'routeMap' | 'reasons'> => {
             return {
               importMap: context.importMap,
               routeMap: context.routeMap,
-              messages: context.messages,
+              reasons: context.reasons,
             };
           },
         },
@@ -337,7 +337,7 @@ const requestHandlerAnalysisMachine = (
             message: 'synchronous route handler have to do send response data using reply.send function',
           };
 
-          next.messages.push(message);
+          next.reasons.push(message);
 
           return next;
         }),
@@ -431,7 +431,7 @@ const requestHandlerAnalysisMachine = (
               return reason;
             });
 
-          next.messages.push(
+          next.reasons.push(
             ...notExportClassReasons.concat(notExportInterfaceReasons).concat(notExportTypeAliasReasons),
           );
 
@@ -466,7 +466,7 @@ const requestHandlerAnalysisMachine = (
             return reason;
           });
 
-          next.messages.push(...propertySignatureWarns);
+          next.reasons.push(...propertySignatureWarns);
 
           return next;
         }),

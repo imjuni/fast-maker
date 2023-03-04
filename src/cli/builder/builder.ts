@@ -31,6 +31,16 @@ export default function builder(args: Argv): Argv {
   // without alias
   // ------------------------------------------------------------------------
   args
+    .option('cli-logo', {
+      describe: 'display cli logo',
+      type: 'boolean',
+      default: false,
+    })
+    .option('max-workers', {
+      describe: 'max worker count',
+      type: 'number',
+      default: undefined,
+    })
     .option('use-default-export', {
       description: 'route function in output file that use default export',
       type: 'boolean',
@@ -40,6 +50,11 @@ export default function builder(args: Argv): Argv {
       description: 'rotue function name',
       type: 'string',
       default: 'routing',
+    })
+    .option('skip-error', {
+      describe: 'skip compile error on source file',
+      type: 'boolean',
+      default: true,
     })
     .demandOption(['handler']);
 

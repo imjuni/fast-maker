@@ -14,6 +14,10 @@ class ReasonBox {
   add(...reasons: IReason[]) {
     this.#reasons.push(...reasons);
   }
+
+  clear() {
+    this.#reasons = [];
+  }
 }
 
 const reasons = new ReasonBox();

@@ -1,167 +1,227 @@
 import progress from '#cli/display/progress';
 import show from '#cli/display/show';
 import spinner from '#cli/display/spinner';
-import type IBaseOption from '#configs/interfaces/IBaseOption';
+import type IReason from '#compilers/interfaces/IReason';
+import getResolvedPaths from '#configs/getResolvedPaths';
+import type { TRouteBaseOption, TRouteOption } from '#configs/interfaces/TRouteOption';
+import FastMakerError from '#errors/FastMakerError';
 import importCodeGenerator from '#generators/importCodeGenerator';
 import prettierProcessing from '#generators/prettierProcessing';
 import routeCodeGenerator from '#generators/routeCodeGenerator';
+import createAnalysisRequestStatementBulkCommand from '#modules/createAnalysisRequestStatementBulkCommand';
+import getOutputFilePath from '#modules/getOutputFilePath';
 import getRoutingCode from '#modules/getRoutingCode';
-import mergeStage03Result from '#modules/mergeStage03Result';
+import mergeAnalysisRequestStatements from '#modules/mergeAnalysisRequestStatements';
 import reasons from '#modules/reasons';
-import methods from '#routes/interface/methods';
+import writeOutputFile from '#modules/writeOutputFile';
 import sortRoutePaths from '#routes/sortRoutePaths';
 import getReasonMessages from '#tools/getReasonMessages';
 import logger from '#tools/logging/logger';
-import { CE_SEND_TO_CHILD_COMMAND } from '#workers/interfaces/CE_SEND_TO_CHILD_COMMAND';
-import type {
-  IFromParentDoInit,
-  IFromParentDoInitProject,
-  IFromParentDoStage01,
-  IFromParentDoStage02,
-  IFromParentDoStage03,
-} from '#workers/interfaces/IFromParent';
-import replyBox from '#workers/replyBox';
-import workerBox from '#workers/workerBox';
-import fs from 'fs';
-import { first, isError, populate } from 'my-easy-fp';
+import { CE_WORKER_ACTION } from '#workers/interfaces/CE_WORKER_ACTION';
+import type TSendMasterToWorkerMessage from '#workers/interfaces/TSendMasterToWorkerMessage';
+import {
+  isFailTaskComplete,
+  type TPickPassWorkerToMasterTaskComplete,
+} from '#workers/interfaces/TSendWorkerToMasterMessage';
+import workers from '#workers/workers';
+import { showLogo } from '@maeum/cli-logo';
+import chalk from 'chalk';
+import { atOrThrow, isError, populate } from 'my-easy-fp';
 import cluster from 'node:cluster';
-import path from 'node:path';
+import os from 'node:os';
 
 const log = logger();
 
-function checkChildrenError() {
-  if (workerBox.errors.length > 0) {
-    workerBox.errors.forEach((err) => {
-      spinner.update(err.message, 'fail');
-    });
-
-    const firstError = first(workerBox.errors);
-    throw firstError;
-  }
-}
-
-export default async function routeCommandClusterHandler(config: IBaseOption) {
+export default async function routeCommandClusterHandler(baseOption: TRouteBaseOption) {
   try {
-    progress.isEnable = true;
-    spinner.isEnable = true;
+    if (baseOption.cliLogo) {
+      await showLogo({
+        message: 'Fast Maker',
+        figlet: { font: 'ANSI Shadow', width: 80 },
+        color: 'cyan',
+      });
+    } else {
+      spinner.start('Fast Maker start');
+      spinner.update('Fast Maker start', 'info');
+      spinner.stop();
+    }
 
-    spinner.start('start route.ts file generation');
+    const resolvedPaths = getResolvedPaths(baseOption);
+    const option: TRouteOption = { ...baseOption, ...resolvedPaths, kind: 'route' };
 
-    await Promise.all(
-      populate(methods.length).map(() => {
-        return Promise.resolve(workerBox.add(cluster.fork()));
-      }),
-    );
+    // slant, star wars, ansi shadow
+    const workerSize = option.maxWorkers ?? os.cpus().length - 1;
+    populate(workerSize).forEach(() => workers.add(cluster.fork()));
 
-    spinner.update(`load tsconfig.json: ${config.project}`);
+    log.trace(`cwd: ${resolvedPaths.cwd}/${resolvedPaths.project}`);
+    log.trace(`${JSON.stringify(option)}`);
+    log.trace(`worker-size: ${workerSize}`);
 
-    workerBox.send(
-      methods.map(() => {
-        return { command: CE_SEND_TO_CHILD_COMMAND.DO_INIT, data: { config } } satisfies IFromParentDoInit;
-      }),
-    );
+    spinner.start(`TypeScript project: ${resolvedPaths.project} loading, ...`);
 
-    await workerBox.wait();
+    workers.broadcast({
+      command: CE_WORKER_ACTION.OPTION_LOAD,
+      data: { option },
+    } satisfies Extract<TSendMasterToWorkerMessage, { command: typeof CE_WORKER_ACTION.OPTION_LOAD }>);
 
-    workerBox.send(
-      methods.map(() => {
-        return {
-          command: CE_SEND_TO_CHILD_COMMAND.DO_INIT_PROJECT,
-          data: {},
-        } satisfies IFromParentDoInitProject;
-      }),
-    );
+    await workers.wait();
 
-    await workerBox.wait();
+    workers.broadcast({
+      command: CE_WORKER_ACTION.PROJECT_LOAD,
+    } satisfies Extract<TSendMasterToWorkerMessage, { command: typeof CE_WORKER_ACTION.PROJECT_LOAD }>);
 
-    checkChildrenError();
+    let reply = await workers.wait(option.workerTimeout);
 
-    spinner.update(`load tsconfig.json: ${config.project}`, 'succeed');
-    spinner.update('find handler files');
+    await workers.wait();
 
-    workerBox.send(
-      methods.map((method) => {
-        return {
-          command: CE_SEND_TO_CHILD_COMMAND.DO_STAGE01,
-          data: { method },
-        } satisfies IFromParentDoStage01;
-      }),
-    );
+    // master check project loading on worker
+    if (reply.data.some((workerReply) => workerReply.result === 'fail')) {
+      const failReplies = reply.data.filter(isFailTaskComplete);
+      const failReply = atOrThrow(failReplies, 0);
+      throw new FastMakerError(failReply.error);
+    }
 
-    await workerBox.wait();
+    spinner.update(`TypeScript project: ${resolvedPaths.project} complete!`, 'succeed');
 
-    spinner.update('find handler files', 'succeed');
-    progress.start(workerBox.handlers, 0);
+    workers.send({
+      command: CE_WORKER_ACTION.PROJECT_DIAGONOSTIC,
+    } satisfies Extract<TSendMasterToWorkerMessage, { command: typeof CE_WORKER_ACTION.PROJECT_DIAGONOSTIC }>);
 
-    checkChildrenError();
+    reply = await workers.wait();
 
-    workerBox.send(
-      methods.map(() => {
-        return {
-          command: CE_SEND_TO_CHILD_COMMAND.DO_STAGE02,
-          data: {},
-        } satisfies IFromParentDoStage02;
-      }),
-    );
+    // master check project diagostic on worker
+    if (reply.data.some((workerReply) => workerReply.result === 'fail')) {
+      const failReplies = reply.data.filter(isFailTaskComplete);
+      const failReply = atOrThrow(failReplies, 0);
+      throw new FastMakerError(failReply.error);
+    }
 
-    await workerBox.wait();
+    workers.broadcast({
+      command: CE_WORKER_ACTION.SUMMARY_ROUTE_HANDLER_FILE,
+    } satisfies Extract<TSendMasterToWorkerMessage, { command: typeof CE_WORKER_ACTION.SUMMARY_ROUTE_HANDLER_FILE }>);
 
-    progress.update(workerBox.handlers);
+    reply = await workers.wait();
 
-    checkChildrenError();
+    if (reply.data.some((workerReply) => workerReply.result === 'fail')) {
+      const failReplies = reply.data.filter(isFailTaskComplete);
+      const failReply = atOrThrow(failReplies, 0);
+      throw new FastMakerError(failReply.error);
+    }
+
+    workers.broadcast({
+      command: CE_WORKER_ACTION.VALIDATE_ROUTE_HANDLER_FILE,
+    } satisfies Extract<TSendMasterToWorkerMessage, { command: typeof CE_WORKER_ACTION.VALIDATE_ROUTE_HANDLER_FILE }>);
+
+    reply = await workers.wait();
+
+    if (reply.data.some((workerReply) => workerReply.result === 'fail')) {
+      const failReplies = reply.data.filter(isFailTaskComplete);
+      const failReply = atOrThrow(failReplies, 0);
+      throw new FastMakerError(failReply.error);
+    }
+
+    const { data: validation } = atOrThrow(reply.data, 0) as TPickPassWorkerToMasterTaskComplete<
+      typeof CE_WORKER_ACTION.VALIDATE_ROUTE_HANDLER_FILE
+    >;
+
+    const handlers = Object.values(validation.valid).flat();
+    const job = createAnalysisRequestStatementBulkCommand(workerSize, handlers);
+
+    workers.send(...job);
+
+    progress.start(handlers.length, 0);
+
+    reply = await workers.wait(option.workerTimeout);
+
+    progress.update(handlers.length);
+    progress.stop();
+
+    if (reply.data.some((workerReply) => workerReply.result === 'fail')) {
+      const failReplies = reply.data.filter(isFailTaskComplete);
+      const failReply = atOrThrow(failReplies, 0);
+      throw new FastMakerError(failReply.error);
+    }
 
     spinner.start('route.ts code generation');
 
-    workerBox.send(
-      methods.map(() => {
-        return {
-          command: CE_SEND_TO_CHILD_COMMAND.DO_STAGE03,
-          data: {},
-        } satisfies IFromParentDoStage03;
-      }),
-    );
+    const data = reply.data as TPickPassWorkerToMasterTaskComplete<
+      typeof CE_WORKER_ACTION.ANALYSIS_REQUEST_STATEMENT
+    >[];
 
-    await workerBox.wait();
+    if (data.length > 0) {
+      const merged = mergeAnalysisRequestStatements(data.map((record) => record.data.pass));
+      const routeCodes = routeCodeGenerator({ routeConfigurations: sortRoutePaths(merged.routes) });
+      const importCodes = importCodeGenerator({ importConfigurations: merged.imports, option });
+      const code = getRoutingCode({ option, imports: importCodes, routes: routeCodes });
+      const prettfied = await prettierProcessing({ code });
+      const outputFilePath = getOutputFilePath(option.output);
+      await writeOutputFile(outputFilePath, prettfied);
+
+      reasons.clear();
+      reasons.add(
+        ...[
+          ...validation.invalid.map(
+            (duplicate) =>
+              ({
+                type: 'error',
+                message: `Found duplicated routePath(${chalk.red(`[${duplicate.method}] ${duplicate.routePath}`)}): ${
+                  duplicate.filePath
+                }`,
+                filePath: duplicate.filePath,
+              } satisfies IReason),
+          ),
+          ...data
+            .map((failReply) => failReply.data.fail)
+            .flat()
+            .map((failReply) => failReply.reason),
+        ],
+      );
+
+      show('log', getReasonMessages(reasons.reasons));
+    } else {
+      reasons.add(
+        ...[
+          ...validation.invalid.map(
+            (duplicate) =>
+              ({
+                type: 'error',
+                message: `Found duplicated routePath(${chalk.red(`[${duplicate.method}] ${duplicate.routePath}`)}): ${
+                  duplicate.filePath
+                }`,
+                filePath: duplicate.filePath,
+              } satisfies IReason),
+          ),
+          ...data
+            .map((failReply) => failReply.data.fail)
+            .flat()
+            .map((failReply) => failReply.reason),
+        ],
+      );
+
+      show('log', getReasonMessages(reasons.reasons));
+    }
 
     spinner.update('route.ts code generation', 'succeed');
 
-    checkChildrenError();
+    log.debug('every worker thread terminate');
 
-    workerBox.broadcast({ command: CE_SEND_TO_CHILD_COMMAND.TERMINATE, data: {} });
-
-    log.debug('worker 스레드를 모두 종료시킴');
-
-    const merged = mergeStage03Result(Object.values(replyBox.passBox).map((reply) => reply.pass.route));
-
-    const sorted = sortRoutePaths(merged.routeConfigurations);
-    const routeCodes = routeCodeGenerator({ routeConfigurations: sorted });
-    const importCodes = importCodeGenerator({ importConfigurations: merged.importConfigurations, option: config });
-
-    const code = getRoutingCode({
-      config,
-      imports: importCodes,
-      routes: routeCodes,
-    });
-
-    const prettfied = await prettierProcessing({ code });
-
-    await fs.promises.writeFile(path.join(config.output, 'route.ts'), prettfied);
-
-    show(getReasonMessages(reasons.reasons));
+    workers.broadcast({ command: CE_WORKER_ACTION.TERMINATE } satisfies Extract<
+      TSendMasterToWorkerMessage,
+      { command: typeof CE_WORKER_ACTION.TERMINATE }
+    >);
 
     return true;
-  } catch (catched) {
-    const err = isError(catched) ?? new Error('unknown error raised');
-    log.error(err.message);
-    log.error(err.stack);
+  } catch (caught) {
+    const err = isError(caught) ?? new Error('unknown error raised');
 
-    workerBox.broadcast({ command: CE_SEND_TO_CHILD_COMMAND.TERMINATE, data: {} });
-
-    spinner.update(err.message, 'fail');
+    log.debug(err.message);
+    log.debug(err.stack);
 
     return false;
   } finally {
-    spinner.stop();
-    progress.stop();
+    workers.broadcast({ command: CE_WORKER_ACTION.TERMINATE } satisfies Extract<
+      TSendMasterToWorkerMessage,
+      { command: typeof CE_WORKER_ACTION.TERMINATE }
+    >);
   }
 }

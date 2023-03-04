@@ -17,6 +17,12 @@ export default interface IBaseOption {
   /** verbose message display */
   verbose: boolean;
 
+  /** skip compile error on project source file */
+  skipError: boolean;
+
+  /** display cli logo */
+  cliLogo: boolean;
+
   /**
    * route function in output file that use default export
    * @default true

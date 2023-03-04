@@ -1,19 +1,27 @@
 import logger from '#tools/logging/logger';
-import { CE_SEND_TO_CHILD_COMMAND } from '#workers/interfaces/CE_SEND_TO_CHILD_COMMAND';
-import type { TFromParent } from '#workers/interfaces/IFromParent';
-import ChildEventEmitter from '#workers/modules/ChildEventEmitter';
+import FastMakerEmitter from '#workers/FastMakerEmitter';
+import type TSendMasterToWorkerMessage from '#workers/interfaces/TSendMasterToWorkerMessage';
+import { isError } from 'my-easy-fp';
 
 const log = logger();
 
 export default async function worker() {
-  const ee = new ChildEventEmitter();
+  const emitter: FastMakerEmitter = new FastMakerEmitter();
 
-  ee.on(CE_SEND_TO_CHILD_COMMAND.TERMINATE, () => process.exit());
+  process.on('message', (payload: TSendMasterToWorkerMessage) => {
+    try {
+      log.trace(`worker message-01: ${typeof payload}-${payload.command}`);
 
-  process.on('SIGTERM', () => process.exit());
+      if ('data' in payload) {
+        emitter.emit(payload.command, payload.data);
+      } else {
+        emitter.emit(payload.command);
+      }
+    } catch (caught) {
+      const err = isError(caught, new Error('unknown error raised'));
 
-  process.on('message', (message: TFromParent) => {
-    log.debug(`메시지를 실행한다: ${message.command}`);
-    ee.emit(message.command, message);
+      log.trace(err.message);
+      log.trace(err.stack);
+    }
   });
 }
