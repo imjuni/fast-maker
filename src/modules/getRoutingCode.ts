@@ -1,11 +1,11 @@
 import type IBaseOption from '#configs/interfaces/IBaseOption';
 
 export default function getRoutingCode({
-  config,
+  option,
   imports,
   routes,
 }: {
-  config: IBaseOption;
+  option: Pick<IBaseOption, 'useDefaultExport' | 'routeFunctionName'>;
   imports: string[];
   routes: string[];
 }) {
@@ -13,8 +13,8 @@ export default function getRoutingCode({
     `import type { FastifyInstance } from 'fastify';`,
     ...imports,
     '\n',
-    `export ${config.useDefaultExport ? 'default ' : ''}function ${
-      config.routeFunctionName
+    `export ${option.useDefaultExport ? 'default ' : ''}function ${
+      option.routeFunctionName
     }(fastify: FastifyInstance): void {`,
     ...routes,
     `}`,

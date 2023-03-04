@@ -1,23 +1,24 @@
 import progress from '#cli/display/progress';
 import show from '#cli/display/show';
 import spinner from '#cli/display/spinner';
+import getHandlerWithOption from '#compilers/navigate/getHandlerWithOption';
 import getTypeScriptProject from '#compilers/tools/getTypeScriptProject';
 import getResolvedPaths from '#configs/getResolvedPaths';
 import type { TRouteBaseOption, TRouteOption } from '#configs/interfaces/TRouteOption';
 import importCodeGenerator from '#generators/importCodeGenerator';
 import prettierProcessing from '#generators/prettierProcessing';
 import routeCodeGenerator from '#generators/routeCodeGenerator';
-import doDedupeRouting from '#modules/doDedupeRouting';
-import doMethodAggregator from '#modules/doMethodAggregator';
-import doStateMachine from '#modules/doStateMachine';
+import doAnalysisRequestStatements from '#modules/doAnalysisRequestStatements';
+import getOutputFilePath from '#modules/getOutputFilePath';
 import getRoutingCode from '#modules/getRoutingCode';
 import getValidRoutePath from '#modules/getValidRoutePath';
 import reasons from '#modules/reasons';
+import summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
+import writeOutputFile from '#modules/writeOutputFile';
 import sortRoutePaths from '#routes/sortRoutePaths';
 import getReasonMessages from '#tools/getReasonMessages';
 import logger from '#tools/logging/logger';
-import fs from 'fs';
-import path from 'node:path';
+import { isDescendant } from 'my-node-fp';
 
 const log = logger();
 
@@ -27,17 +28,24 @@ export default async function routeCommandSyncHandler(baseOption: TRouteBaseOpti
 
   spinner.update(`load tsconfig.json: ${option.project}`);
 
-  const project = await getTypeScriptProject(option.project);
+  const project = await new Promise<ReturnType<typeof getTypeScriptProject>>((resolve) => {
+    setImmediate(() => resolve(getTypeScriptProject(option.project)));
+  });
 
   spinner.update(`load tsconfig.json: ${option.project}`, 'succeed');
 
   spinner.update('find handler files');
 
-  const sourceFilePaths = project.getSourceFiles().map((sourceFile) => sourceFile.getFilePath());
+  const sourceFilePaths = project
+    .getSourceFiles()
+    .map((sourceFile) => sourceFile)
+    .filter((sourceFile) => isDescendant(option.handler, sourceFile.getFilePath().toString()))
+    .filter((sourceFile) => getHandlerWithOption(sourceFile).handler != null)
+    .map((sourceFile) => sourceFile.getFilePath().toString());
 
   log.debug(`count: ${sourceFilePaths.length}`);
 
-  const handlerMap = await doMethodAggregator(sourceFilePaths, option);
+  const handlerMap = await summaryRouteHandlerFile(sourceFilePaths, option);
 
   spinner.update('find handler files', 'succeed');
 
@@ -55,27 +63,24 @@ export default async function routeCommandSyncHandler(baseOption: TRouteBaseOpti
 
   progress.start(count, 0);
 
-  const stateMachineApplied = await doStateMachine(project, option, handlerMap);
+  const statements = await doAnalysisRequestStatements(project, option, validationMap.valid);
 
   progress.update(count);
   progress.stop();
 
   spinner.start('route.ts code generation');
 
-  const { importConfigurations, routeConfigurations } = doDedupeRouting(stateMachineApplied);
+  const routeCodes = routeCodeGenerator({ routeConfigurations: sortRoutePaths(statements.routes) });
+  const importCodes = importCodeGenerator({ importConfigurations: statements.imports, option });
+  const code = getRoutingCode({ option, imports: importCodes, routes: routeCodes });
+  const prettfied = await prettierProcessing({ code });
+  const outputFilePath = getOutputFilePath(option.output);
+
+  await writeOutputFile(outputFilePath, prettfied);
 
   spinner.update('route.ts code generation', 'succeed');
 
-  const routeCodes = routeCodeGenerator({ routeConfigurations: sortRoutePaths(routeConfigurations) });
-  const importCodes = importCodeGenerator({ importConfigurations, option });
-
-  const code = getRoutingCode({ config: option, imports: importCodes, routes: routeCodes });
-
-  const prettfied = await prettierProcessing({ code });
-
-  await fs.promises.writeFile(path.join(option.output, 'route.ts'), prettfied);
-
-  show(getReasonMessages(reasons.reasons));
+  show('log', getReasonMessages(reasons.reasons));
 
   progress.stop();
   spinner.stop();

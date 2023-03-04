@@ -2,7 +2,7 @@ import posixJoin from '#tools/posixJoin';
 import * as env from '#tools/__tests__/tools/env';
 
 export default {
-  duplicate: [
+  invalid: [
     {
       filePath: posixJoin(env.handlerPath, 'post/justice/[dc-league]/world.ts'),
       method: 'post',

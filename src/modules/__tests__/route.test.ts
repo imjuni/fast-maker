@@ -1,15 +1,15 @@
 import getMethodBar from '#modules/getMethodBar';
 import getMethodColor from '#modules/getMethodColor';
 import getValidRoutePath from '#modules/getValidRoutePath';
-import loadData from '#tools/__tests__/tools/loadData';
+import loadSourceData from '#tools/__tests__/tools/loadSourceData';
 import chalk from 'chalk';
 import 'jest';
 
 describe('getValidRoutePath', () => {
   test('pass', async () => {
-    const inp = await loadData<any>('default', __dirname, 'expects', 'route.inp.01');
+    const inp = await loadSourceData<any>('default', __dirname, 'expects', 'route.inp.01');
     const r = getValidRoutePath(inp);
-    const out = await loadData<any>('default', __dirname, 'expects', 'route.out.01');
+    const out = await loadSourceData<any>('default', __dirname, 'expects', 'route.out.01');
 
     expect(r).toMatchObject(out);
   });

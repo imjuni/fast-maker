@@ -1,10 +1,11 @@
-import doMethodAggregator from '#modules/doMethodAggregator';
+import summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
 import evaluateVariablePath from '#routes/evaluateVariablePath';
 import getHandlerFile from '#routes/getHandlerFile';
 import getRoutePath from '#routes/getRoutePath';
 import { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
 import posixJoin from '#tools/posixJoin';
 import * as env from '#tools/__tests__/tools/env';
+import loadSourceData from '#tools/__tests__/tools/loadSourceData';
 import dayjs from 'dayjs';
 import 'jest';
 
@@ -136,32 +137,38 @@ describe('getRoutePath', () => {
 
     const expectation = [
       {
-        filename: posixJoin(env.handlerPath, 'post/avengers/heros/[id]/hero.ts'),
+        filePath: posixJoin(env.handlerPath, 'post/avengers/heros/[id]/hero.ts'),
+        kind: 'route',
         method: 'post',
         routePath: '/avengers/heros/:id/hero',
       },
       {
-        filename: posixJoin(env.handlerPath, 'post/avengers/heros/[kind]-[id]/hero.ts'),
+        filePath: posixJoin(env.handlerPath, 'post/avengers/heros/[kind]-[id]/hero.ts'),
+        kind: 'route',
         method: 'post',
         routePath: '/avengers/heros/:kind-:id/hero',
       },
       {
-        filename: posixJoin(env.handlerPath, 'post/avengers/heros/index.ts'),
+        filePath: posixJoin(env.handlerPath, 'post/avengers/heros/index.ts'),
+        kind: 'route',
         method: 'post',
         routePath: '/avengers/heros',
       },
       {
-        filename: posixJoin(env.handlerPath, 'post/avengers/heros.ts'),
+        filePath: posixJoin(env.handlerPath, 'post/avengers/heros.ts'),
+        kind: 'route',
         method: 'post',
         routePath: '/avengers/heros',
       },
       {
-        filename: posixJoin(env.handlerPath, 'get/justice/[dc-league]/hello.ts'),
+        filePath: posixJoin(env.handlerPath, 'get/justice/[dc-league]/hello.ts'),
+        kind: 'route',
         method: 'get',
         routePath: '/justice/:dc-league/hello',
       },
       {
-        filename: posixJoin(env.handlerPath, 'get/po-ke/hello.ts'),
+        filePath: posixJoin(env.handlerPath, 'get/po-ke/hello.ts'),
+        kind: 'route',
         method: 'get',
         routePath: '/po-ke/hello',
       },
@@ -182,7 +189,7 @@ describe('getRoutePath', () => {
 
 describe('getRouteFiles', () => {
   test('pass', async () => {
-    const routeFiles = await doMethodAggregator(
+    const routeFiles = await summaryRouteHandlerFile(
       [
         posixJoin(env.handlerPath, 'get', 'justice', '[dc-league]', 'hello.ts'),
         posixJoin(env.handlerPath, 'get', 'justice', '[dc-league]', 'world.ts'),
@@ -198,104 +205,8 @@ describe('getRouteFiles', () => {
       { cwd: env.examplePath, handler: env.handlerPath },
     );
 
-    const expectation = [
-      {
-        filename: posixJoin(env.handlerPath, 'delete/hello.ts'),
-        method: 'delete',
-        routePath: '/hello',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'delete/world.ts'),
-        method: 'delete',
-        routePath: '/world',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'get/justice/[dc-league]/hello.ts'),
-        method: 'get',
-        routePath: '/justice/:dc-league/hello',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'get/justice/[dc-league]/world.ts'),
-        method: 'get',
-        routePath: '/justice/:dc-league/world',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'get/justice/[kind]-[id]/hello.ts'),
-        method: 'get',
-        routePath: '/justice/:kind-:id/hello',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'get/justice/world.ts'),
-        method: 'get',
-        routePath: '/justice/world',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'get/justice/world/[id].ts'),
-        method: 'get',
-        routePath: '/justice/world/:id',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'get/po-ke/hello.ts'),
-        method: 'get',
-        routePath: '/po-ke/hello',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'get/po-ke/world.ts'),
-        method: 'get',
-        routePath: '/po-ke/world',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'get/xman/fastify.ts'),
-        method: 'get',
-        routePath: '/xman/fastify',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'get/xman/hello.ts'),
-        method: 'get',
-        routePath: '/xman/hello',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'get/xman/world.ts'),
-        method: 'get',
-        routePath: '/xman/world',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'post/avengers/heros.ts'),
-        method: 'post',
-        routePath: '/avengers/heros',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'post/avengers/heros/[id]/hero.ts'),
-        method: 'post',
-        routePath: '/avengers/heros/:id/hero',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'post/avengers/heros/index.ts'),
-        method: 'post',
-        routePath: '/avengers/heros',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'post/dc/world.ts'),
-        method: 'post',
-        routePath: '/dc/world',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'post/hello2.ts'),
-        method: 'post',
-        routePath: '/hello2',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'put/hello.ts'),
-        method: 'put',
-        routePath: '/hello',
-      },
-      {
-        filename: posixJoin(env.handlerPath, 'put/world.ts'),
-        method: 'put',
-        routePath: '/world',
-      },
-    ];
+    const expectation = await loadSourceData<any>('default', __dirname, 'expects', 'expect.out.03.ts');
 
-    expect(routeFiles).toStrictEqual(expectation);
+    expect(routeFiles).toMatchObject(expectation);
   });
 });

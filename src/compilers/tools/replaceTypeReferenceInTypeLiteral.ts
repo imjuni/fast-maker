@@ -29,7 +29,7 @@ export default function replaceTypeReferenceInTypeLiteral({
       return moduleNames.includes(typeReferenceNode.getText());
     });
 
-  log.debug('Target: ', resolutionWithTypeReferenceNodePairs.length);
+  log.debug(`Target: ${resolutionWithTypeReferenceNodePairs.length}`);
 
   resolutionWithTypeReferenceNodePairs.forEach((resolutionWithTypeReferenceNodePair) => {
     const { resolution, typeReferenceNode } = resolutionWithTypeReferenceNodePair;

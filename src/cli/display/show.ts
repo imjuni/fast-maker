@@ -1,6 +1,6 @@
 type TConsoleFunc = Extract<keyof typeof console, 'log' | 'error' | 'debug' | 'info' | 'trace' | 'warn'>;
 
-export default function show(message: string, channel?: TConsoleFunc) {
-  // eslint-disable-next-line no-console
-  console[channel ?? 'log'](message);
+export default function show(channel: TConsoleFunc | undefined, ...message: any[]) {
+  // eslint-disable-next-line no-console, @typescript-eslint/no-unsafe-argument
+  console[channel ?? 'log'](...message);
 }

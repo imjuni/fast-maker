@@ -62,6 +62,7 @@
       "#modules/*": ["src/modules/*"],
       "#routes/*": ["src/routes/*"],
       "#tools/*": ["src/tools/*"],
+      "#errors/*": ["src/errors/*"],
       "#xstate/*": ["src/xstate/*"],
       "#workers/*": ["src/workers/*"]
     } /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */,

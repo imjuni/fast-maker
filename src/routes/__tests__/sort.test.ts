@@ -1,12 +1,23 @@
 import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
 import sortRoutePath from '#routes/sortRoutePath';
 import sortRoutePaths from '#routes/sortRoutePaths';
-import getData from '#tools/__tests__/tools/getData';
+import { loadJsonData } from '@maeum/test-utility';
 import 'jest';
 import * as mnf from 'my-node-fp';
 
 beforeEach(() => {
   jest.clearAllMocks();
+});
+
+describe('sortRoutePaths', () => {
+  test('pass', async () => {
+    const inp = await loadJsonData<IRouteConfiguration[]>(__dirname, 'expects', 'T01-inp.json');
+    const results = sortRoutePaths(inp);
+
+    const summary = results.map((result) => `${result.method}::${result.routePath}`);
+    const exp = await loadJsonData(__dirname, 'expects', 'T01-expect.json');
+    expect(summary).toEqual(exp);
+  });
 });
 
 describe('sortRoutePath', () => {
@@ -16,9 +27,9 @@ describe('sortRoutePath', () => {
   });
 
   test('pass', async () => {
-    const inp = await getData<IRouteConfiguration[]>(__dirname, 'inp', 'T02-inp.json');
+    const inp = await loadJsonData<IRouteConfiguration[]>(__dirname, 'expects', 'T02-inp.json');
     const result = sortRoutePath(inp);
-    const exp = await getData(__dirname, 'inp', 'T02-expect.json');
+    const exp = await loadJsonData(__dirname, 'expects', 'T02-expect.json');
     expect(result).toEqual(exp);
   });
 
@@ -33,23 +44,12 @@ describe('sortRoutePath', () => {
         return mnf.isDescendant(parentDirPath, targetDirPath, sep);
       });
 
-    const inp = await getData<IRouteConfiguration[]>(__dirname, 'inp', 'T02-inp.json');
+    const inp = await loadJsonData<IRouteConfiguration[]>(__dirname, 'expects', 'T02-inp.json');
     const result = sortRoutePath(inp);
-    const exp = await getData(__dirname, 'inp', 'T03-expect.json');
+    const exp = await loadJsonData(__dirname, 'expects', 'T03-expect.json');
 
     spy.mockRestore();
 
     expect(result).toEqual(exp);
-  });
-});
-
-describe('sortRoutePaths', () => {
-  test('pass', async () => {
-    const inp = await getData<IRouteConfiguration[]>(__dirname, 'inp', 'T01-inp.json');
-    const results = sortRoutePaths(inp);
-
-    const summary = results.map((result) => `${result.method}::${result.routePath}`);
-    const exp = await getData(__dirname, 'inp', 'T01-expect.json');
-    expect(summary).toEqual(exp);
   });
 });

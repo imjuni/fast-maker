@@ -1,6 +1,6 @@
 import type { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
 import { atOrThrow } from 'my-easy-fp';
-import { exists } from 'my-node-fp';
+import { exists, isDescendant, startSepRemove } from 'my-node-fp';
 import * as path from 'path';
 
 export default async function getHandlerFile(
@@ -15,8 +15,8 @@ export default async function getHandlerFile(
           return undefined;
         }
 
-        if (filePath.includes(handlerRoot)) {
-          const handlerFilePath = filePath.replace(handlerRoot, '');
+        if (isDescendant(handlerRoot, filePath)) {
+          const handlerFilePath = startSepRemove(filePath.replace(handlerRoot, ''), path.posix.sep);
           const methodOfFilePath = atOrThrow(handlerFilePath.split(path.posix.sep), 0).toLowerCase();
 
           if (methodOfFilePath.toLowerCase() !== method) {

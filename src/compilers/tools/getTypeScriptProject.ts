@@ -5,8 +5,7 @@ import { Project } from 'ts-morph';
  * @param param.ignore
  * @returns
  */
-export default async function getTypeScriptProject(projectPath: string): Promise<Project> {
-  // Exclude exclude file in .ctiignore file: more exclude progress
+export default function getTypeScriptProject(projectPath: string): Project {
   const project = new Project({ tsConfigFilePath: projectPath });
   return project;
 }

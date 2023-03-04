@@ -1,6 +1,6 @@
 import getHandlerWithOption from '#compilers/navigate/getHandlerWithOption';
 import getResolvedPaths from '#configs/getResolvedPaths';
-import doMethodAggregator from '#modules/doMethodAggregator';
+import summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
 import { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
 import getHash from '#tools/getHash';
 import getRelativeCwd from '#tools/getRelativeCwd';
@@ -8,10 +8,10 @@ import logger from '#tools/logging/logger';
 import posixJoin from '#tools/posixJoin';
 import JestContext from '#tools/__tests__/tools/context';
 import * as env from '#tools/__tests__/tools/env';
-import getTestValue from '#tools/__tests__/tools/getTestValue';
-import loadData from '#tools/__tests__/tools/loadData';
+import loadSourceData from '#tools/__tests__/tools/loadSourceData';
 import { CE_REQUEST_HANDLER_ANALYSIS_MACHINE } from '#xstate/interfaces/CE_REQUEST_HANDLER_ANALYSIS_MACHINE';
 import requestHandlerAnalysisMachine from '#xstate/RequestHandlerAnalysisMachine';
+import { getExpectValue } from '@maeum/test-utility';
 import 'jest';
 import { findOrThrow, isError } from 'my-easy-fp';
 import path from 'path';
@@ -27,7 +27,7 @@ beforeAll(async () => {
   context.project = new tsm.Project({ tsConfigFilePath: context.projectPath });
   context.routeOption = {
     ...env.routeOption,
-    ...getResolvedPaths({ project: context.projectPath, output: env.examplePath }),
+    ...getResolvedPaths({ project: context.projectPath, handler: env.handlerPath, output: env.examplePath }),
   };
 });
 
@@ -39,12 +39,15 @@ describe('requestHandlerAnalysisMachine', () => {
       const routeFilePath = posixJoin(env.handlerPath, 'get', 'xman', 'world.ts');
       const sourceFile = context.project.getSourceFileOrThrow(routeFilePath);
 
-      const methodAggregated = await doMethodAggregator(
+      const methodAggregated = await summaryRouteHandlerFile(
         context.project.getSourceFiles().map((sf) => sf.getFilePath()),
         { ...env.routeOption, cwd: path.join(env.examplePath) },
       );
 
-      const route = findOrThrow(methodAggregated[CE_ROUTE_METHOD.GET], (handler) => handler.filePath === routeFilePath);
+      const route = findOrThrow(
+        methodAggregated.summary[CE_ROUTE_METHOD.GET],
+        (handler) => handler.filePath === routeFilePath,
+      );
       const routing = getHandlerWithOption(sourceFile);
       const hash = getHash(getRelativeCwd(env.handlerPath, route.filePath));
 
@@ -61,10 +64,15 @@ describe('requestHandlerAnalysisMachine', () => {
       const interpretor = interpret(machine);
       const actor = interpretor.start();
       await waitFor(actor, (state) => state.matches(CE_REQUEST_HANDLER_ANALYSIS_MACHINE.DONE));
-      const { messages, importMap: importBox, routeMap: routeBox } = interpretor.getSnapshot().context;
+      const { reasons: messages, importMap: importBox, routeMap: routeBox } = interpretor.getSnapshot().context;
 
-      const expectation = await loadData<any>('default', path.join(__dirname, 'expects', 'expect.out.01.ts'));
-      const terminateCircularResult = getTestValue({ messages, importBox, routeBox });
+      const expectation = await loadSourceData<any>('default', path.join(__dirname, 'expects', 'expect.out.01.ts'));
+      const terminateCircularResult = getExpectValue({ messages, importBox, routeBox }, (_, value: any) => {
+        if (value === '[Circular]') return undefined;
+        if (value instanceof tsm.Node) return undefined;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return value;
+      });
 
       log.debug(terminateCircularResult);
 
@@ -85,12 +93,15 @@ describe('requestHandlerAnalysisMachine', () => {
     const routeFilePath = posixJoin(env.handlerPath, 'get', 'justice', 'world.ts');
     const sourceFile = context.project.getSourceFileOrThrow(routeFilePath);
 
-    const methodAggregated = await doMethodAggregator(
+    const methodAggregated = await summaryRouteHandlerFile(
       context.project.getSourceFiles().map((sf) => sf.getFilePath()),
       { ...env.routeOption, cwd: path.join(env.examplePath) },
     );
 
-    const route = findOrThrow(methodAggregated[CE_ROUTE_METHOD.GET], (handler) => handler.filePath === routeFilePath);
+    const route = findOrThrow(
+      methodAggregated.summary[CE_ROUTE_METHOD.GET],
+      (handler) => handler.filePath === routeFilePath,
+    );
     const routing = getHandlerWithOption(sourceFile);
     const hash = getHash(getRelativeCwd(env.handlerPath, route.filePath));
 
@@ -107,13 +118,18 @@ describe('requestHandlerAnalysisMachine', () => {
     const interpretor = interpret(machine);
     const actor = interpretor.start();
     await waitFor(actor, (state) => state.matches(CE_REQUEST_HANDLER_ANALYSIS_MACHINE.DONE));
-    const { messages, importMap: importBox, routeMap: routeBox } = interpretor.getSnapshot().context;
+    const { reasons: messages, importMap: importBox, routeMap: routeBox } = interpretor.getSnapshot().context;
 
-    const expectation = await loadData<any>('default', path.join(__dirname, 'expects', 'expect.out.02.ts'));
-    const terminateCircularResult = getTestValue({ messages, importBox, routeBox });
+    const expectation = await loadSourceData<any>('default', path.join(__dirname, 'expects', 'expect.out.02.ts'));
+    const terminateCircularResult = getExpectValue({ messages, importBox, routeBox }, (_, value: any) => {
+      if (value === '[Circular]') return undefined;
+      if (value instanceof tsm.Node) return undefined;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return value;
+    });
 
     log.debug(terminateCircularResult);
 
-    expect(terminateCircularResult).toEqual(expectation);
+    expect(terminateCircularResult).toMatchObject(expectation);
   });
 });

@@ -1,6 +1,7 @@
 import builder from '#cli/builder/builder';
 import routeBuilder from '#cli/builder/routeBuilder';
 import watchBuilder from '#cli/builder/watchBuilder';
+import routeCommandClusterHandler from '#cli/command/routeCommandClusterHandler';
 import routeCommandSyncHandler from '#cli/command/routeCommandSyncHandler';
 import watchCommandHandler from '#cli/command/watchCommandHandler';
 import progress from '#cli/display/progress';
@@ -26,11 +27,11 @@ const routeCmd: CommandModule<TRouteOption, TRouteOption> = {
       progress.isEnable = true;
       spinner.isEnable = true;
 
-      await routeCommandSyncHandler(argv);
-      // if (process.env.SYNC_MODE === 'true') {
-      // } else {
-      //   await routeCommandClusterHandler(argv);
-      // }
+      if (process.env.SYNC_MODE === 'true') {
+        await routeCommandSyncHandler(argv);
+      } else {
+        await routeCommandClusterHandler(argv);
+      }
     } catch (caught) {
       const err = isError(caught, new Error('unknown error raised'));
       log.error(err);
