@@ -1,5 +1,6 @@
 import validParamNames from '#compilers/validators/validParamNames';
 import fuzzyWithCase, { type IFuzzyWithCaseReturn } from '#tools/fuzzyWithCase';
+import { atOrUndefined } from 'my-easy-fp';
 import type { Symbol } from 'ts-morph';
 
 interface IValidatePropertySignatureParam {
@@ -16,7 +17,7 @@ export default function validatePropertySignature({ propertySignatures, type }: 
 
   const fuzzyResult = anotherNames.reduce<Record<string, IFuzzyWithCaseReturn>>((aggregated, name) => {
     const fuzzyResults = fuzzyWithCase(expectNames, name).filter((fuzzied) => fuzzied.percent > 0);
-    const [headFuzzyResult] = fuzzyResults;
+    const headFuzzyResult = atOrUndefined(fuzzyResults, 0);
 
     if (headFuzzyResult != null) {
       return { ...aggregated, [name]: headFuzzyResult };

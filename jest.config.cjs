@@ -7,12 +7,16 @@ const fs = require('fs');
 // https://kulshekhar.github.io/ts-jest/docs/getting-started/paths-mapping/#jest-config-with-helper
 // tsconfig.json 파일에 주석 때문에 상단 링크 문서가 설명하는 것과 같이 바로 require로 불러올 수 없었다.
 const tsconfig = parse(fs.readFileSync('./tsconfig.json').toString());
+// https://www.npmjs.com/package/jest_workaround
+const swcrc = JSON.parse(fs.readFileSync('.swcrc', 'utf8'));
+swcrc.jsc.experimental = { plugins: [['jest_workaround', {}]] };
+// ((swcrc.jsc ??= {}).experimental ??= {}).plugins = [['jest_workaround', {}]];
 
 module.exports = {
   testEnvironment: 'node',
   moduleFileExtensions: ['ts', 'tsx', 'js'],
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', { isolateModules: true }, '@swc/jest'],
+    '^.+\\.(ts|tsx)$': ['@swc/jest', swcrc],
   },
   testMatch: ['**/__tests__/*.(ts|tsx)', '!**/__tests__/expects/*.(ts|tsx)'],
   testPathIgnorePatterns: [
