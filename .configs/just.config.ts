@@ -27,6 +27,16 @@ task('clean', async () => {
   });
 });
 
+task('clean:dts', async () => {
+  const cmd = 'rimraf';
+  const option = 'dist/cjs/src dist/esm/src dist/src';
+
+  await execa(cmd, splitArgs(option), {
+    stderr: process.stderr,
+    stdout: process.stdout,
+  });
+});
+
 task('lint', async () => {
   const cmd = 'eslint';
   const option = '--cache .';
@@ -104,7 +114,7 @@ task('unpub', async () => {
 
 task('+rollup:prod', async () => {
   const cmd = 'rollup';
-  const option = '--config ./.configs/rollup.config.prod.ts --configPlugin ts';
+  const option = '--config ./.configs/rollup.config.prod.ts --configPlugin typescript';
 
   await execa(cmd, splitArgs(option), {
     env: {
@@ -118,7 +128,7 @@ task('+rollup:prod', async () => {
 
 task('+rollup:dev', async () => {
   const cmd = 'rollup';
-  const option = '--config ./.configs/rollup.config.dev.ts --configPlugin ts';
+  const option = '--config ./.configs/rollup.config.dev.ts --configPlugin typescript';
 
   await execa(cmd, splitArgs(option), {
     stderr: process.stderr,
@@ -137,8 +147,8 @@ task('+tsc', async () => {
 });
 
 task('build', series('clean', '+tsc'));
-task('pub', series('clean', 'lint', 'ctix:single', '+rollup:prod', 'ctix:remove', '+pub'));
+task('rollup:dev', series('clean', 'lint', 'ctix:single', '+rollup:dev', 'ctix:remove', 'clean:dts'));
+task('rollup:prod', series('clean', 'lint', 'ctix:single', '+rollup:prod', 'ctix:remove', 'clean:dts'));
+task('pub', series('rollup:prod', '+pub'));
+task('pub:prod', series('rollup:prod', '+pub:prod'));
 task('repub', series('unpub', 'pub'));
-task('pub:prod', series('clean', 'lint', 'ctix:single', '+rollup:prod', 'ctix:remove', '+pub:prod'));
-task('rollup:prod', series('clean', 'lint', 'ctix:single', '+rollup:prod', 'ctix:remove'));
-task('rollup:dev', series('clean', 'lint', 'ctix:single', '+rollup:dev', 'ctix:remove'));
