@@ -1,3 +1,4 @@
+import createTable from '#cli/display/createTable';
 import progress from '#cli/display/progress';
 import show from '#cli/display/show';
 import spinner from '#cli/display/spinner';
@@ -16,6 +17,7 @@ import getRoutingCode from '#modules/getRoutingCode';
 import getValidRoutePath from '#modules/getValidRoutePath';
 import reasons from '#modules/reasons';
 import summaryRouteHandlerFiles from '#modules/summaryRouteHandlerFiles';
+import table from '#modules/table';
 import writeOutputFile from '#modules/writeOutputFile';
 import sortRoutePaths from '#routes/sortRoutePaths';
 import getReasonMessages from '#tools/getReasonMessages';
@@ -73,15 +75,18 @@ export default async function routeCommandSyncHandler(baseOption: TRouteBaseOpti
 
   spinner.start('route.ts code generation');
 
-  const routeCodes = routeCodeGenerator({ routeConfigurations: sortRoutePaths(statements.routes) });
+  const sortedRoutes = sortRoutePaths(statements.routes);
+  const routeCodes = routeCodeGenerator({ routeConfigurations: sortedRoutes });
   const importCodes = importCodeGenerator({ importConfigurations: statements.imports, option });
   const code = getRoutingCode({ option, imports: importCodes, routes: routeCodes });
   const prettfied = await prettierProcessing({ code });
   const outputFilePath = getOutputFilePath(option.output);
   await writeOutputFile(outputFilePath, prettfied);
 
+  table.table = createTable(option, handlerMap.summary, sortedRoutes);
+
   if (option.routeMap) {
-    const routeMapCode = routeMapGenerator(sortRoutePaths(statements.routes));
+    const routeMapCode = routeMapGenerator(sortedRoutes);
     const routeMapOutputFilePath = getOutputMapFilePath(option.output);
     const prettfiedRouteMapCode = await prettierProcessing({ code: routeMapCode });
     await writeOutputFile(routeMapOutputFilePath, prettfiedRouteMapCode);
@@ -90,6 +95,7 @@ export default async function routeCommandSyncHandler(baseOption: TRouteBaseOpti
   spinner.update('route.ts code generation', 'succeed');
 
   show('log', getReasonMessages(reasons.reasons));
+  show('log', table.table.toString());
 
   progress.stop();
   spinner.stop();

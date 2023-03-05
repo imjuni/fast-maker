@@ -13,7 +13,7 @@ export type TPassWorkerToMasterTaskComplete =
       command: typeof CE_WORKER_ACTION.SUMMARY_ROUTE_HANDLER_FILE;
       result: 'pass';
       id: number;
-      data: Record<CE_ROUTE_METHOD, number>;
+      data: Record<CE_ROUTE_METHOD, IRouteHandler[]>;
     }
   | {
       command: typeof CE_WORKER_ACTION.VALIDATE_ROUTE_HANDLER_FILE;

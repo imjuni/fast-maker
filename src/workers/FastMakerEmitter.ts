@@ -162,7 +162,8 @@ export default class FastMakerEmitter extends EventEmitter {
         .filter((sourceFile) => getHandlerWithOption(sourceFile).handler != null)
         .map((sourceFile) => sourceFile.getFilePath().toString());
 
-      this.#context.handler = await summaryRouteHandlerFiles(sourceFilePaths, this.#context.option);
+      const handlers = await summaryRouteHandlerFiles(sourceFilePaths, this.#context.option);
+      this.#context.handler = handlers;
 
       process.send?.({
         command: CE_MASTER_ACTION.TASK_COMPLETE,
@@ -170,6 +171,7 @@ export default class FastMakerEmitter extends EventEmitter {
           id: this.id,
           result: 'pass',
           command: CE_WORKER_ACTION.SUMMARY_ROUTE_HANDLER_FILE,
+          data: handlers.summary,
         },
       } satisfies Extract<TSendWorkerToMasterMessage, { command: typeof CE_MASTER_ACTION.TASK_COMPLETE }>);
     } catch (caught) {
