@@ -1,7 +1,7 @@
+import createTable from '#cli/display/createTable';
 import progress from '#cli/display/progress';
 import show from '#cli/display/show';
 import spinner from '#cli/display/spinner';
-import type IReason from '#compilers/interfaces/IReason';
 import getResolvedPaths from '#configs/getResolvedPaths';
 import type { TRouteBaseOption, TRouteOption } from '#configs/interfaces/TRouteOption';
 import FastMakerError from '#errors/FastMakerError';
@@ -15,7 +15,9 @@ import getOutputMapFilePath from '#modules/getOutputMapFilePath';
 import getRoutingCode from '#modules/getRoutingCode';
 import mergeAnalysisRequestStatements from '#modules/mergeAnalysisRequestStatements';
 import reasons from '#modules/reasons';
+import table from '#modules/table';
 import writeOutputFile from '#modules/writeOutputFile';
+import getDuplicateRouteReason from '#routes/getDuplicateRouteReason';
 import sortRoutePaths from '#routes/sortRoutePaths';
 import getReasonMessages from '#tools/getReasonMessages';
 import logger from '#tools/logger';
@@ -112,6 +114,10 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
       throw new FastMakerError(failReply.error);
     }
 
+    const { data: handlerFiles } = atOrThrow(reply.data, 0) as TPickPassWorkerToMasterTaskComplete<
+      typeof CE_WORKER_ACTION.SUMMARY_ROUTE_HANDLER_FILE
+    >;
+
     workers.broadcast({
       command: CE_WORKER_ACTION.VALIDATE_ROUTE_HANDLER_FILE,
     } satisfies Extract<TSendMasterToWorkerMessage, { command: typeof CE_WORKER_ACTION.VALIDATE_ROUTE_HANDLER_FILE }>);
@@ -155,17 +161,22 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
       typeof CE_WORKER_ACTION.ANALYSIS_REQUEST_STATEMENT
     >[];
 
+    reasons.add(...getDuplicateRouteReason(validation.invalid));
+
     if (data.length > 0) {
       const merged = mergeAnalysisRequestStatements(data.map((record) => record.data.pass));
-      const routeCodes = routeCodeGenerator({ routeConfigurations: sortRoutePaths(merged.routes) });
+      const sortedRoutes = sortRoutePaths(merged.routes);
+      const routeCodes = routeCodeGenerator({ routeConfigurations: sortedRoutes });
       const importCodes = importCodeGenerator({ importConfigurations: merged.imports, option });
       const code = getRoutingCode({ option, imports: importCodes, routes: routeCodes });
       const prettfied = await prettierProcessing({ code });
       const outputFilePath = getOutputFilePath(option.output);
       await writeOutputFile(outputFilePath, prettfied);
 
+      table.table = createTable(option, handlerFiles, sortedRoutes);
+
       if (option.routeMap) {
-        const routeMapCode = routeMapGenerator(sortRoutePaths(merged.routes));
+        const routeMapCode = routeMapGenerator(sortedRoutes);
         const routeMapOutputFilePath = getOutputMapFilePath(option.output);
         const prettfiedRouteMapCode = await prettierProcessing({ code: routeMapCode });
         await writeOutputFile(routeMapOutputFilePath, prettfiedRouteMapCode);
@@ -173,47 +184,20 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
 
       reasons.clear();
       reasons.add(
-        ...[
-          ...validation.invalid.map(
-            (duplicate) =>
-              ({
-                type: 'error',
-                message: `Found duplicated routePath(${chalk.red(`[${duplicate.method}] ${duplicate.routePath}`)}): ${
-                  duplicate.filePath
-                }`,
-                filePath: duplicate.filePath,
-              } satisfies IReason),
-          ),
-          ...data
-            .map((failReply) => failReply.data.fail)
-            .flat()
-            .map((failReply) => failReply.reason),
-        ],
-      );
-    } else {
-      reasons.add(
-        ...[
-          ...validation.invalid.map(
-            (duplicate) =>
-              ({
-                type: 'error',
-                message: `Found duplicated routePath(${chalk.red(`[${duplicate.method}] ${duplicate.routePath}`)}): ${
-                  duplicate.filePath
-                }`,
-                filePath: duplicate.filePath,
-              } satisfies IReason),
-          ),
-          ...data
-            .map((failReply) => failReply.data.fail)
-            .flat()
-            .map((failReply) => failReply.reason),
-        ],
+        ...data
+          .map((failReply) => failReply.data.fail)
+          .flat()
+          .map((failReply) => failReply.reason),
       );
     }
 
     spinner.stop('route.ts code generation', 'succeed');
 
     show('log', getReasonMessages(reasons.reasons));
+
+    if (table.table != null) {
+      show('log', table.table.toString());
+    }
 
     log.debug('every worker thread terminate');
 

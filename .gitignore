@@ -69,6 +69,7 @@ artifact/
 .vscode
 
 # Example
-example/handlers/route.ts
+examples/handlers/route.ts
+examples/handlers/route-map.ts
 .eslintcache
 TODO.md
