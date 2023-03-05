@@ -8,8 +8,10 @@ import FastMakerError from '#errors/FastMakerError';
 import importCodeGenerator from '#generators/importCodeGenerator';
 import prettierProcessing from '#generators/prettierProcessing';
 import routeCodeGenerator from '#generators/routeCodeGenerator';
+import routeMapGenerator from '#generators/routeMapGenerator';
 import createAnalysisRequestStatementBulkCommand from '#modules/createAnalysisRequestStatementBulkCommand';
 import getOutputFilePath from '#modules/getOutputFilePath';
+import getOutputMapFilePath from '#modules/getOutputMapFilePath';
 import getRoutingCode from '#modules/getRoutingCode';
 import mergeAnalysisRequestStatements from '#modules/mergeAnalysisRequestStatements';
 import reasons from '#modules/reasons';
@@ -57,7 +59,7 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
     log.trace(`${JSON.stringify(option)}`);
     log.trace(`worker-size: ${workerSize}`);
 
-    spinner.start(`TypeScript project: ${resolvedPaths.project} loading, ...`);
+    spinner.start(`TypeScript project loading: ${resolvedPaths.project}`);
 
     workers.broadcast({
       command: CE_WORKER_ACTION.OPTION_LOAD,
@@ -81,13 +83,15 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
       throw new FastMakerError(failReply.error);
     }
 
-    spinner.update(`TypeScript project: ${resolvedPaths.project} complete!`, 'succeed');
+    spinner.stop(`TypeScript project loaded: ${resolvedPaths.project}`, 'succeed');
 
     workers.send({
       command: CE_WORKER_ACTION.PROJECT_DIAGONOSTIC,
     } satisfies Extract<TSendMasterToWorkerMessage, { command: typeof CE_WORKER_ACTION.PROJECT_DIAGONOSTIC }>);
 
     reply = await workers.wait();
+
+    spinner.start('handler file searching');
 
     // master check project diagostic on worker
     if (reply.data.some((workerReply) => workerReply.result === 'fail')) {
@@ -125,6 +129,9 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
     >;
 
     const handlers = Object.values(validation.valid).flat();
+
+    spinner.stop(`handler file searched: ${chalk.cyanBright(handlers.length)}`, 'succeed');
+
     const job = createAnalysisRequestStatementBulkCommand(workerSize, handlers);
 
     workers.send(...job);
@@ -142,7 +149,7 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
       throw new FastMakerError(failReply.error);
     }
 
-    spinner.start('route.ts code generation');
+    spinner.start(`${chalk.greenBright('route.ts')} code generating`);
 
     const data = reply.data as TPickPassWorkerToMasterTaskComplete<
       typeof CE_WORKER_ACTION.ANALYSIS_REQUEST_STATEMENT
@@ -156,6 +163,13 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
       const prettfied = await prettierProcessing({ code });
       const outputFilePath = getOutputFilePath(option.output);
       await writeOutputFile(outputFilePath, prettfied);
+
+      if (option.routeMap) {
+        const routeMapCode = routeMapGenerator(sortRoutePaths(merged.routes));
+        const routeMapOutputFilePath = getOutputMapFilePath(option.output);
+        const prettfiedRouteMapCode = await prettierProcessing({ code: routeMapCode });
+        await writeOutputFile(routeMapOutputFilePath, prettfiedRouteMapCode);
+      }
 
       reasons.clear();
       reasons.add(
@@ -197,8 +211,7 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
       );
     }
 
-    spinner.update('route.ts code generation', 'succeed');
-    spinner.stop();
+    spinner.stop('route.ts code generation', 'succeed');
 
     show('log', getReasonMessages(reasons.reasons));
 

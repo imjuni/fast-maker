@@ -9,7 +9,7 @@ export default function getOutputFilePath(...filePaths: string[]) {
   }
 
   if (dirPath.endsWith('.ts')) {
-    return path.join(dirPath);
+    return dirPath;
   }
 
   return path.join(dirPath, 'route.ts');

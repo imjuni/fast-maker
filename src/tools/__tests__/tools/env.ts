@@ -15,6 +15,7 @@ export const option: IBaseOption = {
   verbose: false,
   skipError: true,
   cliLogo: true,
+  routeMap: false,
   useDefaultExport: true,
   routeFunctionName: 'routing',
 };
