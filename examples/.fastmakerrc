@@ -1,5 +1,6 @@
 {
   "project": "tsconfig.json",
   "handler": "handlers",
-  "output": "handlers"
+  "output": "handlers",
+  "route-map": true
 }

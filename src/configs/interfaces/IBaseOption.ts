@@ -23,6 +23,9 @@ export default interface IBaseOption {
   /** display cli logo */
   cliLogo: boolean;
 
+  /** create route-map source file */
+  routeMap: boolean;
+
   /**
    * route function in output file that use default export
    * @default true

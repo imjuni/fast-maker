@@ -8,8 +8,10 @@ import type { TRouteBaseOption, TRouteOption } from '#configs/interfaces/TRouteO
 import importCodeGenerator from '#generators/importCodeGenerator';
 import prettierProcessing from '#generators/prettierProcessing';
 import routeCodeGenerator from '#generators/routeCodeGenerator';
+import routeMapGenerator from '#generators/routeMapGenerator';
 import doAnalysisRequestStatements from '#modules/doAnalysisRequestStatements';
 import getOutputFilePath from '#modules/getOutputFilePath';
+import getOutputMapFilePath from '#modules/getOutputMapFilePath';
 import getRoutingCode from '#modules/getRoutingCode';
 import getValidRoutePath from '#modules/getValidRoutePath';
 import reasons from '#modules/reasons';
@@ -76,8 +78,14 @@ export default async function routeCommandSyncHandler(baseOption: TRouteBaseOpti
   const code = getRoutingCode({ option, imports: importCodes, routes: routeCodes });
   const prettfied = await prettierProcessing({ code });
   const outputFilePath = getOutputFilePath(option.output);
-
   await writeOutputFile(outputFilePath, prettfied);
+
+  if (option.routeMap) {
+    const routeMapCode = routeMapGenerator(sortRoutePaths(statements.routes));
+    const routeMapOutputFilePath = getOutputMapFilePath(option.output);
+    const prettfiedRouteMapCode = await prettierProcessing({ code: routeMapCode });
+    await writeOutputFile(routeMapOutputFilePath, prettfiedRouteMapCode);
+  }
 
   spinner.update('route.ts code generation', 'succeed');
 

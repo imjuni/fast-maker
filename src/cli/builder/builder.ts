@@ -36,6 +36,11 @@ export default function builder(args: Argv): Argv {
       type: 'boolean',
       default: false,
     })
+    .option('route-map', {
+      describe: 'create route-map source file',
+      type: 'boolean',
+      default: false,
+    })
     .option('max-workers', {
       describe: 'max worker count',
       type: 'number',

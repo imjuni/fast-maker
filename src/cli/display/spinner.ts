@@ -62,11 +62,17 @@ class Spinner {
     }
   }
 
-  stop(display?: { message: string; channel: keyof Pick<ora.Ora, 'succeed' | 'fail' | 'info'> }) {
+  stop(message?: string, channel?: keyof Pick<ora.Ora, 'succeed' | 'fail' | 'info'>) {
     if (this.isEnable === false) return;
 
-    if (display != null) {
-      this.#spinner[display.channel](display.message);
+    if (message != null && channel != null) {
+      this.#spinner[channel](message);
+    }
+
+    if (message != null) {
+      setImmediate(() => {
+        this.#spinner.text = message;
+      });
     }
 
     if (this.#spinner.isSpinning) {
