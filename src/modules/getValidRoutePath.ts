@@ -1,6 +1,6 @@
 import type IReason from '#compilers/interfaces/IReason';
 import reasons from '#modules/reasons';
-import type summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
+import type summaryRouteHandlerFiles from '#modules/summaryRouteHandlerFiles';
 import { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
 import type { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
 import methods from '#routes/interface/methods';
@@ -10,7 +10,7 @@ import { keyBys } from 'my-easy-fp';
 import type { AsyncReturnType } from 'type-fest';
 
 export default function getValidRoutePath(
-  handlerMap: AsyncReturnType<typeof summaryRouteHandlerFile>,
+  handlerMap: AsyncReturnType<typeof summaryRouteHandlerFiles>,
 ): TPickRouteInfo<typeof CE_ROUTE_INFO_KIND.VALIDATE_ROUTE_HANDLER_FILE> {
   const splittedHandlerMap = methods.reduce<
     Record<CE_ROUTE_METHOD, Record<string, TPickRouteInfo<typeof CE_ROUTE_INFO_KIND.ROUTE>[]>>

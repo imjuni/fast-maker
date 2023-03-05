@@ -251,16 +251,10 @@ const requestHandlerAnalysisMachine = (
 
           // parameter에서 type이 없는 경우 any와 동일하게 처리하면 된다,
           // 그리고 이 상황도 없다, type 없는 경우 이미 ANY_TYPE으로 보냈다
-          const typeArguments = parameter.getType().getTypeArguments();
-
-          // 이게 진짜 Any 타입이다, 하지만 이상황도 이미 이미 ANY_TYPE으로 보냈다
-          if (typeArguments.length < 1) {
-            throw new Error('Invalid state in assignFastifyTypeArgument: empty parameter.type');
-          }
-
           const typeArgument = atOrThrow(
-            typeArguments,
+            parameter.getType().getTypeArguments(),
             0,
+            // 이게 진짜 Any 타입이다, 하지만 이상황도 이미 이미 ANY_TYPE으로 보냈다
             new Error('Invalid state in assignFastifyTypeArgument: empty parameter.type.typeArguments'),
           );
 
@@ -440,9 +434,7 @@ const requestHandlerAnalysisMachine = (
         generatePropertySignatureWarnReason: assign((context) => {
           const next = { ...context };
           const node = castFunctionNode(context.routeHandler);
-          const [parameter] = node.getParameters();
-
-          if (parameter == null) return next;
+          const parameter = atOrThrow(node.getParameters(), 0);
 
           const propertySignatures = getPropertySignatures({ parameter });
           const result = validatePropertySignature({
@@ -474,15 +466,11 @@ const requestHandlerAnalysisMachine = (
           const next = { ...context };
           const node = castFunctionNode(context.routeHandler);
           const sourceFilePath = next.source.getFilePath().toString();
-          const parameter = atOrUndefined(node.getParameters(), 0);
-
-          if (parameter == null) return next;
+          const parameter = atOrThrow(node.getParameters(), 0);
 
           const typeArgument = context.useFastifyRequest
-            ? atOrUndefined(parameter.getType().getTypeArguments(), 0)
+            ? atOrThrow(parameter.getType().getTypeArguments(), 0)
             : parameter.getType();
-
-          if (typeArgument == null) return next;
 
           const routeFileImportConfiguration: IImportConfiguration = {
             hash: next.hash,
@@ -552,11 +540,10 @@ const requestHandlerAnalysisMachine = (
 
                   // https://github.com/dsherret/ts-morph/issues/202
                   // symbol을 호출하고 declaration을 호출해서 declaration에서 text를 얻어낸다
-                  const text = getTypeSymbolText(newTypeArgument);
-                  return text;
+                  return getTypeSymbolText(newTypeArgument);
                 }
 
-                return typeArgument.getSymbolOrThrow().getEscapedName();
+                return getTypeSymbolText(typeArgument);
               })()
             : parameter.getTypeNodeOrThrow().getFullText().trim();
 

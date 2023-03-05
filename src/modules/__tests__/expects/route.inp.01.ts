@@ -1,9 +1,9 @@
-import type summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
+import type summaryRouteHandlerFiles from '#modules/summaryRouteHandlerFiles';
 import posixJoin from '#tools/posixJoin';
 import * as env from '#tools/__tests__/tools/env';
 import type { AsyncReturnType } from 'type-fest';
 
-const data: AsyncReturnType<typeof summaryRouteHandlerFile> = {
+const data: AsyncReturnType<typeof summaryRouteHandlerFiles> = {
   kind: 'summary-route-handler-file',
   summary: {
     get: [

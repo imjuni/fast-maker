@@ -17,6 +17,7 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js'],
   transform: {
     '^.+\\.(ts|tsx)$': ['@swc/jest', swcrc],
+    // '^.+\\.(ts|tsx)$': 'ts-jest',
   },
   testMatch: ['**/__tests__/*.(ts|tsx)', '!**/__tests__/expects/*.(ts|tsx)'],
   testPathIgnorePatterns: [

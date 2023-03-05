@@ -3,52 +3,44 @@ import getInternalImportTypeReference from '#compilers/tools/getInternalImportTy
 import getResolvedModuleInImports from '#compilers/tools/getResolvedModuleInImports';
 import getTypeReferences from '#compilers/tools/getTypeReferences';
 import replaceTypeReferenceInTypeLiteral from '#compilers/tools/replaceTypeReferenceInTypeLiteral';
-import logger from '#tools/logger';
+import getResolvedPaths from '#configs/getResolvedPaths';
 import posixJoin from '#tools/posixJoin';
 import JestContext from '#tools/__tests__/tools/context';
 import * as env from '#tools/__tests__/tools/env';
+import loadSourceData from '#tools/__tests__/tools/loadSourceData';
+import { getExpectValue } from '@maeum/test-utility';
 import 'jest';
 import { atOrThrow } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
 import path from 'path';
-import { Project, SyntaxKind } from 'ts-morph';
+import { Node, Project, SyntaxKind } from 'ts-morph';
 
 const context = new JestContext();
 
-const log = logger();
-
 beforeAll(() => {
-  context.project = new Project({ tsConfigFilePath: path.join(env.examplePath, 'tsconfig.json') });
+  context.projectPath = posixJoin(env.examplePath, 'tsconfig.json');
+  context.project = new Project({ tsConfigFilePath: context.projectPath });
+  context.routeOption = { ...env.option, ...env.routeOption, ...getResolvedPaths(env.option) };
 });
 
 describe('getResolvedModuleInImports', () => {
   test('pass', async () => {
-    const routeFilePath = replaceSepToPosix(path.join(env.handlerPath, 'get\\xman\\world.ts'));
-    const source = context.project.getSourceFileOrThrow(routeFilePath);
-    const route = getHandlerWithOption(source);
-
-    const functionNode = route.handler!;
-
-    const casted =
-      functionNode.node.getKind() === SyntaxKind.FunctionDeclaration
-        ? functionNode.node.asKindOrThrow(SyntaxKind.FunctionDeclaration)
-        : functionNode.node.asKindOrThrow(SyntaxKind.ArrowFunction);
-
-    const parameters = casted.getParameters();
+    const routeFilePath = posixJoin(env.handlerPath, 'get', 'xman', 'world.ts');
+    const sourceFile = context.project.getSourceFileOrThrow(routeFilePath);
+    const route = getHandlerWithOption(sourceFile);
+    const parameters = route.handler!.node.asKindOrThrow(SyntaxKind.FunctionDeclaration).getParameters();
     const parameter = atOrThrow(parameters, 0);
 
     // 결국 resolve module을 하는 이유가, parameter 또는 typeArgument를 위해서인데
     // state-machine을 좀 더 단순화 하려면 resolve moulde이, parameter 또는 typeArgument를
     // 알아내서 resolved module을 가져 오는게 좋을 듯 하다
     const typeReferenceNodes = getTypeReferences(parameter);
-    const internalTypeReferenceNodes = getInternalImportTypeReference({ source, typeReferenceNodes });
+    const internalTypeReferenceNodes = getInternalImportTypeReference({ source: sourceFile, typeReferenceNodes });
     const resolutions = getResolvedModuleInImports({
-      source,
+      source: sourceFile,
       typeReferenceNodes: internalTypeReferenceNodes,
-      option: env.option,
+      option: context.routeOption,
     });
-
-    log.debug(JSON.stringify(resolutions, null, 2));
 
     expect(resolutions).toEqual([
       {
@@ -108,6 +100,35 @@ describe('getResolvedModuleInImports', () => {
         ],
       },
     ]);
+  });
+
+  test('pass - with dedupe', async () => {
+    const routeFilePath = posixJoin(env.handlerPath, 'get', 'xman', 'ww.ts');
+    const sourceFile = context.project.getSourceFileOrThrow(routeFilePath);
+    const route = getHandlerWithOption(sourceFile);
+    const parameters = route.handler!.node.asKindOrThrow(SyntaxKind.FunctionDeclaration).getParameters();
+    const parameter = atOrThrow(parameters, 0);
+
+    // 결국 resolve module을 하는 이유가, parameter 또는 typeArgument를 위해서인데
+    // state-machine을 좀 더 단순화 하려면 resolve moulde이, parameter 또는 typeArgument를
+    // 알아내서 resolved module을 가져 오는게 좋을 듯 하다
+    const typeReferenceNodes = getTypeReferences(parameter);
+    const internalTypeReferenceNodes = getInternalImportTypeReference({ source: sourceFile, typeReferenceNodes });
+    const r1 = getResolvedModuleInImports({
+      source: sourceFile,
+      typeReferenceNodes: internalTypeReferenceNodes,
+      option: context.routeOption,
+    });
+
+    const r2 = getExpectValue(r1, (_, value: any) => {
+      if (value === '[Circular]') return undefined;
+      if (value instanceof Node) return undefined;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return value;
+    });
+
+    const expectation = await loadSourceData<any>('default', __dirname, 'expects', 'expect.out.101');
+    expect(r2).toMatchObject(expectation);
   });
 });
 
