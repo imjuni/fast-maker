@@ -1,7 +1,6 @@
 import getHandlerWithOption from '#compilers/navigate/getHandlerWithOption';
 import getResolvedPaths from '#configs/getResolvedPaths';
 import summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
-import { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
 import getHash from '#tools/getHash';
 import getRelativeCwd from '#tools/getRelativeCwd';
 import logger from '#tools/logger';
@@ -13,7 +12,7 @@ import { CE_REQUEST_HANDLER_ANALYSIS_MACHINE } from '#xstate/interfaces/CE_REQUE
 import requestHandlerAnalysisMachine from '#xstate/RequestHandlerAnalysisMachine';
 import { getExpectValue } from '@maeum/test-utility';
 import 'jest';
-import { findOrThrow, isError } from 'my-easy-fp';
+import { isError } from 'my-easy-fp';
 import path from 'path';
 import * as tsm from 'ts-morph';
 import { interpret } from 'xstate';
@@ -38,24 +37,15 @@ describe('requestHandlerAnalysisMachine', () => {
       // project://example\handlers\get\xman\world.ts
       const routeFilePath = posixJoin(env.handlerPath, 'get', 'xman', 'world.ts');
       const sourceFile = context.project.getSourceFileOrThrow(routeFilePath);
-
-      const methodAggregated = await summaryRouteHandlerFile(
-        context.project.getSourceFiles().map((sf) => sf.getFilePath()),
-        { ...env.routeOption, cwd: path.join(env.examplePath) },
-      );
-
-      const route = findOrThrow(
-        methodAggregated.summary[CE_ROUTE_METHOD.GET],
-        (handler) => handler.filePath === routeFilePath,
-      );
+      const routeHandler = await summaryRouteHandlerFile(routeFilePath, context.routeOption);
       const routing = getHandlerWithOption(sourceFile);
-      const hash = getHash(getRelativeCwd(env.handlerPath, route.filePath));
+      const hash = getHash(getRelativeCwd(env.handlerPath, routeHandler.filePath));
 
       const machine = requestHandlerAnalysisMachine({
         project: context.project,
         source: sourceFile,
         hash,
-        routing: route,
+        routing: routeHandler,
         routeHandler: routing.handler!,
         routeOption: routing.option,
         option: context.routeOption,
@@ -92,24 +82,15 @@ describe('requestHandlerAnalysisMachine', () => {
     // project://example\handlers\get\xman\world.ts
     const routeFilePath = posixJoin(env.handlerPath, 'get', 'justice', 'world.ts');
     const sourceFile = context.project.getSourceFileOrThrow(routeFilePath);
-
-    const methodAggregated = await summaryRouteHandlerFile(
-      context.project.getSourceFiles().map((sf) => sf.getFilePath()),
-      { ...env.routeOption, cwd: path.join(env.examplePath) },
-    );
-
-    const route = findOrThrow(
-      methodAggregated.summary[CE_ROUTE_METHOD.GET],
-      (handler) => handler.filePath === routeFilePath,
-    );
+    const routeHandler = await summaryRouteHandlerFile(routeFilePath, context.routeOption);
     const routing = getHandlerWithOption(sourceFile);
-    const hash = getHash(getRelativeCwd(env.handlerPath, route.filePath));
+    const hash = getHash(getRelativeCwd(env.handlerPath, routeHandler.filePath));
 
     const machine = requestHandlerAnalysisMachine({
       project: context.project,
       source: sourceFile,
       hash,
-      routing: route,
+      routing: routeHandler,
       routeHandler: routing.handler!,
       routeOption: routing.option,
       option: context.routeOption,
@@ -131,5 +112,227 @@ describe('requestHandlerAnalysisMachine', () => {
     log.debug(terminateCircularResult);
 
     expect(terminateCircularResult).toMatchObject(expectation);
+  });
+
+  test('async function no parameter', async () => {
+    try {
+      // project://example\handlers\get\justice\world.ts
+      // project://example\handlers\get\xman\world.ts
+      const routeFilePath = posixJoin(env.handlerPath, 'delete', 'hello.ts');
+      const sourceFile = context.project.getSourceFileOrThrow(routeFilePath);
+      const routeHandler = await summaryRouteHandlerFile(routeFilePath, context.routeOption);
+      const routing = getHandlerWithOption(sourceFile);
+      const hash = getHash(getRelativeCwd(env.handlerPath, routeHandler.filePath));
+
+      const machine = requestHandlerAnalysisMachine({
+        project: context.project,
+        source: sourceFile,
+        hash,
+        routing: routeHandler,
+        routeHandler: routing.handler!,
+        routeOption: routing.option,
+        option: context.routeOption,
+      });
+
+      const interpretor = interpret(machine);
+      const actor = interpretor.start();
+      await waitFor(actor, (state) => state.matches(CE_REQUEST_HANDLER_ANALYSIS_MACHINE.DONE));
+      const { reasons: messages, importMap: importBox, routeMap: routeBox } = interpretor.getSnapshot().context;
+
+      const expectation = await loadSourceData<any>('default', path.join(__dirname, 'expects', 'expect.out.03.ts'));
+      const terminateCircularResult = getExpectValue({ messages, importBox, routeBox }, (_, value: any) => {
+        if (value === '[Circular]') return undefined;
+        if (value instanceof tsm.Node) return undefined;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return value;
+      });
+
+      expect(terminateCircularResult).toMatchObject(expectation);
+    } catch (caught) {
+      const err = isError(caught, new Error('unknown error raised'));
+
+      console.error(err.message);
+      console.error(err.stack);
+
+      expect(caught).toBeUndefined();
+    }
+  });
+
+  test('async anonymous function no parameter', async () => {
+    try {
+      // project://example\handlers\get\justice\world.ts
+      // project://example\handlers\get\xman\world.ts
+      const routeFilePath = posixJoin(env.handlerPath, 'post', 'dc', 'world.ts');
+      const sourceFile = context.project.getSourceFileOrThrow(routeFilePath);
+      const routeHandler = await summaryRouteHandlerFile(routeFilePath, context.routeOption);
+      const routing = getHandlerWithOption(sourceFile);
+      const hash = getHash(getRelativeCwd(env.handlerPath, routeHandler.filePath));
+
+      const machine = requestHandlerAnalysisMachine({
+        project: context.project,
+        source: sourceFile,
+        hash,
+        routing: routeHandler,
+        routeHandler: routing.handler!,
+        routeOption: routing.option,
+        option: context.routeOption,
+      });
+
+      const interpretor = interpret(machine);
+      const actor = interpretor.start();
+      await waitFor(actor, (state) => state.matches(CE_REQUEST_HANDLER_ANALYSIS_MACHINE.DONE));
+      const { reasons: messages, importMap: importBox, routeMap: routeBox } = interpretor.getSnapshot().context;
+
+      const expectation = await loadSourceData<any>('default', path.join(__dirname, 'expects', 'expect.out.04'));
+      const terminateCircularResult = getExpectValue({ messages, importBox, routeBox }, (_, value: any) => {
+        if (value === '[Circular]') return undefined;
+        if (value instanceof tsm.Node) return undefined;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return value;
+      });
+
+      expect(terminateCircularResult).toMatchObject(expectation);
+    } catch (caught) {
+      const err = isError(caught, new Error('unknown error raised'));
+
+      console.error(err.message);
+      console.error(err.stack);
+
+      expect(caught).toBeUndefined();
+    }
+  });
+
+  test('sync function no parameter', async () => {
+    try {
+      // project://example\handlers\get\justice\world.ts
+      // project://example\handlers\get\xman\world.ts
+      const sourceCode = `
+      // import { RouteShorthandOptions } from 'fastify';
+      import { FastifyRequest, FastifyReply, RouteShorthandOptions } from 'fastify';
+      import { Server } from 'http';
+      import type IReqPokeHello from '../interface/IReqPokeHello';
+      import schema from '../interface/JSC_IReqPokeHello';
+      
+      export const option: RouteShorthandOptions = {
+        schema: {
+          querystring: schema.properties?.Querystring,
+          body: schema.properties?.Body,
+        },
+      };
+      
+      export default function world() {
+        console.debug(req.query);
+        console.debug(req.body);
+      
+        return 'world';
+      };
+      
+      export default world;`;
+
+      const routeFilePath = posixJoin(env.handlerPath, 'get', 'po-ke', 'c1.ts');
+      const sourceFile = context.project.createSourceFile(routeFilePath, sourceCode, { overwrite: true });
+      const routeHandler = await summaryRouteHandlerFile(routeFilePath, context.routeOption);
+      const routing = getHandlerWithOption(sourceFile);
+      const hash = getHash(getRelativeCwd(env.handlerPath, routeHandler.filePath));
+
+      const machine = requestHandlerAnalysisMachine({
+        project: context.project,
+        source: sourceFile,
+        hash,
+        routing: routeHandler,
+        routeHandler: routing.handler!,
+        routeOption: routing.option,
+        option: context.routeOption,
+      });
+
+      const interpretor = interpret(machine);
+      const actor = interpretor.start();
+      await waitFor(actor, (state) => state.matches(CE_REQUEST_HANDLER_ANALYSIS_MACHINE.DONE));
+      const { reasons: messages, importMap: importBox, routeMap: routeBox } = interpretor.getSnapshot().context;
+
+      const expectation = await loadSourceData<any>('default', path.join(__dirname, 'expects', 'expect.out.05'));
+      const terminateCircularResult = getExpectValue({ messages, importBox, routeBox }, (_, value: any) => {
+        if (value === '[Circular]') return undefined;
+        if (value instanceof tsm.Node) return undefined;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return value;
+      });
+
+      expect(terminateCircularResult).toMatchObject(expectation);
+    } catch (caught) {
+      const err = isError(caught, new Error('unknown error raised'));
+
+      console.error(err.message);
+      console.error(err.stack);
+
+      expect(caught).toBeUndefined();
+    }
+  });
+
+  test('invalid type parameter no parameter', async () => {
+    try {
+      // project://example\handlers\get\justice\world.ts
+      // project://example\handlers\get\xman\world.ts
+      const sourceCode = `
+      // import { RouteShorthandOptions } from 'fastify';
+      import { FastifyRequest, FastifyReply, RouteShorthandOptions } from 'fastify';
+      import { Server } from 'http';
+      import type IReqPokeHello from '../interface/IReqPokeHello';
+      import schema from '../interface/JSC_IReqPokeHello';
+      
+      export const option: RouteShorthandOptions = {
+        schema: {
+          querystring: schema.properties?.Querystring,
+          body: schema.properties?.Body,
+        },
+      };
+      
+      export default async function world(req: FastifyRequest<{ Querstring: IReqPokeHello['querystring']; Body: IReqPokeHello['Body']; }>) {
+        console.debug(req.query);
+        console.debug(req.body);
+      
+        return 'world';
+      };
+      
+      export default world;`;
+
+      const routeFilePath = posixJoin(env.handlerPath, 'get', 'po-ke', 'c3.ts');
+      const sourceFile = context.project.createSourceFile(routeFilePath, sourceCode, { overwrite: true });
+      const routeHandler = await summaryRouteHandlerFile(routeFilePath, context.routeOption);
+      const routing = getHandlerWithOption(sourceFile);
+      const hash = getHash(getRelativeCwd(env.handlerPath, routeHandler.filePath));
+
+      const machine = requestHandlerAnalysisMachine({
+        project: context.project,
+        source: sourceFile,
+        hash,
+        routing: routeHandler,
+        routeHandler: routing.handler!,
+        routeOption: routing.option,
+        option: context.routeOption,
+      });
+
+      const interpretor = interpret(machine);
+      const actor = interpretor.start();
+      await waitFor(actor, (state) => state.matches(CE_REQUEST_HANDLER_ANALYSIS_MACHINE.DONE));
+      const { reasons: messages, importMap: importBox, routeMap: routeBox } = interpretor.getSnapshot().context;
+
+      const expectation = await loadSourceData<any>('default', path.join(__dirname, 'expects', 'expect.out.06'));
+      const terminateCircularResult = getExpectValue({ messages, importBox, routeBox }, (_, value: any) => {
+        if (value === '[Circular]') return undefined;
+        if (value instanceof tsm.Node) return undefined;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return value;
+      });
+
+      expect(terminateCircularResult).toMatchObject(expectation);
+    } catch (caught) {
+      const err = isError(caught, new Error('unknown error raised'));
+
+      console.error(err.message);
+      console.error(err.stack);
+
+      expect(caught).toBeUndefined();
+    }
   });
 });

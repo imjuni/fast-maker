@@ -5,7 +5,7 @@ import doAnalysisRequestStatement from '#modules/doAnalysisRequestStatement';
 import doDedupeRouting from '#modules/doDedupeRouting';
 import errorTrace from '#modules/errorTrace';
 import getValidRoutePath from '#modules/getValidRoutePath';
-import summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
+import summaryRouteHandlerFiles from '#modules/summaryRouteHandlerFiles';
 import { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
 import FastMakerContext from '#workers/FastMakerContext';
 import { CE_MASTER_ACTION } from '#workers/interfaces/CE_MASTER_ACTION';
@@ -160,7 +160,7 @@ export default class FastMakerEmitter extends EventEmitter {
         .filter((sourceFile) => getHandlerWithOption(sourceFile).handler != null)
         .map((sourceFile) => sourceFile.getFilePath().toString());
 
-      this.#context.handler = await summaryRouteHandlerFile(sourceFilePaths, this.#context.option);
+      this.#context.handler = await summaryRouteHandlerFiles(sourceFilePaths, this.#context.option);
 
       process.send?.({
         command: CE_MASTER_ACTION.TASK_COMPLETE,

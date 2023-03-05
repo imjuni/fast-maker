@@ -1,4 +1,4 @@
-import summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
+import summaryRouteHandlerFiles from '#modules/summaryRouteHandlerFiles';
 import evaluateVariablePath from '#routes/evaluateVariablePath';
 import getHandlerFile from '#routes/getHandlerFile';
 import getRoutePath from '#routes/getRoutePath';
@@ -240,7 +240,7 @@ describe('getRoutePath', () => {
 
 describe('getRouteFiles', () => {
   test('pass', async () => {
-    const routeFiles = await summaryRouteHandlerFile(
+    const routeFiles = await summaryRouteHandlerFiles(
       [
         posixJoin(env.handlerPath, 'get', 'justice', '[dc-league]', 'hello.ts'),
         posixJoin(env.handlerPath, 'get', 'justice', '[dc-league]', 'world.ts'),

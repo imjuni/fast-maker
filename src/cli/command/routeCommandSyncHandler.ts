@@ -13,7 +13,7 @@ import getOutputFilePath from '#modules/getOutputFilePath';
 import getRoutingCode from '#modules/getRoutingCode';
 import getValidRoutePath from '#modules/getValidRoutePath';
 import reasons from '#modules/reasons';
-import summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
+import summaryRouteHandlerFiles from '#modules/summaryRouteHandlerFiles';
 import writeOutputFile from '#modules/writeOutputFile';
 import sortRoutePaths from '#routes/sortRoutePaths';
 import getReasonMessages from '#tools/getReasonMessages';
@@ -45,7 +45,7 @@ export default async function routeCommandSyncHandler(baseOption: TRouteBaseOpti
 
   log.debug(`count: ${sourceFilePaths.length}`);
 
-  const handlerMap = await summaryRouteHandlerFile(sourceFilePaths, option);
+  const handlerMap = await summaryRouteHandlerFiles(sourceFilePaths, option);
 
   spinner.update('find handler files', 'succeed');
 
