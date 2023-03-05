@@ -176,8 +176,6 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
             .map((failReply) => failReply.reason),
         ],
       );
-
-      show('log', getReasonMessages(reasons.reasons));
     } else {
       reasons.add(
         ...[
@@ -197,11 +195,12 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
             .map((failReply) => failReply.reason),
         ],
       );
-
-      show('log', getReasonMessages(reasons.reasons));
     }
 
     spinner.update('route.ts code generation', 'succeed');
+    spinner.stop();
+
+    show('log', getReasonMessages(reasons.reasons));
 
     log.debug('every worker thread terminate');
 
@@ -223,5 +222,8 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
       TSendMasterToWorkerMessage,
       { command: typeof CE_WORKER_ACTION.TERMINATE }
     >);
+
+    spinner.stop();
+    progress.stop();
   }
 }

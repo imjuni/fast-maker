@@ -67,7 +67,9 @@ class Spinner {
 
     if (display != null) {
       this.#spinner[display.channel](display.message);
-    } else {
+    }
+
+    if (this.#spinner.isSpinning) {
       this.#spinner.stop();
     }
   }

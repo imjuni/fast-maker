@@ -4,10 +4,13 @@ import cliProgesss from 'cli-progress';
 class Progress {
   accessor isEnable: boolean;
 
+  #isProgressing: boolean;
+
   #bar: cliProgesss.SingleBar;
 
   constructor() {
     this.isEnable = true;
+    this.#isProgressing = false;
 
     this.#bar = new cliProgesss.SingleBar(
       {
@@ -21,8 +24,13 @@ class Progress {
     );
   }
 
+  get isProgressing() {
+    return this.#isProgressing;
+  }
+
   start(total: number, startValue: number, schemaName?: string) {
     if (this.isEnable) {
+      this.#isProgressing = true;
       this.#bar.start(total, startValue, {
         schemaName: schemaName != null ? ` - ${schemaName}` : '',
       });
@@ -42,7 +50,9 @@ class Progress {
   }
 
   stop() {
-    if (this.isEnable) {
+    if (this.isEnable === false) return;
+
+    if (this.#isProgressing) {
       this.#bar.stop();
     }
   }

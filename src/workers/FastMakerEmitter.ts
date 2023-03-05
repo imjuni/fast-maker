@@ -4,6 +4,7 @@ import getDiagnostics from '#compilers/validators/getDiagnostics';
 import doAnalysisRequestStatement from '#modules/doAnalysisRequestStatement';
 import doDedupeRouting from '#modules/doDedupeRouting';
 import errorTrace from '#modules/errorTrace';
+import getOutputFilePath from '#modules/getOutputFilePath';
 import getValidRoutePath from '#modules/getValidRoutePath';
 import summaryRouteHandlerFiles from '#modules/summaryRouteHandlerFiles';
 import { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
@@ -157,6 +158,7 @@ export default class FastMakerEmitter extends EventEmitter {
         .getSourceFiles()
         .map((sourceFile) => sourceFile)
         .filter((sourceFile) => isDescendant(this.#context.option.handler, sourceFile.getFilePath().toString()))
+        .filter((sourceFile) => sourceFile.getFilePath().toString() !== getOutputFilePath(this.#context.option.output))
         .filter((sourceFile) => getHandlerWithOption(sourceFile).handler != null)
         .map((sourceFile) => sourceFile.getFilePath().toString());
 
