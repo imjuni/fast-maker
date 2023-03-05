@@ -40,6 +40,7 @@ export default async function routeCommandSyncHandler(baseOption: TRouteBaseOpti
     .getSourceFiles()
     .map((sourceFile) => sourceFile)
     .filter((sourceFile) => isDescendant(option.handler, sourceFile.getFilePath().toString()))
+    .filter((sourceFile) => sourceFile.getFilePath().toString() !== getOutputFilePath(option.output))
     .filter((sourceFile) => getHandlerWithOption(sourceFile).handler != null)
     .map((sourceFile) => sourceFile.getFilePath().toString());
 
