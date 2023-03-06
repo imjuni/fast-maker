@@ -25,6 +25,7 @@ import { CE_WORKER_ACTION } from '#workers/interfaces/CE_WORKER_ACTION';
 import type TSendMasterToWorkerMessage from '#workers/interfaces/TSendMasterToWorkerMessage';
 import {
   isFailTaskComplete,
+  isPassTaskComplete,
   type TPickPassWorkerToMasterTaskComplete,
 } from '#workers/interfaces/TSendWorkerToMasterMessage';
 import workers from '#workers/workers';
@@ -46,8 +47,7 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
       });
     } else {
       spinner.start('Fast Maker start');
-      spinner.update('Fast Maker start', 'info');
-      spinner.stop();
+      spinner.stop('Fast Maker start', 'info');
     }
 
     const resolvedPaths = getResolvedPaths(baseOption);
@@ -93,14 +93,14 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
 
     reply = await workers.wait();
 
-    spinner.start('handler file searching');
-
     // master check project diagostic on worker
     if (reply.data.some((workerReply) => workerReply.result === 'fail')) {
       const failReplies = reply.data.filter(isFailTaskComplete);
       const failReply = atOrThrow(failReplies, 0);
       throw new FastMakerError(failReply.error);
     }
+
+    spinner.start('handler file searching');
 
     workers.broadcast({
       command: CE_WORKER_ACTION.SUMMARY_ROUTE_HANDLER_FILE,
@@ -135,8 +135,13 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
     >;
 
     const handlers = Object.values(validation.valid).flat();
+    const count = Object.values(validation.valid).reduce((sum, validHandlers) => sum + validHandlers.length, 0);
 
-    spinner.stop(`handler file searched: ${chalk.cyanBright(handlers.length)}`, 'succeed');
+    spinner.stop(`handler file searched: ${chalk.cyanBright(count)}`, 'succeed');
+
+    if (count <= 0) {
+      throw new Error(`Cannot found valid route handler file: ${count}/ ${Object.values(handlerFiles).flat().length}`);
+    }
 
     const job = createAnalysisRequestStatementBulkCommand(workerSize, handlers);
 
@@ -157,7 +162,7 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
 
     spinner.start(`${chalk.greenBright('route.ts')} code generating`);
 
-    const data = reply.data as TPickPassWorkerToMasterTaskComplete<
+    const data = reply.data.filter(isPassTaskComplete) as TPickPassWorkerToMasterTaskComplete<
       typeof CE_WORKER_ACTION.ANALYSIS_REQUEST_STATEMENT
     >[];
 
@@ -182,13 +187,7 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
         await writeOutputFile(routeMapOutputFilePath, prettfiedRouteMapCode);
       }
 
-      reasons.clear();
-      reasons.add(
-        ...data
-          .map((failReply) => failReply.data.fail)
-          .flat()
-          .map((failReply) => failReply.reason),
-      );
+      reasons.add(...data.map((passReply) => passReply.data.fail.map((reason) => reason.reason)).flat());
     }
 
     spinner.stop('route.ts code generation', 'succeed');

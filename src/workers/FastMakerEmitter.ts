@@ -14,9 +14,10 @@ import { CE_WORKER_ACTION } from '#workers/interfaces/CE_WORKER_ACTION';
 import type { TPickSendMasterToWorkerMessage } from '#workers/interfaces/TSendMasterToWorkerMessage';
 import type TSendWorkerToMasterMessage from '#workers/interfaces/TSendWorkerToMasterMessage';
 import { findOrThrow, isError } from 'my-easy-fp';
-import { isDescendant } from 'my-node-fp';
+import { exists, isDescendant } from 'my-node-fp';
 import type { TPickIFail, TPickIPass } from 'my-only-either';
 import EventEmitter from 'node:events';
+import path from 'node:path';
 import type { AsyncReturnType } from 'type-fest';
 
 export default class FastMakerEmitter extends EventEmitter {
@@ -69,6 +70,27 @@ export default class FastMakerEmitter extends EventEmitter {
       CE_WORKER_ACTION.ANALYSIS_REQUEST_STATEMENT_BULK,
       (payload: TPickSendMasterToWorkerMessage<typeof CE_WORKER_ACTION.ANALYSIS_REQUEST_STATEMENT_BULK>['data']) => {
         this.analysisRequestStatementBulk(payload).catch(errorTrace);
+      },
+    );
+
+    this.on(
+      CE_WORKER_ACTION.WATCH_SOURCE_FILE_ADD,
+      (payload: TPickSendMasterToWorkerMessage<typeof CE_WORKER_ACTION.WATCH_SOURCE_FILE_ADD>['data']) => {
+        this.watchSourceFileAdd(payload).catch(errorTrace);
+      },
+    );
+
+    this.on(
+      CE_WORKER_ACTION.WATCH_SOURCE_FILE_CHANGE,
+      (payload: TPickSendMasterToWorkerMessage<typeof CE_WORKER_ACTION.WATCH_SOURCE_FILE_CHANGE>['data']) => {
+        this.watchSourceFileChange(payload).catch(errorTrace);
+      },
+    );
+
+    this.on(
+      CE_WORKER_ACTION.WATCH_SOURCE_FILE_UNLINK,
+      (payload: TPickSendMasterToWorkerMessage<typeof CE_WORKER_ACTION.WATCH_SOURCE_FILE_UNLINK>['data']) => {
+        this.watchSourceFileUnlink(payload).catch(errorTrace);
       },
     );
 
@@ -357,6 +379,147 @@ export default class FastMakerEmitter extends EventEmitter {
           error: { kind: 'error', message: err.message, stack: err.stack },
         },
       } satisfies Extract<TSendWorkerToMasterMessage, { command: typeof CE_MASTER_ACTION.TASK_COMPLETE }>);
+    }
+  }
+
+  // watch action
+  async watchSourceFileAdd(
+    payload: TPickSendMasterToWorkerMessage<typeof CE_WORKER_ACTION.WATCH_SOURCE_FILE_ADD>['data'],
+  ) {
+    const resolved = path.join(this.#context.option.cwd, payload.filePath);
+
+    try {
+      if ((await exists(resolved)) === false) {
+        throw new Error('Cannot found add file');
+      }
+
+      this.#context.project.addSourceFileAtPath(resolved);
+
+      process.send?.({
+        command: CE_MASTER_ACTION.TASK_COMPLETE,
+        data: {
+          command: CE_WORKER_ACTION.WATCH_SOURCE_FILE_ADD,
+          id: this.id,
+          result: 'pass',
+        },
+      } satisfies TSendWorkerToMasterMessage);
+    } catch (caught) {
+      const err = isError(caught, new Error('unknown error raised'));
+
+      process.send?.({
+        command: CE_MASTER_ACTION.TASK_COMPLETE,
+        data: {
+          command: CE_WORKER_ACTION.WATCH_SOURCE_FILE_ADD,
+          id: this.id,
+          result: 'fail',
+          error: {
+            kind: 'error-with-reason',
+            message: err.message,
+            stack: err.stack,
+            data: [
+              {
+                type: 'error',
+                message: 'Cannot found add source file',
+                filePath: resolved,
+              },
+            ],
+          },
+        },
+      } satisfies TSendWorkerToMasterMessage);
+    }
+  }
+
+  async watchSourceFileChange(
+    payload: TPickSendMasterToWorkerMessage<typeof CE_WORKER_ACTION.WATCH_SOURCE_FILE_CHANGE>['data'],
+  ) {
+    const resolved = path.join(this.#context.option.cwd, payload.filePath);
+
+    try {
+      const sourceFile = this.#context.project.getSourceFile(payload.filePath);
+
+      if (sourceFile == null) {
+        throw new Error(`Cannot found watch-file: ${payload.filePath}`);
+      }
+
+      await sourceFile.refreshFromFileSystem();
+
+      process.send?.({
+        command: CE_MASTER_ACTION.TASK_COMPLETE,
+        data: {
+          command: CE_WORKER_ACTION.WATCH_SOURCE_FILE_CHANGE,
+          id: this.id,
+          result: 'pass',
+        },
+      } satisfies TSendWorkerToMasterMessage);
+    } catch (caught) {
+      const err = isError(caught, new Error('unknown error raised'));
+
+      process.send?.({
+        command: CE_MASTER_ACTION.TASK_COMPLETE,
+        data: {
+          command: CE_WORKER_ACTION.WATCH_SOURCE_FILE_CHANGE,
+          id: this.id,
+          result: 'fail',
+          error: {
+            kind: 'error-with-reason',
+            message: err.message,
+            stack: err.stack,
+            data: [
+              {
+                type: 'error',
+                message: 'Cannot found change source file',
+                filePath: resolved,
+              },
+            ],
+          },
+        },
+      } satisfies TSendWorkerToMasterMessage);
+    }
+  }
+
+  async watchSourceFileUnlink(
+    payload: TPickSendMasterToWorkerMessage<typeof CE_WORKER_ACTION.WATCH_SOURCE_FILE_UNLINK>['data'],
+  ) {
+    const resolved = path.join(this.#context.option.cwd, payload.filePath);
+
+    try {
+      const sourceFile = this.#context.project.getSourceFile(resolved);
+
+      if (sourceFile == null) {
+        throw new Error(`Cannot found watch-file: ${payload.filePath}`);
+      }
+
+      process.send?.({
+        command: CE_MASTER_ACTION.TASK_COMPLETE,
+        data: {
+          command: CE_WORKER_ACTION.WATCH_SOURCE_FILE_UNLINK,
+          id: this.id,
+          result: 'pass',
+        },
+      } satisfies TSendWorkerToMasterMessage);
+    } catch (caught) {
+      const err = isError(caught, new Error('unknown error raised'));
+
+      process.send?.({
+        command: CE_MASTER_ACTION.TASK_COMPLETE,
+        data: {
+          command: CE_WORKER_ACTION.WATCH_SOURCE_FILE_UNLINK,
+          id: this.id,
+          result: 'fail',
+          error: {
+            kind: 'error-with-reason',
+            message: err.message,
+            stack: err.stack,
+            data: [
+              {
+                type: 'error',
+                message: 'Cannot found delete source file',
+                filePath: resolved,
+              },
+            ],
+          },
+        },
+      } satisfies TSendWorkerToMasterMessage);
     }
   }
 }
