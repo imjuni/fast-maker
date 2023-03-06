@@ -1,3 +1,4 @@
+import { CE_DEFAULT_VALUE } from '#configs/interfaces/CE_DEFAULT_VALUE';
 import type { Argv } from 'yargs';
 
 export default function builder(args: Argv): Argv {
@@ -15,16 +16,15 @@ export default function builder(args: Argv): Argv {
       description: 'pass configuration file path, default value is cwd(current working directory)',
       type: 'string',
     })
+    .option('output', {
+      alias: 'o',
+      description: 'generated "route.ts" file on store this directory',
+      type: 'string',
+    })
     .option('project', {
       alias: 'p',
       description: 'tsconfig.json file for route.ts generation',
       type: 'string',
-    })
-    .option('verbose', {
-      alias: 'v',
-      description: 'display verbose message',
-      type: 'boolean',
-      default: false,
     });
 
   // ------------------------------------------------------------------------
@@ -45,6 +45,11 @@ export default function builder(args: Argv): Argv {
       describe: 'max worker count',
       type: 'number',
       default: undefined,
+    })
+    .option('worker-timeout', {
+      describe: 'route code generation worker timeout: default 90 seconds',
+      type: 'number',
+      default: CE_DEFAULT_VALUE.DEFAULT_TASK_WAIT_SECOND * 3,
     })
     .option('use-default-export', {
       description: 'route function in output file that use default export',
