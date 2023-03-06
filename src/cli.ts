@@ -1,6 +1,7 @@
 import builder from '#cli/builders/builder';
 import routeBuilder from '#cli/builders/routeBuilder';
 import watchBuilder from '#cli/builders/watchBuilder';
+import initCommandSyncHandler from '#cli/commands/initCommandSyncHandler';
 import routeCommandClusterHandler from '#cli/commands/routeCommandClusterHandler';
 import routeCommandSyncHandler from '#cli/commands/routeCommandSyncHandler';
 import watchCommandClusterHandler from '#cli/commands/watchCommandClusterHandler';
@@ -19,6 +20,20 @@ import { isError } from 'my-easy-fp';
 import yargs, { type CommandModule } from 'yargs';
 
 const log = logger();
+
+const initCmd: CommandModule<{}, {}> = {
+  command: CE_COMMAND_LIST.INIT,
+  aliases: CE_COMMAND_LIST.INIT_ALIAS,
+  describe: 'create route.ts file in your directory using by tsconfig.json',
+  handler: async () => {
+    try {
+      await initCommandSyncHandler();
+    } catch (caught) {
+      const err = isError(caught, new Error('unknown error raised'));
+      log.error(err);
+    }
+  },
+};
 
 const routeCmd: CommandModule<TRouteOption, TRouteOption> = {
   command: CE_COMMAND_LIST.ROUTE,
@@ -70,6 +85,7 @@ if (process.env.SYNC_MODE === 'true') {
   parser
     .command(routeCmd as CommandModule<{}, TRouteOption>)
     .command(watchCmd as CommandModule<{}, TWatchOption>)
+    .command(initCmd)
     .demandCommand()
     .recommendCommands()
     .config(preLoadConfig())
@@ -93,6 +109,7 @@ if (process.env.SYNC_MODE === 'true') {
   parser
     .command(routeCmd as CommandModule<{}, TRouteOption>)
     .command(watchCmd as CommandModule<{}, TWatchOption>)
+    .command(initCmd)
     .demandCommand()
     .recommendCommands()
     .config(preLoadConfig())

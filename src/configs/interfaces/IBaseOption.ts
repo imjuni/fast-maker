@@ -2,9 +2,6 @@ export default interface IBaseOption {
   /** path of .fastmakerrc configuration file */
   config?: string;
 
-  /** save extra log for debugging */
-  debugLog: boolean;
-
   /** path of the api handler */
   handler: string;
 
@@ -13,9 +10,6 @@ export default interface IBaseOption {
 
   /** path of the tsconfig file. Because fast-maker use typescript compiler api. */
   project: string;
-
-  /** verbose message display */
-  verbose: boolean;
 
   /** skip compile error on project source file */
   skipError: boolean;
