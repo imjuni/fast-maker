@@ -31,7 +31,7 @@ import {
 import workers from '#workers/workers';
 import { showLogo } from '@maeum/cli-logo';
 import chalk from 'chalk';
-import { atOrThrow, isError, populate } from 'my-easy-fp';
+import { atOrThrow, isError, populate, sleep } from 'my-easy-fp';
 import cluster from 'node:cluster';
 import os from 'node:os';
 
@@ -48,6 +48,7 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
     } else {
       spinner.start('Fast Maker start');
       spinner.stop('Fast Maker start', 'info');
+      await sleep(50);
     }
 
     const resolvedPaths = getResolvedPaths(baseOption);
