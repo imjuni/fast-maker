@@ -24,33 +24,52 @@ fastify.js already have auto route mechanics using [fastify-autoload](https://gi
 ## Table of Contents <!-- omit in toc -->
 
 - [Getting started](#getting-started)
+- [How it works?](#how-it-works)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Detail option](#detail-option)
-- [Constraints](#constraints)
-  - [TypeScript only](#typescript-only)
-  - [Directory structure is route path](#directory-structure-is-route-path)
-    - [method](#method)
-    - [path parameter](#path-parameter)
-  - [Single file, Single route](#single-file-single-route)
-  - [Hash](#hash)
-- [Type declaration for FastifyRequest](#type-declaration-for-fastifyrequest)
-- [RouteShorthandOptions](#routeshorthandoptions)
-- [.fastmakerrc file](#fastmakerrc-file)
+- [Routing](#routing)
+  - [HTTP Method](#http-method)
+  - [Route options](#route-options)
+  - [Route handler](#route-handler)
+  - [Variable in Route Path](#variable-in-route-path)
+- [Example using fastify.js](#example-using-fastifyjs)
+- [Relate To](#relate-to)
+- [Roadmaps](#roadmaps)
+- [License](#license)
 
 ## Getting started
 
 ```bash
-npx fast-maker -h [your handler directory]
+npx fast-maker init
+npx fast-maker route
 ```
+
+You can create configuration file using init command. And you can run route command, `fast-maker` generate `route.ts` file on your output directory in configuration file.
+
+You can see this mechanics!
 
 ![fast-maker-showcase.gif](assets/fast-maker-showcase.gif)
 
-| directory structure                                        |     | route function                                     |
+## How it works?
+
+`fast-maker` using **TypeScript Compiler API**. So `fast-maker` exactly know handler function and route option in each file.
+
+```mermaid
+graph LR
+
+A[route file] --> fast-maker
+subgraph fast-maker
+direction TB
+C[TypeScript Compiler API]-->|extract <br/>handler function,<br /> option variable|B[fast-maker]
+end
+fast-maker-->|extract <br />route path|D[route.ts]
+```
+
+The image below briefly shows how the directory is converted to route configurations.
+
+| AS-IS (directory structure)                                |     | TO-BE (route function)                             |
 | ---------------------------------------------------------- | --- | -------------------------------------------------- |
 | ![directory_structure.png](assets/directory_structure.png) | ➜   | ![route_config_ts.png](assets/route_config_ts.png) |
-
-Yes, `fast-maker` automatic generation route function!
 
 ## Installation
 
@@ -60,174 +79,124 @@ npm i fast-maker --save-dev
 
 ## Usage
 
-fast-maker need two option. handlers directory and tsconfig.json file. Or you can create .fastmakerrc.
+You can see help from `--help` option.
 
 ```bash
-# with option
-fast-maker -h <your ruote handler directory>
+# display help for each commands
+npx fast-maker --help
 
-# with .fastmakerrc
-fast-maker -c ./.configs/.fastmakerrc
+# display help for route commands
+npx fast-maker route --help
+
+# display help for watch commands
+npx fast-maker watch --help
+
+# display help for init commands
+npx fast-maker init --help
 ```
 
-## Detail option
+Also you can see detail option [here](/docs/options.md).
 
-|    name    | required | alias | desc.                                                                                                         |
-| :--------: | :------: | :---: | :------------------------------------------------------------------------------------------------------------ |
-| --handler  | required |  -a   | API handler directory                                                                                         |
-| --project  | required |  -p   | tsconfig path                                                                                                 |
-|  --output  |          |  -o   | route.ts file generate on output directory. Default value is route handler directory(--handler option passed) |
-| --verbose  |          |  -v   | verbose message display                                                                                       |
-| --debugLog |          |  -d   | generate debug log file                                                                                       |
-|  --config  |          |  -c   | configuration file load given directory                                                                       |
+## Routing
 
-## Constraints
+`fast-maker` has a file-system based route configuration. This concept borrowed from [Next.js routing system](https://nextjs.org/docs/routing/introduction). But one difference is that _HTTP Method_ is separated by file-system.
 
-1. Typescript only
-1. Directory structure is route path
-1. Single file, Single route
-1. Hash
+### HTTP Method
 
-### TypeScript only
+use file-system.
 
-fast-maker based on TypeScript type system and use TypeScript compiler API(using ts-morph). Therefore only work on TypeScript project.
-
-### Directory structure is route path
-
-fast-maker inspired by CodeIgniter and Next.js routing system. fast-maker using specific directory name use to method discrimination. So fast-maker need get, post, put, delete, etc directory need to method discrimination.
-
-#### method
-
-get, post, put, delete, all, etc directory bind method
-
-- as-is: \<your project>/src/handlers/get/utility/health_check
-- to-be: server.get('/utility/health_check')
-
-- as-is: \<your project>/src/handlers/post/articles
-- to-be: server.post('/articles')
-
-#### path parameter
-
-square brackets replace to path parameter
-
-- as-is: \<your project>/src/handlers/get/articles/[id].ts
-- to-be: server.get('/articles/:id')
-
-- as-is: \<your project>/src/handlers/get/major/[majorId]/student/[studentId].ts
-- to-be: server.get('/major/:majorId/student/:studentId')
-
-### Single file, Single route
-
-fast-maker using default function to handler function. `option` variable use to `RouteShorthandOptions`.
-
-### Hash
-
-For example, option is same name every file. Also route handler can have same filename in many directory. Therefore fast-maker add hash each route handler and option. Like below example.
-
-```ts
-import IReqPokeHello from './get/interface/IReqPokeHello';
-import hello_bc1Vxcm2acwx2zx33spLFPqxVvROeeVa, {
-  option as option_bc1Vxcm2acwx2zx33spLFPqxVvROeeVa,
-} from './get/po-ke/hello';
-
-fastify.get<IReqPokeHello>(
-  '/po-ke/hello',
-  option_bc1Vxcm2acwx2zx33spLFPqxVvROeeVa,
-  hello_bc1Vxcm2acwx2zx33spLFPqxVvROeeVa,
-);
+```text
+handlers/
+├─ get/
+│  ├─ hero/
+│  │  ├─ [name].ts
+├─ post/
+│  ├─ hero.ts
+├─ put/
+│  ├─ hero/
+│  │  ├─ [name].ts
+├─ delete/
+│  ├─ hero/
+│  │  ├─ [name].ts
 ```
 
-Hash create by resolved full-directory. And hash use crypto.createHmac function. So, if you donot change directory structure that always same string.
+`get`, `post`, `put`, `delete` directory represent _HTTP Method_. Also you can use `options`, `patch`, `head`, `all` directory.
 
-## Type declaration for FastifyRequest
+### Route options
 
-fast-maker support FastifyRequest type argument. see below.
-
-```ts
-// get/poke/world.ts
-const world = async (
-  req: FastifyRequest<
-    {
-      Querystring: IReqPokeHello['Querystring'];
-      Body: IReqPokeHello['Body'];
-      Headers: {
-        'access-token': string;
-        'refresh-token': string;
-        'expire-time': {
-          token: string;
-          expire: number;
-          site: {
-            host: string;
-            port: number;
-          };
-        };
-      };
-    },
-    Server
-  >,
-  _reply: FastifyReply,
-) => {
-  console.debug(req.query);
-  console.debug(req.body);
-
-  return 'world';
-};
-
-// generated code
-fastify.get<{
-  // if IReqPokeHello interface in your typescript project, fast-maker append postfix hash.
-  // Because error prevent raise by same name interface import
-  Querystring: IReqPokeHello_052A3A1D6C6D4FFC835C4EB7F39FE90E['Querystring'];
-  Body: IReqPokeHello_052A3A1D6C6D4FFC835C4EB7F39FE90E['Body'];
-  Headers: {
-    'access-token': string;
-    'refresh-token': string;
-    'expire-time': {
-      token: string;
-      expire: number;
-      site: {
-        host: string;
-        port: number;
-      };
-    };
-  };
-}>('/po-ke/world', option_nPZHxkE1fH4b3EascyCyIFc8UqLca2bc, world_nPZHxkE1fH4b3EascyCyIFc8UqLca2bc);
-```
-
-Don't worry about request type arguments, detail type declare and error prevent!
-
-## RouteShorthandOptions
-
-Named export `option` variable use to RouteShorthandOptions. I recommand using [simple-tjscli](https://www.npmjs.com/package/simple-tjscli). or [crate-ts-json-schema](https://github.com/imjuni/create-ts-json-schema). simple-tjscli, create-ts-json-schema can transfile TypeScript interface to JSONSchema. So you can pass like that.
+You can pass `RouteShorthandOptions` option like that,
 
 ```ts
-// simple-tjscli
 export const option: RouteShorthandOptions = {
   schema: {
     querystring: schema.properties?.Querystring,
     body: schema.properties?.Body,
   },
 };
-
-// create-ts-json-schema
-export const option: RouteShorthandOptions = {
-  schema: {
-    querystring: { $ref: 'your-json-schema-name-of-querystring' },
-    body: { $ref: 'your-json-schema-name-of-body' },
-  },
-};
 ```
 
-If you using [@fastify/swagger](https://www.npmjs.com/package/@fastify/swagger), JSONSchema will be create swagger.io document.
+You have to `named export` and variable name must be a `option`.
 
-## .fastmakerrc file
+### Route handler
 
-You can use .fastmakerrc file for configuration. fast-maker use jsonc parser for configuration file. See below.
+You can pass route handler function like that,
 
-```jsonc
-{
-  "project": "./server/tsconfig.json",
-  "handler": "./server/handlers/api",
-  "output": "./server/handlers"
+```ts
+import { FastifyRequest } from 'fastify';
+import type { IReqSearchPokemonQuerystring, IReqSearchPokemonParams } from '../../interface/IReqSearchPokemon';
+
+export default async function (
+  req: FastifyRequest<{ Querystring: IReqSearchPokemonQuerystring; Params: IReqSearchPokemonParams }>,
+) {
+  console.debug(req.query);
+  console.debug(req.body);
+
+  return 'hello';
 }
 ```
+
+You have to `non-named export` (aka default export). Also you can use arrow function and you can use any name under TypeScript function name rule, as well as type arguments perfectly applied on route configuration
+
+### Variable in Route Path
+
+File or Directory name surrounded square bracket like that,
+
+```text
+handlers/
+├─ get/
+│  ├─ hero/
+│  │  ├─ [name].ts
+```
+
+Complex variable, No problem.
+
+```text
+handlers/
+├─ get/
+│  ├─ hero/
+│  │  ├─ [affiliation]-[name].ts
+```
+
+This route path access like that: `curl http://localhost:8080/hero/marvel-ironman`
+
+That's it. `fast-maker` takes care of the rest.
+
+## Example using fastify.js
+
+A complete example of using `fast-maker` can be found at [Ma-eum](https://github.com/maeumjs/maeum).
+
+## Relate To
+
+- [ts-morph](https://github.com/dsherret/ts-morph)
+  - TypeScript Compiler API wrapper
+
+## Roadmaps
+
+- [ ] display each route path in cli-table
+- [ ] add new option silent
+- [ ] documentation site
+- [ ] add more test
+
+## License
+
+This software is licensed under the [MIT](https://github.com/imjuni/fast-maker/blob/master/LICENSE).
