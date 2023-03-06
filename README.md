@@ -1,4 +1,4 @@
-# Introduction
+# fast-maker
 
 ![ts](https://flat.badgen.net/badge/Built%20With/TypeScript/blue)
 [![Download Status](https://img.shields.io/npm/dw/fast-maker.svg?style=flat-square)](https://npmcharts.com/compare/fast-maker?minimal=true)
@@ -10,11 +10,39 @@
 [![codecov](https://codecov.io/gh/imjuni/fast-maker/branch/master/graph/badge.svg?token=YrUlnfDbso&style=flat-square)](https://codecov.io/gh/imjuni/fast-maker)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-fast-maker is micro utility for [fastify.js](https://www.fastify.io/) over 3.x. fast-maker inspired by codeigniter(in PHP) and Next.js directory structure based route system. fast-maker auto generate route.ts file using directory structure futhermore include type declaration that inheritance RequestGenericInterface. This method have varity benefits.
+`fast-maker` generate fastify.js route configuration using by directory structure.
 
-1. So keep similar code style of route handler function
-1. More focus about business logic
-1. Recognize route path using by directory structure
+Why `fast-maker`?
+
+fastify.js already have auto route mechanics using [fastify-autoload](https://github.com/fastify/fastify-autoload). But why you have to use `fast-maker`?
+
+1. [Static analysis](https://en.wikipedia.org/wiki/Static_program_analysis): `fast-maker` generate TypeScript source code. Because it help to find error in compile-time, not runtime
+2. Complex Variable: You can use like that: `/person/[kind]-[id]/`. It help to get id and kind of id, for example serial-number and id or db-pk and id
+3. Next.js: `fast-maker` use the same mechanics as [Next.js](https://nextjs.org/docs/routing/introduction)
+4. `fast-maker` support a beautiful cli-interface
+
+## Table of Contents <!-- omit in toc -->
+
+- [Getting started](#getting-started)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Detail option](#detail-option)
+- [Constraints](#constraints)
+  - [TypeScript only](#typescript-only)
+  - [Directory structure is route path](#directory-structure-is-route-path)
+    - [method](#method)
+    - [path parameter](#path-parameter)
+  - [Single file, Single route](#single-file-single-route)
+  - [Hash](#hash)
+- [Type declaration for FastifyRequest](#type-declaration-for-fastifyrequest)
+- [RouteShorthandOptions](#routeshorthandoptions)
+- [.fastmakerrc file](#fastmakerrc-file)
+
+## Getting started
+
+```bash
+npx fast-maker -h [your handler directory]
+```
 
 ![fast-maker-showcase.gif](assets/fast-maker-showcase.gif)
 
