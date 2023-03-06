@@ -16,13 +16,13 @@ export const option: IBaseOption = {
   skipError: true,
   cliLogo: true,
   routeMap: false,
+  workerTimeout: CE_DEFAULT_VALUE.DEFAULT_TASK_WAIT_SECOND * 3,
   useDefaultExport: true,
   routeFunctionName: 'routing',
 };
 
 export const routeOption: TRouteBaseOption = {
   ...option,
-  workerTimeout: CE_DEFAULT_VALUE.DEFAULT_TASK_WAIT_SECOND * 3,
   kind: 'route',
 };
 

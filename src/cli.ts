@@ -3,7 +3,8 @@ import routeBuilder from '#cli/builder/routeBuilder';
 import watchBuilder from '#cli/builder/watchBuilder';
 import routeCommandClusterHandler from '#cli/command/routeCommandClusterHandler';
 import routeCommandSyncHandler from '#cli/command/routeCommandSyncHandler';
-import watchCommandHandler from '#cli/command/watchCommandHandler';
+import watchCommandClusterHandler from '#cli/command/watchCommandClusterHandler';
+import watchCommandSyncHandler from '#cli/command/watchCommandSyncHandler';
 import progress from '#cli/display/progress';
 import spinner from '#cli/display/spinner';
 import { CE_COMMAND_LIST } from '#cli/interfaces/CE_COMMAND_LIST';
@@ -48,7 +49,14 @@ const watchCmd: CommandModule<TWatchOption, TWatchOption> = {
   builder: (argv) => watchBuilder(builder(argv)),
   handler: async (argv) => {
     try {
-      await watchCommandHandler(argv);
+      progress.isEnable = true;
+      spinner.isEnable = true;
+
+      if (process.env.SYNC_MODE === 'true') {
+        await watchCommandSyncHandler(argv);
+      } else {
+        await watchCommandClusterHandler(argv);
+      }
     } catch (caught) {
       const err = isError(caught, new Error('unknown error raised'));
       log.error(err);

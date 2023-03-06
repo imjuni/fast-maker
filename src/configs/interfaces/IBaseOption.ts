@@ -26,6 +26,12 @@ export default interface IBaseOption {
   /** create route-map source file */
   routeMap: boolean;
 
+  /** max worker count */
+  maxWorkers?: number;
+
+  /** route code generation worker timeout: default 90 seconds */
+  workerTimeout: number;
+
   /**
    * route function in output file that use default export
    * @default true

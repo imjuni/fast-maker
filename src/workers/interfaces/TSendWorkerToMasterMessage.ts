@@ -70,6 +70,12 @@ export type TFailData =
       stack?: string;
     }
   | {
+      kind: 'error-with-reason';
+      message: string;
+      stack?: string;
+      data: IReason[];
+    }
+  | {
       kind: 'state-machine-error';
       message: string;
       stack?: string;
@@ -86,6 +92,8 @@ export interface IFailWorkerToMasterTaskComplete {
   // master/worker cannot send error class, send error message and stack
   error: TFailData;
 }
+
+export type TPickFailWorkerToMasterTaskComplete<T> = Extract<IFailWorkerToMasterTaskComplete, { command: T }>;
 
 export function isPassTaskComplete(
   value: IFailWorkerToMasterTaskComplete | TPassWorkerToMasterTaskComplete,
