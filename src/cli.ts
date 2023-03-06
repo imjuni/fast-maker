@@ -1,10 +1,10 @@
-import builder from '#cli/builder/builder';
-import routeBuilder from '#cli/builder/routeBuilder';
-import watchBuilder from '#cli/builder/watchBuilder';
-import routeCommandClusterHandler from '#cli/command/routeCommandClusterHandler';
-import routeCommandSyncHandler from '#cli/command/routeCommandSyncHandler';
-import watchCommandClusterHandler from '#cli/command/watchCommandClusterHandler';
-import watchCommandSyncHandler from '#cli/command/watchCommandSyncHandler';
+import builder from '#cli/builders/builder';
+import routeBuilder from '#cli/builders/routeBuilder';
+import watchBuilder from '#cli/builders/watchBuilder';
+import routeCommandClusterHandler from '#cli/commands/routeCommandClusterHandler';
+import routeCommandSyncHandler from '#cli/commands/routeCommandSyncHandler';
+import watchCommandClusterHandler from '#cli/commands/watchCommandClusterHandler';
+import watchCommandSyncHandler from '#cli/commands/watchCommandSyncHandler';
 import progress from '#cli/display/progress';
 import spinner from '#cli/display/spinner';
 import { CE_COMMAND_LIST } from '#cli/interfaces/CE_COMMAND_LIST';
