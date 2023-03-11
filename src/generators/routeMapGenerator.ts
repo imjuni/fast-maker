@@ -6,6 +6,14 @@ interface IRouteMapItem {
   method: string;
 }
 
+function getItemStatement(item: IRouteMapItem): string {
+  return `{
+    method: "${item.method}",
+    filePath: "${item.filePath}",
+    routePath: "${item.routePath}",
+  }`;
+}
+
 export default function routeMapGenerator(routeConfigurations: IRouteConfiguration[]) {
   const routeMap = routeConfigurations.reduce<Record<string, IRouteMapItem[]>>((aggregation, routeConfiguration) => {
     return {
@@ -22,14 +30,14 @@ export default function routeMapGenerator(routeConfigurations: IRouteConfigurati
   }, {});
 
   return [
-    `const routeMap = new Map<string, { filePath: string; routePath: string; method: string }[]>([${Object.entries(
+    `const routeMap = new Map<string, Map<string, { filePath: string; routePath: string; method: string }>>([${Object.entries(
       routeMap,
     )
       .map(([key, value]) => ({ routePath: key, items: value }))
       .map((entry) => {
-        return `["${entry.routePath}", [ ${entry.items
-          .map((item) => `{ filePath: "${item.filePath}", routePath: "${item.routePath}", method: "${item.method}" }`)
-          .join(',')} ] ]`;
+        return `["${entry.routePath}", new Map<string, { filePath: string; routePath: string; method: string }>([
+          ${entry.items.map((item) => `["${item.method}", ${getItemStatement(item)}]`).join(',')}
+        ]) ]`;
       })
       .join(',')}]);`,
     '\nexport default routeMap;',
