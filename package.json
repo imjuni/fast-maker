@@ -7,7 +7,7 @@
     "test:silent": "LOG_LEVEL=info node --trace-warnings --no-compilation-cache node_modules/.bin/jest --coverage --silent",
     "test:debug": "node -r ts-node/register --inspect --nolazy node_modules/jest/bin/jest",
     "test:report": "http-server -p 9991 ./coverage/lcov-report",
-    "dev": "ts-node ./src/cli.ts",
+    "dev": "USE_INIT_CWD=true ts-node ./src/cli.ts",
     "clean": "just --config ./.configs/just.config.ts clean",
     "pub:prod": "just --config ./.configs/just.config.ts pub:prod",
     "pub": "just --config ./.configs/just.config.ts pub",

@@ -5,6 +5,7 @@ import path from 'path';
 const originPath = process.env.INIT_CWD!;
 
 beforeEach(() => {
+  process.env.USE_INIT_CWD = 'true';
   process.env.INIT_CWD = path.join(originPath, 'examples');
 });
 

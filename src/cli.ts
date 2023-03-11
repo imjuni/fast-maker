@@ -21,7 +21,7 @@ import yargs, { type CommandModule } from 'yargs';
 
 const log = logger();
 
-const initCmd: CommandModule<{}, {}> = {
+const initCmd: CommandModule = {
   command: CE_COMMAND_LIST.INIT,
   aliases: CE_COMMAND_LIST.INIT_ALIAS,
   describe: 'create route.ts file in your directory using by tsconfig.json',

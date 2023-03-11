@@ -67,7 +67,18 @@ describe('getCwd', () => {
 
     expect(r01).toEqual(e);
 
-    const r02 = getCwd({ INIT_CWD: '/examples' });
+    const r02 = getCwd({ USE_INIT_CWD: 'true', INIT_CWD: '/examples' });
     expect(r02).toEqual('/examples');
+
+    const r03 = getCwd({ USE_INIT_CWD: 'false', INIT_CWD: '/examples' });
+    expect(r03).toEqual(process.cwd());
+
+    const r04 = getCwd({ INIT_CWD: '/examples' });
+    expect(r04).toEqual(process.cwd());
+
+    const r05 = getCwd({ USE_INIT_CWD: 'true' });
+    const e2 = path.resolve('.');
+
+    expect(r05).toEqual(e2);
   });
 });

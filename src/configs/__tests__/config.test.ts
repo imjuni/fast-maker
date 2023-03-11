@@ -5,32 +5,32 @@ import 'jest';
 import path from 'path';
 
 describe('getConfigFilePath', () => {
-  test('pass - c', () => {
+  beforeEach(() => {
+    process.env.USE_INIT_CWD = 'true';
     process.env.INIT_CWD = env.examplePath;
+  });
+
+  test('pass - c', () => {
     const file = getConfigFilePath({ c: path.join(env.examplePath, CE_DEFAULT_VALUE.CONFIG_FILE_NAME) });
     expect(file).toEqual(path.join(env.examplePath, CE_DEFAULT_VALUE.CONFIG_FILE_NAME));
   });
 
   test('pass - config', () => {
-    process.env.INIT_CWD = env.examplePath;
     const file = getConfigFilePath({ config: path.join(env.examplePath, CE_DEFAULT_VALUE.CONFIG_FILE_NAME) });
     expect(file).toEqual(path.join(env.examplePath, CE_DEFAULT_VALUE.CONFIG_FILE_NAME));
   });
 
   test('pass - tsconfig', () => {
-    process.env.INIT_CWD = env.examplePath;
     const file = getConfigFilePath({}, path.join(env.examplePath, CE_DEFAULT_VALUE.TSCONFIG_FILE_NAME));
     expect(file).toEqual(path.join(env.examplePath, CE_DEFAULT_VALUE.CONFIG_FILE_NAME));
   });
 
   test('pass - tsconfig', () => {
-    process.env.INIT_CWD = env.examplePath;
     const file = getConfigFilePath({}, path.join(env.examplePath, CE_DEFAULT_VALUE.TSCONFIG_FILE_NAME));
     expect(file).toEqual(path.join(env.examplePath, CE_DEFAULT_VALUE.CONFIG_FILE_NAME));
   });
 
   test('pass - no option', () => {
-    process.env.INIT_CWD = env.examplePath;
     const file = getConfigFilePath({});
     expect(file).toEqual(path.join(env.examplePath, CE_DEFAULT_VALUE.CONFIG_FILE_NAME));
   });
