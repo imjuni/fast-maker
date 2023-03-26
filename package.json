@@ -1,6 +1,6 @@
 {
   "name": "fast-maker",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "create route file on specific directory",
   "scripts": {
     "test": "LOG_LEVEL=info node --trace-warnings --no-compilation-cache node_modules/.bin/jest --coverage",
