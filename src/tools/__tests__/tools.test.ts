@@ -1,9 +1,9 @@
 import getResolvedPaths from '#configs/getResolvedPaths';
+import JestContext from '#tools/__tests__/tools/context';
+import * as env from '#tools/__tests__/tools/env';
 import getCwd from '#tools/getCwd';
 import getRelativeCwd from '#tools/getRelativeCwd';
 import posixJoin from '#tools/posixJoin';
-import JestContext from '#tools/__tests__/tools/context';
-import * as env from '#tools/__tests__/tools/env';
 import 'jest';
 import path from 'path';
 

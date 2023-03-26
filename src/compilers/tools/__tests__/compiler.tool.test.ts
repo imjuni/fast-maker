@@ -4,10 +4,10 @@ import getResolvedModuleInImports from '#compilers/tools/getResolvedModuleInImpo
 import getTypeReferences from '#compilers/tools/getTypeReferences';
 import replaceTypeReferenceInTypeLiteral from '#compilers/tools/replaceTypeReferenceInTypeLiteral';
 import getResolvedPaths from '#configs/getResolvedPaths';
-import posixJoin from '#tools/posixJoin';
 import JestContext from '#tools/__tests__/tools/context';
 import * as env from '#tools/__tests__/tools/env';
 import loadSourceData from '#tools/__tests__/tools/loadSourceData';
+import posixJoin from '#tools/posixJoin';
 import { getExpectValue } from '@maeum/test-utility';
 import 'jest';
 import { atOrThrow } from 'my-easy-fp';

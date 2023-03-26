@@ -17,4 +17,8 @@ echo -e "\n ${yellow}* code build start.${no_color}"
 npm run build
 echo -e "\n ${yellow}* code build end.${no_color}"
 
+echo -e "\n ${yellow}* code test start.${no_color}"
+npm run test
+echo -e "\n ${yellow}* code test end.${no_color}"
+
 echo -e "\n ${green}* pre-commit hook was SUCCESSFUL${no_color} \n"
