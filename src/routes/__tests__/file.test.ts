@@ -2,9 +2,9 @@ import summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
 import summaryRouteHandlerFiles from '#modules/summaryRouteHandlerFiles';
 import getMethod from '#routes/getMethod';
 import { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
-import posixJoin from '#tools/posixJoin';
 import * as env from '#tools/__tests__/tools/env';
 import loadSourceData from '#tools/__tests__/tools/loadSourceData';
+import posixJoin from '#tools/posixJoin';
 import 'jest';
 
 describe('summaryRouteHandlerFile', () => {
