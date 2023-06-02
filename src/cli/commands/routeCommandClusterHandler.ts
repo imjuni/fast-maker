@@ -5,6 +5,7 @@ import spinner from '#cli/display/spinner';
 import getResolvedPaths from '#configs/getResolvedPaths';
 import type { TRouteBaseOption, TRouteOption } from '#configs/interfaces/TRouteOption';
 import FastMakerError from '#errors/FastMakerError';
+import dedupeImportConfiguration from '#generators/dedupeImportConfiguration';
 import importCodeGenerator from '#generators/importCodeGenerator';
 import prettierProcessing from '#generators/prettierProcessing';
 import routeCodeGenerator from '#generators/routeCodeGenerator';
@@ -173,7 +174,10 @@ export default async function routeCommandClusterHandler(baseOption: TRouteBaseO
       const merged = mergeAnalysisRequestStatements(data.map((record) => record.data.pass));
       const sortedRoutes = sortRoutePaths(merged.routes);
       const routeCodes = routeCodeGenerator({ routeConfigurations: sortedRoutes });
-      const importCodes = importCodeGenerator({ importConfigurations: merged.imports, option });
+      const importCodes = importCodeGenerator({
+        importConfigurations: dedupeImportConfiguration(merged.imports),
+        option,
+      });
       const code = getRoutingCode({ option, imports: importCodes, routes: routeCodes });
       const prettfied = await prettierProcessing({ code });
       const outputFilePath = getOutputFilePath(option.output);
