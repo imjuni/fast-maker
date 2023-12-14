@@ -2,6 +2,9 @@
   "name": "fast-maker",
   "version": "3.2.1",
   "description": "create route file on specific directory",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "test": "LOG_LEVEL=info node --trace-warnings --no-compilation-cache node_modules/.bin/jest --coverage",
     "test:silent": "LOG_LEVEL=info node --trace-warnings --no-compilation-cache node_modules/.bin/jest --coverage --silent",
