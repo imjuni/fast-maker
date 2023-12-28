@@ -1,4 +1,4 @@
-import logger from '#tools/logger';
+import logger from '#/tools/logger';
 import { isError } from 'my-easy-fp';
 
 const log = logger();

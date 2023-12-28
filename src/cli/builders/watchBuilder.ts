@@ -1,4 +1,4 @@
-import type { TWatchOption } from '#configs/interfaces/TWatchOption';
+import type { TWatchOption } from '#/configs/interfaces/TWatchOption';
 import type { Argv } from 'yargs';
 
 export default function watchBuilder(argv: Argv) {

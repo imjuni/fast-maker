@@ -1,4 +1,4 @@
-import { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
+import { CE_ROUTE_METHOD } from '#/routes/interface/CE_ROUTE_METHOD';
 
 export default function isValidMethod(method: string): method is CE_ROUTE_METHOD {
   const toLoweredMethod = method.toLowerCase();

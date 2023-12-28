@@ -1,4 +1,4 @@
-import type { IHandlerStatement } from '#compilers/interfaces/THandlerNode';
+import type { IHandlerStatement } from '#/compilers/interfaces/THandlerNode';
 import { atOrThrow, findOrThrow } from 'my-easy-fp';
 import type { ExportedDeclarations } from 'ts-morph';
 import { SyntaxKind } from 'ts-morph';

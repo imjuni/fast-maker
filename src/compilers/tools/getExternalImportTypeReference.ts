@@ -1,4 +1,4 @@
-import getNamedBindingName from '#compilers/tools/getNamedBindingName';
+import getNamedBindingName from '#/compilers/tools/getNamedBindingName';
 import type { SourceFile, TypeReferenceNode } from 'ts-morph';
 
 interface IFilterExternalTypeReferenceParam {

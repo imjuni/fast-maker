@@ -1,5 +1,5 @@
-import { CE_DEFAULT_VALUE } from '#configs/interfaces/CE_DEFAULT_VALUE';
-import getCwd from '#tools/getCwd';
+import { CE_DEFAULT_VALUE } from '#/configs/interfaces/CE_DEFAULT_VALUE';
+import getCwd from '#/tools/getCwd';
 import * as findUp from 'find-up';
 import { getDirnameSync } from 'my-node-fp';
 

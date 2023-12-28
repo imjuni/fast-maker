@@ -1,25 +1,23 @@
-import builder from '#cli/builders/builder';
-import routeBuilder from '#cli/builders/routeBuilder';
-import watchBuilder from '#cli/builders/watchBuilder';
-import initCommandSyncHandler from '#cli/commands/initCommandSyncHandler';
-import routeCommandClusterHandler from '#cli/commands/routeCommandClusterHandler';
-import routeCommandSyncHandler from '#cli/commands/routeCommandSyncHandler';
-import watchCommandClusterHandler from '#cli/commands/watchCommandClusterHandler';
-import watchCommandSyncHandler from '#cli/commands/watchCommandSyncHandler';
-import progress from '#cli/display/progress';
-import spinner from '#cli/display/spinner';
-import { CE_COMMAND_LIST } from '#cli/interfaces/CE_COMMAND_LIST';
-import type { TRouteOption } from '#configs/interfaces/TRouteOption';
-import type { TWatchOption } from '#configs/interfaces/TWatchOption';
-import isValidConfig from '#configs/isValidConfig';
-import preLoadConfig from '#configs/preLoadConfig';
-import logger from '#tools/logger';
-import worker from '#workers/worker';
-import getIsPrimary from '#xstate/tools/getIsPrimary';
+import builder from '#/cli/builders/builder';
+import routeBuilder from '#/cli/builders/routeBuilder';
+import watchBuilder from '#/cli/builders/watchBuilder';
+import initCommandSyncHandler from '#/cli/commands/initCommandSyncHandler';
+import routeCommandClusterHandler from '#/cli/commands/routeCommandClusterHandler';
+import routeCommandSyncHandler from '#/cli/commands/routeCommandSyncHandler';
+import watchCommandClusterHandler from '#/cli/commands/watchCommandClusterHandler';
+import watchCommandSyncHandler from '#/cli/commands/watchCommandSyncHandler';
+import progress from '#/cli/display/progress';
+import spinner from '#/cli/display/spinner';
+import { CE_COMMAND_LIST } from '#/cli/interfaces/CE_COMMAND_LIST';
+import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
+import type { TWatchOption } from '#/configs/interfaces/TWatchOption';
+import isValidConfig from '#/configs/isValidConfig';
+import preLoadConfig from '#/configs/preLoadConfig';
+import worker from '#/workers/worker';
+import getIsPrimary from '#/xstate/tools/getIsPrimary';
+import consola from 'consola';
 import { isError } from 'my-easy-fp';
 import yargs, { type CommandModule } from 'yargs';
-
-const log = logger();
 
 const initCmd: CommandModule = {
   command: CE_COMMAND_LIST.INIT,
@@ -30,7 +28,7 @@ const initCmd: CommandModule = {
       await initCommandSyncHandler();
     } catch (caught) {
       const err = isError(caught, new Error('unknown error raised'));
-      log.error(err);
+      consola.error(err);
     }
   },
 };
@@ -52,7 +50,7 @@ const routeCmd: CommandModule<TRouteOption, TRouteOption> = {
       }
     } catch (caught) {
       const err = isError(caught, new Error('unknown error raised'));
-      log.error(err);
+      consola.error(err);
     }
   },
 };
@@ -74,7 +72,7 @@ const watchCmd: CommandModule<TWatchOption, TWatchOption> = {
       }
     } catch (caught) {
       const err = isError(caught, new Error('unknown error raised'));
-      log.error(err);
+      consola.error(err);
     }
   },
 };
@@ -83,8 +81,8 @@ if (process.env.SYNC_MODE === 'true') {
   const parser = yargs(process.argv.slice(2));
 
   parser
-    .command(routeCmd as CommandModule<{}, TRouteOption>)
-    .command(watchCmd as CommandModule<{}, TWatchOption>)
+    .command(routeCmd as CommandModule<object, TRouteOption>)
+    .command(watchCmd as CommandModule<object, TWatchOption>)
     .command(initCmd)
     .demandCommand()
     .recommendCommands()
@@ -98,8 +96,8 @@ if (process.env.SYNC_MODE === 'true') {
 
   handler().catch((caught) => {
     const err = isError(caught, new Error('unknown error raised'));
-    log.error(err.message);
-    log.error(err.stack);
+    consola.error(err.message);
+    consola.error(err.stack);
 
     process.exit(1);
   });
@@ -107,8 +105,8 @@ if (process.env.SYNC_MODE === 'true') {
   const parser = yargs(process.argv.slice(2));
 
   parser
-    .command(routeCmd as CommandModule<{}, TRouteOption>)
-    .command(watchCmd as CommandModule<{}, TWatchOption>)
+    .command(routeCmd as CommandModule<object, TRouteOption>)
+    .command(watchCmd as CommandModule<object, TWatchOption>)
     .command(initCmd)
     .demandCommand()
     .recommendCommands()
@@ -122,16 +120,16 @@ if (process.env.SYNC_MODE === 'true') {
 
   handler().catch((caught) => {
     const err = isError(caught, new Error('unknown error raised'));
-    log.error(err.message);
-    log.error(err.stack);
+    consola.error(err.message);
+    consola.error(err.stack);
 
     process.exit(1);
   });
 } else {
   worker().catch((caught) => {
     const err = isError(caught, new Error('unknown error raised'));
-    log.error(err.message);
-    log.error(err.stack);
+    consola.error(err.message);
+    consola.error(err.stack);
 
     process.exit(1);
   });

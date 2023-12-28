@@ -1,4 +1,4 @@
-import type { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
+import type { CE_ROUTE_METHOD } from '#/routes/interface/CE_ROUTE_METHOD';
 
 const max = 11;
 

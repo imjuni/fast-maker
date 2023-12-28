@@ -1,6 +1,6 @@
-import show from '#cli/display/show';
-import { CE_DEFAULT_VALUE } from '#configs/interfaces/CE_DEFAULT_VALUE';
-import getCwd from '#tools/getCwd';
+import show from '#/cli/display/show';
+import { CE_DEFAULT_VALUE } from '#/configs/interfaces/CE_DEFAULT_VALUE';
+import getCwd from '#/tools/getCwd';
 import chalk from 'chalk';
 import fastGlob from 'fast-glob';
 import fastSafeStringify from 'fast-safe-stringify';

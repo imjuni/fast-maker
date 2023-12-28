@@ -1,7 +1,7 @@
-import type { TRouteOption } from '#configs/interfaces/TRouteOption';
-import type { TWatchOption } from '#configs/interfaces/TWatchOption';
-import type { CE_WATCH_EVENT } from '#modules/interfaces/CE_WATCH_EVENT';
-import type { CE_WORKER_ACTION } from '#workers/interfaces/CE_WORKER_ACTION';
+import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
+import type { TWatchOption } from '#/configs/interfaces/TWatchOption';
+import type { CE_WATCH_EVENT } from '#/modules/interfaces/CE_WATCH_EVENT';
+import type { CE_WORKER_ACTION } from '#/workers/interfaces/CE_WORKER_ACTION';
 
 type TSendMasterToWorkerMessage =
   | {

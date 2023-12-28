@@ -1,5 +1,5 @@
-import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
-import logger from '#tools/logger';
+import type IImportConfiguration from '#/compilers/interfaces/IImportConfiguration';
+import logger from '#/tools/logger';
 import type { LastArrayElement } from 'type-fest';
 
 const log = logger();

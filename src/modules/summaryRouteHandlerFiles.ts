@@ -1,9 +1,9 @@
-import type { TRouteOption } from '#configs/interfaces/TRouteOption';
-import type { TWatchOption } from '#configs/interfaces/TWatchOption';
-import summaryRouteHandlerFile from '#modules/summaryRouteHandlerFile';
-import { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
-import type { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
-import type { TPickRouteInfo } from '#routes/interface/TRouteInfo';
+import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
+import type { TWatchOption } from '#/configs/interfaces/TWatchOption';
+import summaryRouteHandlerFile from '#/modules/summaryRouteHandlerFile';
+import { CE_ROUTE_INFO_KIND } from '#/routes/interface/CE_ROUTE_INFO_KIND';
+import type { CE_ROUTE_METHOD } from '#/routes/interface/CE_ROUTE_METHOD';
+import type { TPickRouteInfo } from '#/routes/interface/TRouteInfo';
 
 export default async function summaryRouteHandlerFiles(
   filePaths: string[],

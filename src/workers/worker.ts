@@ -1,6 +1,6 @@
-import logger from '#tools/logger';
-import FastMakerEmitter from '#workers/FastMakerEmitter';
-import type TSendMasterToWorkerMessage from '#workers/interfaces/TSendMasterToWorkerMessage';
+import logger from '#/tools/logger';
+import FastMakerEmitter from '#/workers/FastMakerEmitter';
+import type TSendMasterToWorkerMessage from '#/workers/interfaces/TSendMasterToWorkerMessage';
 import { isError } from 'my-easy-fp';
 
 const log = logger();

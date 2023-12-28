@@ -1,5 +1,5 @@
-import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
-import getTypeSymbolText from '#compilers/tools/getTypeSymbolText';
+import type IImportConfiguration from '#/compilers/interfaces/IImportConfiguration';
+import getTypeSymbolText from '#/compilers/tools/getTypeSymbolText';
 import type { SourceFile, TypeReferenceNode } from 'ts-morph';
 
 interface IGetLocalExportStatementImport {

@@ -1,4 +1,4 @@
-import type IBaseOption from '#configs/interfaces/IBaseOption';
+import type IBaseOption from '#/configs/interfaces/IBaseOption';
 
 export default function getRoutingCode({
   option,

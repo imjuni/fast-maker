@@ -1,5 +1,5 @@
-import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
-import getHandlerNameWithoutSquareBracket from '#generators/getHandlerNameWithoutSquareBracket';
+import type IImportConfiguration from '#/compilers/interfaces/IImportConfiguration';
+import getHandlerNameWithoutSquareBracket from '#/generators/getHandlerNameWithoutSquareBracket';
 
 export default function getHashedBindingCode({
   nonNamedBinding,

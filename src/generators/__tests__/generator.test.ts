@@ -1,10 +1,10 @@
-import getHandlerWithOption from '#compilers/navigate/getHandlerWithOption';
-import getInternalImportTypeReference from '#compilers/tools/getInternalImportTypeReference';
-import getResolvedModuleInImports from '#compilers/tools/getResolvedModuleInImports';
-import getTypeReferences from '#compilers/tools/getTypeReferences';
-import replaceTypeReferenceInTypeLiteral from '#compilers/tools/replaceTypeReferenceInTypeLiteral';
-import * as env from '#tools/__tests__/tools/env';
-import logger from '#tools/logger';
+import getHandlerWithOption from '#/compilers/navigate/getHandlerWithOption';
+import getInternalImportTypeReference from '#/compilers/tools/getInternalImportTypeReference';
+import getResolvedModuleInImports from '#/compilers/tools/getResolvedModuleInImports';
+import getTypeReferences from '#/compilers/tools/getTypeReferences';
+import replaceTypeReferenceInTypeLiteral from '#/compilers/tools/replaceTypeReferenceInTypeLiteral';
+import * as env from '#/tools/__tests__/tools/env';
+import logger from '#/tools/logger';
 import 'jest';
 import { atOrThrow } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';

@@ -1,7 +1,7 @@
-import { CE_DEFAULT_VALUE } from '#configs/interfaces/CE_DEFAULT_VALUE';
-import type IBaseOption from '#configs/interfaces/IBaseOption';
-import type { TRouteBaseOption } from '#configs/interfaces/TRouteOption';
-import type { TWatchBaseOption } from '#configs/interfaces/TWatchOption';
+import { CE_DEFAULT_VALUE } from '#/configs/interfaces/CE_DEFAULT_VALUE';
+import type IBaseOption from '#/configs/interfaces/IBaseOption';
+import type { TRouteBaseOption } from '#/configs/interfaces/TRouteOption';
+import type { TWatchBaseOption } from '#/configs/interfaces/TWatchOption';
 import path from 'path';
 
 export const examplePath = path.resolve(path.join(__dirname, '..', '..', '..', '..', 'examples'));

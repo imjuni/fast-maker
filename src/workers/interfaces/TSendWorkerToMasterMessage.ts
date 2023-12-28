@@ -1,12 +1,12 @@
-import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
-import type IReason from '#compilers/interfaces/IReason';
-import type { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
-import type { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
-import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
-import type IRouteHandler from '#routes/interface/IRouteHandler';
-import type { TPickRouteInfo } from '#routes/interface/TRouteInfo';
-import type { CE_MASTER_ACTION } from '#workers/interfaces/CE_MASTER_ACTION';
-import type { CE_WORKER_ACTION } from '#workers/interfaces/CE_WORKER_ACTION';
+import type IImportConfiguration from '#/compilers/interfaces/IImportConfiguration';
+import type IReason from '#/compilers/interfaces/IReason';
+import type { CE_ROUTE_INFO_KIND } from '#/routes/interface/CE_ROUTE_INFO_KIND';
+import type { CE_ROUTE_METHOD } from '#/routes/interface/CE_ROUTE_METHOD';
+import type IRouteConfiguration from '#/routes/interface/IRouteConfiguration';
+import type IRouteHandler from '#/routes/interface/IRouteHandler';
+import type { TPickRouteInfo } from '#/routes/interface/TRouteInfo';
+import type { CE_MASTER_ACTION } from '#/workers/interfaces/CE_MASTER_ACTION';
+import type { CE_WORKER_ACTION } from '#/workers/interfaces/CE_WORKER_ACTION';
 
 export type TPassWorkerToMasterTaskComplete =
   | {

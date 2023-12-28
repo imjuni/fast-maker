@@ -1,7 +1,7 @@
-import validParamNames from '#compilers/validators/validParamNames';
-import fuzzyWithCase from '#tools/fuzzyWithCase';
-import { getNumber, getPercentNumber } from '#tools/getNumber';
-import logger from '#tools/logger';
+import validParamNames from '#/compilers/validators/validParamNames';
+import fuzzyWithCase from '#/tools/fuzzyWithCase';
+import { getNumber, getPercentNumber } from '#/tools/getNumber';
+import logger from '#/tools/logger';
 import 'jest';
 
 const log = logger();

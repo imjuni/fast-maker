@@ -1,8 +1,8 @@
-import { CE_DEFAULT_VALUE } from '#configs/interfaces/CE_DEFAULT_VALUE';
-import type { TWatchOption } from '#configs/interfaces/TWatchOption';
-import getOutputFilePath from '#modules/getOutputFilePath';
-import getOutputMapFilePath from '#modules/getOutputMapFilePath';
-import getRelativeCwd from '#tools/getRelativeCwd';
+import { CE_DEFAULT_VALUE } from '#/configs/interfaces/CE_DEFAULT_VALUE';
+import type { TWatchOption } from '#/configs/interfaces/TWatchOption';
+import getOutputFilePath from '#/modules/getOutputFilePath';
+import getOutputMapFilePath from '#/modules/getOutputMapFilePath';
+import getRelativeCwd from '#/tools/getRelativeCwd';
 import fastGlob from 'fast-glob';
 import fs from 'fs';
 import { isDescendant } from 'my-node-fp';

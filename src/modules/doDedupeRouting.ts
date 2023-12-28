@@ -1,9 +1,9 @@
-import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
-import dedupeImportConfiguration from '#generators/dedupeImportConfiguration';
-import type doAnalysisRequestStatement from '#modules/doAnalysisRequestStatement';
-import { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
-import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
-import type { TPickRouteInfo } from '#routes/interface/TRouteInfo';
+import type IImportConfiguration from '#/compilers/interfaces/IImportConfiguration';
+import dedupeImportConfiguration from '#/generators/dedupeImportConfiguration';
+import type doAnalysisRequestStatement from '#/modules/doAnalysisRequestStatement';
+import { CE_ROUTE_INFO_KIND } from '#/routes/interface/CE_ROUTE_INFO_KIND';
+import type IRouteConfiguration from '#/routes/interface/IRouteConfiguration';
+import type { TPickRouteInfo } from '#/routes/interface/TRouteInfo';
 import type { TPickPass } from 'my-only-either';
 import type { AsyncReturnType } from 'type-fest';
 

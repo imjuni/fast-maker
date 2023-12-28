@@ -1,5 +1,5 @@
-import type IGetModuleInImports from '#compilers/interfaces/IGetModuleInImports';
-import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
+import type IGetModuleInImports from '#/compilers/interfaces/IGetModuleInImports';
+import type IImportConfiguration from '#/compilers/interfaces/IImportConfiguration';
 
 export default function getImportConfigurationFromResolutions({
   resolutions,

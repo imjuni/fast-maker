@@ -1,4 +1,4 @@
-import type { IOptionStatement } from '#compilers/interfaces/THandlerNode';
+import type { IOptionStatement } from '#/compilers/interfaces/THandlerNode';
 import type { ExportedDeclarations } from 'ts-morph';
 import { SyntaxKind } from 'ts-morph';
 

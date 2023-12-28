@@ -1,36 +1,36 @@
-import show from '#cli/display/show';
-import spinner from '#cli/display/spinner';
-import type IReason from '#compilers/interfaces/IReason';
-import type { TWatchOption } from '#configs/interfaces/TWatchOption';
-import FastMakerError from '#errors/FastMakerError';
-import importCodeGenerator from '#generators/importCodeGenerator';
-import prettierProcessing from '#generators/prettierProcessing';
-import routeCodeGenerator from '#generators/routeCodeGenerator';
-import routeMapGenerator from '#generators/routeMapGenerator';
-import createAnalysisRequestStatementBulkCommand from '#modules/createAnalysisRequestStatementBulkCommand';
-import getOutputFilePath from '#modules/getOutputFilePath';
-import getOutputMapFilePath from '#modules/getOutputMapFilePath';
-import getRoutingCode from '#modules/getRoutingCode';
-import { CE_WATCH_EVENT } from '#modules/interfaces/CE_WATCH_EVENT';
-import type IUpdateEvent from '#modules/interfaces/IUpdateEvent';
-import type IWatchEvent from '#modules/interfaces/IWatchEvent';
-import mergeAnalysisRequestStatements from '#modules/mergeAnalysisRequestStatements';
-import reasons from '#modules/reasons';
-import writeOutputFile from '#modules/writeOutputFile';
-import getDuplicateRouteReason from '#routes/getDuplicateRouteReason';
-import type { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
-import type { TPickRouteInfo } from '#routes/interface/TRouteInfo';
-import sortRoutePaths from '#routes/sortRoutePaths';
-import getReasonMessages from '#tools/getReasonMessages';
-import { CE_WORKER_ACTION } from '#workers/interfaces/CE_WORKER_ACTION';
-import type TSendMasterToWorkerMessage from '#workers/interfaces/TSendMasterToWorkerMessage';
+import show from '#/cli/display/show';
+import spinner from '#/cli/display/spinner';
+import type IReason from '#/compilers/interfaces/IReason';
+import type { TWatchOption } from '#/configs/interfaces/TWatchOption';
+import FastMakerError from '#/errors/FastMakerError';
+import importCodeGenerator from '#/generators/importCodeGenerator';
+import prettierProcessing from '#/generators/prettierProcessing';
+import routeCodeGenerator from '#/generators/routeCodeGenerator';
+import routeMapGenerator from '#/generators/routeMapGenerator';
+import createAnalysisRequestStatementBulkCommand from '#/modules/createAnalysisRequestStatementBulkCommand';
+import getOutputFilePath from '#/modules/getOutputFilePath';
+import getOutputMapFilePath from '#/modules/getOutputMapFilePath';
+import getRoutingCode from '#/modules/getRoutingCode';
+import { CE_WATCH_EVENT } from '#/modules/interfaces/CE_WATCH_EVENT';
+import type IUpdateEvent from '#/modules/interfaces/IUpdateEvent';
+import type IWatchEvent from '#/modules/interfaces/IWatchEvent';
+import mergeAnalysisRequestStatements from '#/modules/mergeAnalysisRequestStatements';
+import reasons from '#/modules/reasons';
+import writeOutputFile from '#/modules/writeOutputFile';
+import getDuplicateRouteReason from '#/routes/getDuplicateRouteReason';
+import type { CE_ROUTE_INFO_KIND } from '#/routes/interface/CE_ROUTE_INFO_KIND';
+import type { TPickRouteInfo } from '#/routes/interface/TRouteInfo';
+import sortRoutePaths from '#/routes/sortRoutePaths';
+import getReasonMessages from '#/tools/getReasonMessages';
+import { CE_WORKER_ACTION } from '#/workers/interfaces/CE_WORKER_ACTION';
+import type TSendMasterToWorkerMessage from '#/workers/interfaces/TSendMasterToWorkerMessage';
 import {
   isFailTaskComplete,
   isPassTaskComplete,
   type TFailData,
   type TPickPassWorkerToMasterTaskComplete,
-} from '#workers/interfaces/TSendWorkerToMasterMessage';
-import workers from '#workers/workers';
+} from '#/workers/interfaces/TSendWorkerToMasterMessage';
+import workers from '#/workers/workers';
 import chalk from 'chalk';
 import fastCopy from 'fast-copy';
 import { atOrThrow } from 'my-easy-fp';

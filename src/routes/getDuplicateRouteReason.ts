@@ -1,5 +1,5 @@
-import type IReason from '#compilers/interfaces/IReason';
-import type IRouteHandler from '#routes/interface/IRouteHandler';
+import type IReason from '#/compilers/interfaces/IReason';
+import type IRouteHandler from '#/routes/interface/IRouteHandler';
 import chalk from 'chalk';
 
 export default function getDuplicateRouteReason(handlerFiles: IRouteHandler[]): IReason[] {
@@ -11,6 +11,6 @@ export default function getDuplicateRouteReason(handlerFiles: IRouteHandler[]): 
           duplicate.filePath
         }`,
         filePath: duplicate.filePath,
-      } satisfies IReason),
+      }) satisfies IReason,
   );
 }

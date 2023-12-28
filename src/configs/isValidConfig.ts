@@ -1,5 +1,5 @@
-import { CE_COMMAND_LIST } from '#cli/interfaces/CE_COMMAND_LIST';
-import getResolvePath from '#configs/getResolvePath';
+import { CE_COMMAND_LIST } from '#/cli/interfaces/CE_COMMAND_LIST';
+import getResolvePath from '#/configs/getResolvePath';
 import { atOrUndefined } from 'my-easy-fp';
 
 const commands: string[] = [

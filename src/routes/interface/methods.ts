@@ -1,4 +1,4 @@
-import { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
+import { CE_ROUTE_METHOD } from '#/routes/interface/CE_ROUTE_METHOD';
 
 const methods: Readonly<CE_ROUTE_METHOD[]> = [
   CE_ROUTE_METHOD.GET,

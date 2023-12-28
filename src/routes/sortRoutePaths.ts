@@ -1,6 +1,6 @@
-import type { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
-import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
-import sortRoutePath from '#routes/sortRoutePath';
+import type { CE_ROUTE_METHOD } from '#/routes/interface/CE_ROUTE_METHOD';
+import type IRouteConfiguration from '#/routes/interface/IRouteConfiguration';
+import sortRoutePath from '#/routes/sortRoutePath';
 
 export default function sortRoutePaths(routes: IRouteConfiguration[]): IRouteConfiguration[] {
   const classficationed = routes.reduce<Record<CE_ROUTE_METHOD, IRouteConfiguration[]>>(
