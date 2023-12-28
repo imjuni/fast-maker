@@ -1,4 +1,4 @@
-import type { IHandlerStatement } from '#compilers/interfaces/THandlerNode';
+import type { IHandlerStatement } from '#/compilers/interfaces/THandlerNode';
 import { findOrThrow } from 'my-easy-fp';
 import * as tsm from 'ts-morph';
 

@@ -1,5 +1,5 @@
-import getNamedBindingName from '#compilers/tools/getNamedBindingName';
-import logger from '#tools/logger';
+import getNamedBindingName from '#/compilers/tools/getNamedBindingName';
+import logger from '#/tools/logger';
 import type { SourceFile, TypeReferenceNode } from 'ts-morph';
 
 const log = logger();

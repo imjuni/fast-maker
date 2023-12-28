@@ -1,6 +1,6 @@
-import { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
-import * as env from '#tools/__tests__/tools/env';
-import posixJoin from '#tools/posixJoin';
+import { CE_ROUTE_METHOD } from '#/routes/interface/CE_ROUTE_METHOD';
+import * as env from '#/tools/__tests__/tools/env';
+import posixJoin from '#/tools/posixJoin';
 
 export default [
   posixJoin(env.handlerPath, CE_ROUTE_METHOD.GET, 'justice', '[dc-league]', 'hello.ts'),

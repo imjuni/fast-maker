@@ -1,4 +1,4 @@
-import type { TFailData } from '#workers/interfaces/TSendWorkerToMasterMessage';
+import type { TFailData } from '#/workers/interfaces/TSendWorkerToMasterMessage';
 
 export default class FastMakerError extends Error {
   readonly data: Omit<TFailData, 'message' | 'stack'>;

@@ -1,6 +1,6 @@
-import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
-import sortRoutePath from '#routes/sortRoutePath';
-import sortRoutePaths from '#routes/sortRoutePaths';
+import type IRouteConfiguration from '#/routes/interface/IRouteConfiguration';
+import sortRoutePath from '#/routes/sortRoutePath';
+import sortRoutePaths from '#/routes/sortRoutePaths';
 import { loadJsonData } from '@maeum/test-utility';
 import 'jest';
 import * as mnf from 'my-node-fp';

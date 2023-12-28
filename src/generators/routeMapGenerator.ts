@@ -1,4 +1,4 @@
-import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
+import type IRouteConfiguration from '#/routes/interface/IRouteConfiguration';
 
 interface IRouteMapItem {
   filePath: string;

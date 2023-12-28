@@ -1,9 +1,9 @@
-import type IGetModuleInImports from '#compilers/interfaces/IGetModuleInImports';
-import getNamedBindingName from '#compilers/tools/getNamedBindingName';
-import type { TRouteOption } from '#configs/interfaces/TRouteOption';
-import type { TWatchOption } from '#configs/interfaces/TWatchOption';
-import appendPostfixHash from '#tools/appendPostfixHash';
-import getHash from '#tools/getHash';
+import type IGetModuleInImports from '#/compilers/interfaces/IGetModuleInImports';
+import getNamedBindingName from '#/compilers/tools/getNamedBindingName';
+import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
+import type { TWatchOption } from '#/configs/interfaces/TWatchOption';
+import appendPostfixHash from '#/tools/appendPostfixHash';
+import getHash from '#/tools/getHash';
 import { atOrUndefined } from 'my-easy-fp';
 import { replaceSepToPosix } from 'my-node-fp';
 import * as path from 'path';

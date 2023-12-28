@@ -1,7 +1,7 @@
-import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
-import type { TRouteOption } from '#configs/interfaces/TRouteOption';
-import type { TWatchOption } from '#configs/interfaces/TWatchOption';
-import getHashedBindingCode from '#generators/getHashedBindingCode';
+import type IImportConfiguration from '#/compilers/interfaces/IImportConfiguration';
+import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
+import type { TWatchOption } from '#/configs/interfaces/TWatchOption';
+import getHashedBindingCode from '#/generators/getHashedBindingCode';
 import { replaceSepToPosix } from 'my-node-fp';
 import path from 'path';
 

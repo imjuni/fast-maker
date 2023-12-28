@@ -1,6 +1,6 @@
-import type IBaseOption from '#configs/interfaces/IBaseOption';
-import type IResolvedPaths from '#configs/interfaces/IResolvedPaths';
-import getCwd from '#tools/getCwd';
+import type IBaseOption from '#/configs/interfaces/IBaseOption';
+import type IResolvedPaths from '#/configs/interfaces/IResolvedPaths';
+import getCwd from '#/tools/getCwd';
 import { getDirnameSync } from 'my-node-fp';
 import path from 'path';
 import type { SetOptional } from 'type-fest';

@@ -1,6 +1,6 @@
-import type { IHandlerStatement, IOptionStatement } from '#compilers/interfaces/THandlerNode';
-import getHandlerStatement from '#compilers/navigate/getHandlerStatement';
-import getOptionStatement from '#compilers/navigate/getOptionStatement';
+import type { IHandlerStatement, IOptionStatement } from '#/compilers/interfaces/THandlerNode';
+import getHandlerStatement from '#/compilers/navigate/getHandlerStatement';
+import getOptionStatement from '#/compilers/navigate/getOptionStatement';
 import type { SourceFile } from 'ts-morph';
 
 /**

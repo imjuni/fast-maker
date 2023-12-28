@@ -1,5 +1,5 @@
-import * as env from '#tools/__tests__/tools/env';
-import posixJoin from '#tools/posixJoin';
+import * as env from '#/tools/__tests__/tools/env';
+import posixJoin from '#/tools/posixJoin';
 
 export default {
   messages: [

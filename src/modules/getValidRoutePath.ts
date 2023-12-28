@@ -1,10 +1,10 @@
-import type IReason from '#compilers/interfaces/IReason';
-import reasons from '#modules/reasons';
-import type summaryRouteHandlerFiles from '#modules/summaryRouteHandlerFiles';
-import { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
-import type { CE_ROUTE_METHOD } from '#routes/interface/CE_ROUTE_METHOD';
-import methods from '#routes/interface/methods';
-import type { TPickRouteInfo } from '#routes/interface/TRouteInfo';
+import type IReason from '#/compilers/interfaces/IReason';
+import reasons from '#/modules/reasons';
+import type summaryRouteHandlerFiles from '#/modules/summaryRouteHandlerFiles';
+import { CE_ROUTE_INFO_KIND } from '#/routes/interface/CE_ROUTE_INFO_KIND';
+import type { CE_ROUTE_METHOD } from '#/routes/interface/CE_ROUTE_METHOD';
+import methods from '#/routes/interface/methods';
+import type { TPickRouteInfo } from '#/routes/interface/TRouteInfo';
 import chalk from 'chalk';
 import { keyBys } from 'my-easy-fp';
 import type { AsyncReturnType } from 'type-fest';

@@ -1,7 +1,7 @@
-import getTypeSymbolText from '#compilers/tools/getTypeSymbolText';
-import getResolvedPaths from '#configs/getResolvedPaths';
-import JestContext from '#tools/__tests__/tools/context';
-import * as env from '#tools/__tests__/tools/env';
+import getTypeSymbolText from '#/compilers/tools/getTypeSymbolText';
+import getResolvedPaths from '#/configs/getResolvedPaths';
+import JestContext from '#/tools/__tests__/tools/context';
+import * as env from '#/tools/__tests__/tools/env';
 import 'jest';
 import { atOrThrow } from 'my-easy-fp';
 import path from 'path';

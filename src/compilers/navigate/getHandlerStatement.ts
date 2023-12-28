@@ -1,5 +1,5 @@
-import getArrowFunctionWithModifier from '#compilers/navigate/getArrowFunctionWithModifier';
-import getFunctionDeclarationWithModifier from '#compilers/navigate/getFunctionDeclarationWithModifier';
+import getArrowFunctionWithModifier from '#/compilers/navigate/getArrowFunctionWithModifier';
+import getFunctionDeclarationWithModifier from '#/compilers/navigate/getFunctionDeclarationWithModifier';
 import { atOrThrow } from 'my-easy-fp';
 import type { ExportedDeclarations } from 'ts-morph';
 import { SyntaxKind } from 'ts-morph';

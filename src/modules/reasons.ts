@@ -1,4 +1,4 @@
-import type IReason from '#compilers/interfaces/IReason';
+import type IReason from '#/compilers/interfaces/IReason';
 
 class ReasonBox {
   #reasons: IReason[];

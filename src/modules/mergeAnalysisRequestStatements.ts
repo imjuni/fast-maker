@@ -1,5 +1,5 @@
-import type doDedupeRouting from '#modules/doDedupeRouting';
-import { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
+import type doDedupeRouting from '#/modules/doDedupeRouting';
+import { CE_ROUTE_INFO_KIND } from '#/routes/interface/CE_ROUTE_INFO_KIND';
 
 export default function mergeAnalysisRequestStatements(
   routes: Omit<ReturnType<typeof doDedupeRouting>, 'kind'>[],

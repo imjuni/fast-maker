@@ -3,7 +3,7 @@
  * 아예 매칭이 되지 않기 때문에 아래와 같이 caseSensitive는 false로 처리하되, case가 다른 경우
  * matchCase를 별도로 전달한다
  */
-import { getNumber, getPercentNumber } from '#tools/getNumber';
+import { getNumber, getPercentNumber } from '#/tools/getNumber';
 import Fuse from 'fuse.js';
 
 export interface IFuzzyWithCaseReturn {

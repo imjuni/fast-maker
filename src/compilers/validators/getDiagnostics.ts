@@ -1,4 +1,4 @@
-import type IBaseOption from '#configs/interfaces/IBaseOption';
+import type IBaseOption from '#/configs/interfaces/IBaseOption';
 import type * as tsm from 'ts-morph';
 
 interface IGetDiagnostics {

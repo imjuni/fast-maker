@@ -1,8 +1,8 @@
-import type { TRouteOption } from '#configs/interfaces/TRouteOption';
-import type { TWatchOption } from '#configs/interfaces/TWatchOption';
-import getRoutePath from '#routes/getRoutePath';
-import { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
-import type { TPickRouteInfo } from '#routes/interface/TRouteInfo';
+import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
+import type { TWatchOption } from '#/configs/interfaces/TWatchOption';
+import getRoutePath from '#/routes/getRoutePath';
+import { CE_ROUTE_INFO_KIND } from '#/routes/interface/CE_ROUTE_INFO_KIND';
+import type { TPickRouteInfo } from '#/routes/interface/TRouteInfo';
 
 import { startSepRemove } from 'my-node-fp';
 import path from 'path';

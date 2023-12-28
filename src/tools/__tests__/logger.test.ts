@@ -1,5 +1,5 @@
-import logger, { loggerClear } from '#tools/logger';
-import * as lm from '#tools/loggerModule';
+import logger, { loggerClear } from '#/tools/logger';
+import * as lm from '#/tools/loggerModule';
 
 import 'jest';
 

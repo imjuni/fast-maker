@@ -1,4 +1,4 @@
-import getCwd from '#tools/getCwd';
+import getCwd from '#/tools/getCwd';
 import { existsSync } from 'my-node-fp';
 import path from 'path';
 

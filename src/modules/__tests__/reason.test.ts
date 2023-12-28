@@ -1,5 +1,5 @@
-import type IReason from '#compilers/interfaces/IReason';
-import reasons from '#modules/reasons';
+import type IReason from '#/compilers/interfaces/IReason';
+import reasons from '#/modules/reasons';
 import 'jest';
 import { atOrThrow } from 'my-easy-fp';
 

@@ -1,6 +1,6 @@
-import getTypeScriptConfig from '#compilers/tools/getTypeScriptConfig';
-import getTypeScriptProject from '#compilers/tools/getTypeScriptProject';
-import * as env from '#tools/__tests__/tools/env';
+import getTypeScriptConfig from '#/compilers/tools/getTypeScriptConfig';
+import getTypeScriptProject from '#/compilers/tools/getTypeScriptProject';
+import * as env from '#/tools/__tests__/tools/env';
 import 'jest';
 import path from 'path';
 

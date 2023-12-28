@@ -1,8 +1,8 @@
-import type { TRouteOption } from '#configs/interfaces/TRouteOption';
-import type { TWatchOption } from '#configs/interfaces/TWatchOption';
-import type { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
-import type TRouteInfo from '#routes/interface/TRouteInfo';
-import type { TPickRouteInfo } from '#routes/interface/TRouteInfo';
+import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
+import type { TWatchOption } from '#/configs/interfaces/TWatchOption';
+import type { CE_ROUTE_INFO_KIND } from '#/routes/interface/CE_ROUTE_INFO_KIND';
+import type TRouteInfo from '#/routes/interface/TRouteInfo';
+import type { TPickRouteInfo } from '#/routes/interface/TRouteInfo';
 import type { Project } from 'ts-morph';
 
 export default class FastMakerContext {

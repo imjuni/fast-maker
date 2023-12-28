@@ -1,8 +1,8 @@
-import type IGetModuleInImports from '#compilers/interfaces/IGetModuleInImports';
-import getTypeSymbolText from '#compilers/tools/getTypeSymbolText';
-import type IBaseOption from '#configs/interfaces/IBaseOption';
-import appendPostfixHash from '#tools/appendPostfixHash';
-import getHash from '#tools/getHash';
+import type IGetModuleInImports from '#/compilers/interfaces/IGetModuleInImports';
+import getTypeSymbolText from '#/compilers/tools/getTypeSymbolText';
+import type IBaseOption from '#/configs/interfaces/IBaseOption';
+import appendPostfixHash from '#/tools/appendPostfixHash';
+import getHash from '#/tools/getHash';
 import { replaceSepToPosix } from 'my-node-fp';
 import path from 'path';
 import type { SourceFile, TypeReferenceNode } from 'ts-morph';

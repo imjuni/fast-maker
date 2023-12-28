@@ -1,7 +1,7 @@
-import getMethodBar from '#modules/getMethodBar';
-import getMethodColor from '#modules/getMethodColor';
-import getValidRoutePath from '#modules/getValidRoutePath';
-import loadSourceData from '#tools/__tests__/tools/loadSourceData';
+import getMethodBar from '#/modules/getMethodBar';
+import getMethodColor from '#/modules/getMethodColor';
+import getValidRoutePath from '#/modules/getValidRoutePath';
+import loadSourceData from '#/tools/__tests__/tools/loadSourceData';
 import chalk from 'chalk';
 import 'jest';
 

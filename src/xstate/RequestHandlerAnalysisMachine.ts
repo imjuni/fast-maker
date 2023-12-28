@@ -1,31 +1,29 @@
-import type IImportConfiguration from '#compilers/interfaces/IImportConfiguration';
-import type IReason from '#compilers/interfaces/IReason';
-import type { IHandlerStatement, IOptionStatement } from '#compilers/interfaces/THandlerNode';
-import getPropertySignatures from '#compilers/navigate/getPropertySignatures';
-import getLocalModuleInImports from '#compilers/tools/getLocalModuleInImport';
-import getResolvedModuleInImports from '#compilers/tools/getResolvedModuleInImports';
-import getTypeReferences from '#compilers/tools/getTypeReferences';
-import getTypeSymbolText from '#compilers/tools/getTypeSymbolText';
-import replaceTypeReferenceInTypeLiteral from '#compilers/tools/replaceTypeReferenceInTypeLiteral';
-import validatePropertySignature from '#compilers/validators/validatePropertySignature';
-import validateTypeReferences from '#compilers/validators/validateTypeReference';
-import type IBaseOption from '#configs/interfaces/IBaseOption';
-import dedupeImportConfiguration from '#generators/dedupeImportConfiguration';
-import getHandlerNameWithoutSquareBracket from '#generators/getHandlerNameWithoutSquareBracket';
-import getImportConfigurationFromResolutions from '#generators/getImportConfigurationFromResolutions';
-import type IRouteConfiguration from '#routes/interface/IRouteConfiguration';
-import type IRouteHandler from '#routes/interface/IRouteHandler';
-import appendPostfixHash from '#tools/appendPostfixHash';
-import logger from '#tools/logger';
-import { CE_REQUEST_HANDLER_ANALYSIS_MACHINE } from '#xstate/interfaces/CE_REQUEST_HANDLER_ANALYSIS_MACHINE';
-import castFunctionNode from '#xstate/tools/castFunctionNode';
+import type IImportConfiguration from '#/compilers/interfaces/IImportConfiguration';
+import type IReason from '#/compilers/interfaces/IReason';
+import type { IHandlerStatement, IOptionStatement } from '#/compilers/interfaces/THandlerNode';
+import getPropertySignatures from '#/compilers/navigate/getPropertySignatures';
+import getLocalModuleInImports from '#/compilers/tools/getLocalModuleInImport';
+import getResolvedModuleInImports from '#/compilers/tools/getResolvedModuleInImports';
+import getTypeReferences from '#/compilers/tools/getTypeReferences';
+import getTypeSymbolText from '#/compilers/tools/getTypeSymbolText';
+import replaceTypeReferenceInTypeLiteral from '#/compilers/tools/replaceTypeReferenceInTypeLiteral';
+import validatePropertySignature from '#/compilers/validators/validatePropertySignature';
+import validateTypeReferences from '#/compilers/validators/validateTypeReference';
+import type IBaseOption from '#/configs/interfaces/IBaseOption';
+import dedupeImportConfiguration from '#/generators/dedupeImportConfiguration';
+import getHandlerNameWithoutSquareBracket from '#/generators/getHandlerNameWithoutSquareBracket';
+import getImportConfigurationFromResolutions from '#/generators/getImportConfigurationFromResolutions';
+import type IRouteConfiguration from '#/routes/interface/IRouteConfiguration';
+import type IRouteHandler from '#/routes/interface/IRouteHandler';
+import appendPostfixHash from '#/tools/appendPostfixHash';
+import { CE_REQUEST_HANDLER_ANALYSIS_MACHINE } from '#/xstate/interfaces/CE_REQUEST_HANDLER_ANALYSIS_MACHINE';
+import castFunctionNode from '#/xstate/tools/castFunctionNode';
 import chalk from 'chalk';
+import consola from 'consola';
 import { atOrThrow, atOrUndefined } from 'my-easy-fp';
 import * as path from 'path';
 import type { Project, SourceFile, Type } from 'ts-morph';
 import { assign, createMachine } from 'xstate';
-
-const log = logger();
 
 export interface IAnalysisMachineContext {
   project: Project;
@@ -60,8 +58,8 @@ const requestHandlerAnalysisMachine = (
       states: {
         [CE_REQUEST_HANDLER_ANALYSIS_MACHINE.INITIAL]: {
           entry: (context) => {
-            log.debug(`xstate state machine start: ${context.currentNode}`);
-            log.debug(`xstate state machine analysis request: sync, async and type parameter`);
+            consola.debug(`xstate state machine start: ${context.currentNode}`);
+            consola.debug(`xstate state machine analysis request: sync, async and type parameter`);
           },
           always: [
             {

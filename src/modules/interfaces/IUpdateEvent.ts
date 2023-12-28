@@ -1,7 +1,7 @@
-import type IReason from '#compilers/interfaces/IReason';
-import type { CE_WATCH_EVENT } from '#modules/interfaces/CE_WATCH_EVENT';
-import type { CE_ROUTE_INFO_KIND } from '#routes/interface/CE_ROUTE_INFO_KIND';
-import type { TPickRouteInfo } from '#routes/interface/TRouteInfo';
+import type IReason from '#/compilers/interfaces/IReason';
+import type { CE_WATCH_EVENT } from '#/modules/interfaces/CE_WATCH_EVENT';
+import type { CE_ROUTE_INFO_KIND } from '#/routes/interface/CE_ROUTE_INFO_KIND';
+import type { TPickRouteInfo } from '#/routes/interface/TRouteInfo';
 
 export default interface IUpdateEvent {
   /**

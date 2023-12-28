@@ -4,11 +4,18 @@
   "printWidth": 120,
   "arrowParens": "always",
   "parser": "typescript",
+  "plugins": ["prettier-plugin-organize-imports"],
   "overrides": [
     {
       "files": "*.md",
       "options": {
         "parser": "markdown"
+      }
+    },
+    {
+      "files": ".ctirc",
+      "options": {
+        "parser": "json"
       }
     },
     {

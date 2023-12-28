@@ -1,4 +1,4 @@
-import getResolvedPaths from '#configs/getResolvedPaths';
+import getResolvedPaths from '#/configs/getResolvedPaths';
 import 'jest';
 import path from 'path';
 

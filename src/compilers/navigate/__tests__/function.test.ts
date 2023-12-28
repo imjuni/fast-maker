@@ -1,5 +1,5 @@
-import getFunctionDeclarationWithModifier from '#compilers/navigate/getFunctionDeclarationWithModifier';
-import JestContext from '#tools/__tests__/tools/context';
+import getFunctionDeclarationWithModifier from '#/compilers/navigate/getFunctionDeclarationWithModifier';
+import JestContext from '#/tools/__tests__/tools/context';
 import 'jest';
 import { Project } from 'ts-morph';
 
