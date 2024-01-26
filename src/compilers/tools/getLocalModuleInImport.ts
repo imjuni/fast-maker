@@ -1,4 +1,4 @@
-import type IGetModuleInImports from '#/compilers/interfaces/IGetModuleInImports';
+import type IGetModuleInImports from '#/compilers/interfaces/IResolvedImportModule';
 import getTypeSymbolText from '#/compilers/tools/getTypeSymbolText';
 import type IBaseOption from '#/configs/interfaces/IBaseOption';
 import appendPostfixHash from '#/tools/appendPostfixHash';

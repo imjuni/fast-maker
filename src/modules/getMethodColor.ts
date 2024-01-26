@@ -1,4 +1,4 @@
-import { CE_ROUTE_METHOD } from '#/routes/interface/CE_ROUTE_METHOD';
+import { CE_ROUTE_METHOD } from '#/routes/const-enum/CE_ROUTE_METHOD';
 import type chalk from 'chalk';
 
 function getMethodColor(method: CE_ROUTE_METHOD, type: 'background'): typeof chalk.BackgroundColor;

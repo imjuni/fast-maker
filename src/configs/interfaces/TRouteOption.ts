@@ -1,10 +1,10 @@
-import type IBaseOption from '#/configs/interfaces/IBaseOption';
-import type IResolvedPaths from '#/configs/interfaces/IResolvedPaths';
+import type { IBaseOption } from '#/configs/interfaces/IBaseOption';
+import type { IResolvedPaths } from '#/configs/interfaces/IResolvedPaths';
 
-export interface IRouteOption {
+export interface IRouteOptionKind {
   kind: 'route';
 }
 
-export type TRouteBaseOption = IBaseOption & IRouteOption;
+export type TRouteBaseOption = IBaseOption & IRouteOptionKind;
 
-export type TRouteOption = IBaseOption & IResolvedPaths & IRouteOption;
+export type TRouteOption = TRouteBaseOption & { path: IResolvedPaths };

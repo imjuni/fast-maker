@@ -1,4 +1,4 @@
-export default interface IImportConfiguration {
+export interface IImportConfiguration {
   /**
    * hash 난수로 생성한다
    */
@@ -23,6 +23,9 @@ export default interface IImportConfiguration {
    * import 할 파일의 경로
    */
   importFile: string;
+
+  /** import statement를 작성할 때 사용할 상대 경로 */
+  relativePath: string;
 
   /** 소스파일 */
   // source: SourceFile;

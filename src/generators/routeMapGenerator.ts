@@ -1,4 +1,4 @@
-import type IRouteConfiguration from '#/routes/interface/IRouteConfiguration';
+import type { IRouteConfiguration } from '#/routes/interfaces/IRouteConfiguration';
 
 interface IRouteMapItem {
   filePath: string;
@@ -14,7 +14,7 @@ function getItemStatement(item: IRouteMapItem): string {
   }`;
 }
 
-export default function routeMapGenerator(routeConfigurations: IRouteConfiguration[]) {
+export function routeMapGenerator(routeConfigurations: IRouteConfiguration[]) {
   const routeMap = routeConfigurations.reduce<Record<string, IRouteMapItem[]>>((aggregation, routeConfiguration) => {
     return {
       ...aggregation,
@@ -23,7 +23,7 @@ export default function routeMapGenerator(routeConfigurations: IRouteConfigurati
         {
           filePath: routeConfiguration.sourceFilePath,
           routePath: routeConfiguration.routePath,
-          method: routeConfiguration.method,
+          method: routeConfiguration.methods,
         },
       ],
     };

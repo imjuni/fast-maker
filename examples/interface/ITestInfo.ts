@@ -13,3 +13,7 @@ export interface ITestInfoType02 {
   /** usage count of one day */
   count: number;
 }
+
+type TTypeParams = { Querystring: ITestInfoType01; Params: ITestInfoType02 };
+
+export default TTypeParams;

@@ -1,13 +1,13 @@
-import type IBaseOption from '#/configs/interfaces/IBaseOption';
+import type { IBaseOption } from '#/configs/interfaces/IBaseOption';
 import type * as tsm from 'ts-morph';
 
 interface IGetDiagnostics {
-  option: Pick<IBaseOption, 'skipError'>;
+  options: Pick<IBaseOption, 'skipError'>;
   project: tsm.Project;
 }
 
-export default function getDiagnostics({ option, project }: IGetDiagnostics): boolean {
-  if (option.skipError === false) {
+export function getDiagnostics({ options, project }: IGetDiagnostics): boolean {
+  if (options.skipError === false) {
     const diagnostics = project.getPreEmitDiagnostics();
     const diagnosticFiles = diagnostics
       .map((diagnostic) => diagnostic.getSourceFile())

@@ -1,16 +1,14 @@
-import { CE_DEFAULT_VALUE } from '#/configs/interfaces/CE_DEFAULT_VALUE';
-import getConfigFilePath from '#/configs/interfaces/getConfigFilePath';
+import { CE_DEFAULT_VALUE } from '#/configs/const-enum/CE_DEFAULT_VALUE';
 import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
 import type { TWatchOption } from '#/configs/interfaces/TWatchOption';
-import logger from '#/tools/logger';
+import { getConfigFilePath } from '#/configs/interfaces/getConfigFilePath';
+import consola from 'consola';
 import * as findUp from 'find-up';
 import * as fs from 'fs';
 import { parse } from 'jsonc-parser';
 import minimist from 'minimist';
 
-const log = logger();
-
-export default function preLoadConfig() {
+export function preLoadConfig() {
   try {
     const argv = minimist(process.argv.slice(2));
 
@@ -35,8 +33,8 @@ export default function preLoadConfig() {
   } catch (caught) {
     const err = caught instanceof Error ? caught : new Error('unknown error raised');
 
-    log.error(err);
-    log.error(err.stack);
+    consola.error(err);
+    consola.error(err.stack);
 
     return {};
   }

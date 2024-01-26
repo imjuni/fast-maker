@@ -1,4 +1,4 @@
-import { CE_DEFAULT_VALUE } from '#/configs/interfaces/CE_DEFAULT_VALUE';
+import { CE_DEFAULT_VALUE } from '#/configs/const-enum/CE_DEFAULT_VALUE';
 import getConfigFilePath from '#/configs/interfaces/getConfigFilePath';
 import * as env from '#/tools/__tests__/tools/env';
 import 'jest';

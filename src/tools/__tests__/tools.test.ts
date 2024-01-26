@@ -1,67 +1,16 @@
-import getResolvedPaths from '#/configs/getResolvedPaths';
-import JestContext from '#/tools/__tests__/tools/context';
-import * as env from '#/tools/__tests__/tools/env';
-import getCwd from '#/tools/getCwd';
-import getRelativeCwd from '#/tools/getRelativeCwd';
-import posixJoin from '#/tools/posixJoin';
-import 'jest';
-import path from 'path';
+import { getCwd } from '#/modules/files/getCwd';
+import { getRelativeCwd } from '#/tools/getRelativeCwd';
+import path from 'node:path';
+import { describe, expect, it } from 'vitest';
 
-describe('JestContext', () => {
-  test('pass', () => {
-    const ctx = new JestContext();
-    ctx.watchOption = { ...env.option, ...env.watchOption, ...getResolvedPaths(env.option) };
-    expect(ctx.watchOption).toMatchObject({ ...env.option, ...env.watchOption, ...getResolvedPaths(env.option) });
-  });
-
-  test('fail', () => {
-    const ctx = new JestContext();
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      ctx.project;
-    } catch (caught) {
-      expect(caught).toBeTruthy();
-    }
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      ctx.projectPath;
-    } catch (caught) {
-      expect(caught).toBeTruthy();
-    }
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      ctx.routeOption;
-    } catch (caught) {
-      expect(caught).toBeTruthy();
-    }
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      ctx.watchOption;
-    } catch (caught) {
-      expect(caught).toBeTruthy();
-    }
-  });
-});
-
-describe('getRativeCwd', () => {
-  test('default', () => {
+describe('getRelativeCwd', () => {
+  it('pass case of getRelativeCwd', () => {
     expect(getRelativeCwd('/a/b/c', '/a/b/c/d/test.ts')).toEqual('d/test.ts');
   });
 });
 
-describe('posixJoin', () => {
-  test('join path', () => {
-    const joined = posixJoin('hello', 'world');
-    expect(joined).toEqual('hello/world');
-  });
-});
-
 describe('getCwd', () => {
-  test('cwd', () => {
+  it('test every case of getCwd', () => {
     const r01 = getCwd({});
     const e = path.resolve('.');
 

@@ -1,16 +1,13 @@
 import { atOrThrow } from 'my-easy-fp';
-import type { Node, Type } from 'ts-morph';
+import type * as tsm from 'ts-morph';
 
-export default function getTypeSymbolText(
-  typeNode: Type,
-  declarationNodeCallback?: (declarationNode: Node) => string,
-): string {
+export function getTypeSymbolText(typeNode: tsm.Type, callback?: (declarationNode: tsm.Node) => string): string {
   const symbol = typeNode.getSymbol();
   const aliasSymbol = typeNode.getAliasSymbol();
 
   if (symbol != null) {
     const declarationNode = atOrThrow(symbol.getDeclarations(), 0);
-    return declarationNodeCallback == null ? declarationNode.getText() : declarationNodeCallback(declarationNode);
+    return callback == null ? declarationNode.getText() : callback(declarationNode);
   }
 
   if (aliasSymbol != null) {
@@ -19,3 +16,16 @@ export default function getTypeSymbolText(
 
   throw new Error(`Cannot acquire text from type node: ${typeNode.getText()}`);
 }
+
+/*
+
+node.getType().getSymbol().getDeclarations().at(0).getText()
+"{\n  name: string;\n  age: number;\n}"
+
+
+
+node.getType().getAliasSymbol().getDeclarations().at(0).getText()
+"export type TQuerystring = {\n  name: string;\n  age: number;\n}"
+
+
+*/

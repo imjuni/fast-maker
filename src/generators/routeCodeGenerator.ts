@@ -1,10 +1,10 @@
-import type IRouteConfiguration from '#/routes/interface/IRouteConfiguration';
+import type { IRouteConfiguration } from '#/routes/interfaces/IRouteConfiguration';
 
 interface IRouteCodeGenerator {
   routeConfigurations: IRouteConfiguration[];
 }
 
-export default function routeCodeGenerator({ routeConfigurations }: IRouteCodeGenerator) {
+export function routeCodeGenerator({ routeConfigurations }: IRouteCodeGenerator) {
   const codes = routeConfigurations.map((routeConfiguration) => {
     const handler = routeConfiguration.handlerName;
     const typeArgument =
@@ -13,8 +13,8 @@ export default function routeCodeGenerator({ routeConfigurations }: IRouteCodeGe
         : '';
 
     const code = routeConfiguration.hasOption
-      ? `fastify.${routeConfiguration.method}${typeArgument}('${routeConfiguration.routePath}', option_${routeConfiguration.hash}, ${handler});`
-      : `fastify.${routeConfiguration.method}${typeArgument}('${routeConfiguration.routePath}', ${handler});`;
+      ? `fastify.${routeConfiguration.methods}${typeArgument}('${routeConfiguration.routePath}', option_${routeConfiguration.hash}, ${handler});`
+      : `fastify.${routeConfiguration.methods}${typeArgument}('${routeConfiguration.routePath}', ${handler});`;
 
     return code;
   });

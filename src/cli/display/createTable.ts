@@ -1,18 +1,16 @@
 import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
-import type { TWatchOption } from '#/configs/interfaces/TWatchOption';
 import getMethodBar from '#/modules/getMethodBar';
 import getMethodColor from '#/modules/getMethodColor';
-import type { CE_ROUTE_METHOD } from '#/routes/interface/CE_ROUTE_METHOD';
-import type IRouteConfiguration from '#/routes/interface/IRouteConfiguration';
-import type IRouteHandler from '#/routes/interface/IRouteHandler';
-import posixJoin from '#/tools/posixJoin';
+import type { CE_ROUTE_METHOD } from '#/routes/const-enum/CE_ROUTE_METHOD';
+import type { IRouteConfiguration } from '#/routes/interfaces/IRouteConfiguration';
+import { posixJoin } from '#/tools/posixJoin';
 import chalk from 'chalk';
 import Table from 'cli-table3';
 import type { Entries } from 'type-fest';
 
-export default function createTable(
-  option: Pick<TRouteOption, 'handler'> | Pick<TWatchOption, 'handler'>,
-  handlerFiles: Record<CE_ROUTE_METHOD, IRouteHandler[]>,
+export function createTable(
+  option: Pick<TRouteOption['base'], 'handler'>,
+  handlerFiles: Record<CE_ROUTE_METHOD, IRouteConfiguration[]>,
   routes: IRouteConfiguration[],
 ): Table.Table {
   const table = new Table({
@@ -27,18 +25,14 @@ export default function createTable(
 
   const routeMap = routes.reduce<Record<CE_ROUTE_METHOD, IRouteConfiguration[]>>(
     (aggregation, route) => {
-      return { ...aggregation, [route.method]: [...aggregation[route.method], route] };
+      return route.methods.reduce(
+        (next, method) => {
+          return { ...next, [method]: [...next[method], route] };
+        },
+        { ...aggregation },
+      );
     },
-    {
-      get: [],
-      post: [],
-      put: [],
-      delete: [],
-      patch: [],
-      options: [],
-      head: [],
-      all: [],
-    },
+    {} as Record<CE_ROUTE_METHOD, IRouteConfiguration[]>,
   );
 
   (Object.entries(routeMap) as Entries<typeof routeMap>).forEach(([method, route]) => {

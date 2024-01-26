@@ -1,17 +1,34 @@
 import { CE_STREAM_TYPE } from '#/cli/interfaces/CE_STREAM_TYPE';
 import ora from 'ora';
 
-class Spinner {
+export class Spinner {
+  static #it: Spinner;
+
+  static #isBootstrap = false;
+
+  static get it(): Readonly<Spinner> {
+    return Spinner.#it;
+  }
+
+  static bootstrap(stream?: CE_STREAM_TYPE, isEnable?: boolean) {
+    if (Spinner.#isBootstrap) {
+      return;
+    }
+
+    Spinner.#it = new Spinner(stream ?? CE_STREAM_TYPE.STDOUT, isEnable ?? false);
+    Spinner.#isBootstrap = true;
+  }
+
   #spinner: ora.Ora;
 
   #stream: CE_STREAM_TYPE;
 
   accessor isEnable: boolean;
 
-  constructor(stream?: CE_STREAM_TYPE) {
-    this.#spinner = ora({ text: '', stream: process.stdout });
-    this.isEnable = false;
-    this.#stream = stream ?? CE_STREAM_TYPE.STDOUT;
+  constructor(stream: CE_STREAM_TYPE, isEnable: boolean) {
+    this.#spinner = ora({ text: '', stream: stream === CE_STREAM_TYPE.STDOUT ? process.stdout : process.stderr });
+    this.isEnable = isEnable;
+    this.#stream = stream;
   }
 
   set stream(value: CE_STREAM_TYPE) {
@@ -80,7 +97,3 @@ class Spinner {
     }
   }
 }
-
-const spinner = new Spinner();
-
-export default spinner;

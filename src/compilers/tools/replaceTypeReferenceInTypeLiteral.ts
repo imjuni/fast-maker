@@ -1,4 +1,4 @@
-import type IGetModuleInImports from '#/compilers/interfaces/IGetModuleInImports';
+import type IGetModuleInImports from '#/compilers/interfaces/IResolvedImportModule';
 import logger from '#/tools/logger';
 import type { TypeReferenceNode } from 'ts-morph';
 

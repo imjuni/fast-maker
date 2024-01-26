@@ -1,6 +1,6 @@
 import getHandlerWithOption from '#/compilers/navigate/getHandlerWithOption';
 import getLocalModuleInImports from '#/compilers/tools/getLocalModuleInImport';
-import getTypeReferences from '#/compilers/tools/getTypeReferences';
+import getTypeReferences from '#/compilers/type-tools/getTypeReferences';
 import getResolvedPaths from '#/configs/getResolvedPaths';
 import dedupeImportConfiguration from '#/generators/dedupeImportConfiguration';
 import getImportConfigurationFromResolutions from '#/generators/getImportConfigurationFromResolutions';

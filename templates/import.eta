@@ -1,0 +1,32 @@
+<%
+  function getNonNamedBinding(importStatement) {
+    if (importStatement.nonNamedBinding != null && importStatement.nonNamedBinding !== '') {
+      if (importStatement.nonNamedBindingIsPureType === true) {
+        return `type ${importStatement.nonNamedBinding}`;
+      }
+
+      return importStatement.nonNamedBinding;
+    }
+
+    return '';
+  }
+
+  function getNmaedBinding(namedBindings) {
+    const bindings = namedBindings.map((namedBinding) => {
+      if (namedBinding.isPureType) {
+        return `type ${namedBinding.alias}`;
+      }
+
+      return namedBinding.alias;
+    }).join(', ');
+
+    if (bindings.length > 0) {
+      return ` { ${bindings} }`
+    }
+
+    return '';
+  }
+%>
+<% it.imports.forEach((importStatement) => { %>
+import <%= getNonNamedBinding(importStatement) %><%= getNmaedBinding(importStatement.namedBindings) %> from '<%= importStatement.relativePath %>';
+<% }) %>

@@ -1,5 +1,5 @@
 import { CE_COMMAND_LIST } from '#/cli/interfaces/CE_COMMAND_LIST';
-import getResolvePath from '#/configs/getResolvePath';
+import { getResolvePath } from '#/configs/getResolvePath';
 import { atOrUndefined } from 'my-easy-fp';
 
 const commands: string[] = [
@@ -20,7 +20,7 @@ function getConfigValue(value: unknown) {
   return undefined;
 }
 
-export default function isValidConfig(argv: { [argName: string]: unknown; _: (string | number)[]; $0: string }) {
+export function isValidConfig(argv: { [argName: string]: unknown; _: (string | number)[]; $0: string }) {
   const command = atOrUndefined(argv._, 0);
 
   if (commands.includes(`${command ?? ''}`) === false) {
