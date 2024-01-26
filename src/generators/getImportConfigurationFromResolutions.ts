@@ -1,11 +1,7 @@
-import type IGetModuleInImports from '#/compilers/interfaces/IGetModuleInImports';
-import type IImportConfiguration from '#/compilers/interfaces/IImportConfiguration';
+import type { IImportConfiguration } from '#/compilers/interfaces/IImportConfiguration';
+import type { IResolvedImportModule } from '#/compilers/interfaces/IResolvedImportModule';
 
-export default function getImportConfigurationFromResolutions({
-  resolutions,
-}: {
-  resolutions: IGetModuleInImports[];
-}): IImportConfiguration[] {
+export function getImportConfigurationFromResolutions(resolutions: IResolvedImportModule[]): IImportConfiguration[] {
   const importConfigurations = resolutions.map((resolution) => {
     const defaultImportDeclarations = resolution.importDeclarations.find(
       (importDeclaration) => importDeclaration.isDefaultExport,
@@ -23,7 +19,7 @@ export default function getImportConfigurationFromResolutions({
       nonNamedBinding: defaultImportDeclarations?.importModuleNameTo,
       nonNamedBindingIsPureType: defaultImportDeclarations?.isPureType,
       importFile: resolution.exportFrom,
-      // source,
+      relativePath: resolution.relativePath,
     };
 
     return importConfiguration;

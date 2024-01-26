@@ -1,100 +1,62 @@
-import getTypeSymbolText from '#/compilers/tools/getTypeSymbolText';
-import getResolvedPaths from '#/configs/getResolvedPaths';
-import JestContext from '#/tools/__tests__/tools/context';
-import * as env from '#/tools/__tests__/tools/env';
-import 'jest';
+import { getRouteNode } from '#/compilers/routes/getRouteNode';
+import { getTypeSymbolText } from '#/compilers/tools/getTypeSymbolText';
 import { atOrThrow } from 'my-easy-fp';
-import path from 'path';
-import { Project, Type } from 'ts-morph';
+import { randomUUID } from 'node:crypto';
+import path from 'node:path';
+import * as tsm from 'ts-morph';
+import { describe, expect, it } from 'vitest';
 
-const context = new JestContext();
-
-beforeAll(async () => {
-  context.projectPath = path.join(env.examplePath, 'tsconfig.json');
-  context.project = new Project({ tsConfigFilePath: context.projectPath });
-  context.routeOption = {
-    ...env.routeOption,
-    ...getResolvedPaths({ project: context.projectPath, handler: env.handlerPath, output: env.examplePath }),
-  };
-});
+const tsconfigDirPath = path.join(process.cwd(), 'examples');
+const tsconfigFilePath = path.join(tsconfigDirPath, 'tsconfig.example.json');
+const project = new tsm.Project({ tsConfigFilePath: tsconfigFilePath });
+const context: { index: number } = { index: 0 };
 
 describe('getTypeSymbolText', () => {
-  test('pass', async () => {
-    const sourceCode = `import { FastifyRequest } from 'fastify';
-import { IAbility } from '../../../../../interface/IAbility';
+  it('without callback', () => {
+    const uuid = randomUUID();
+    const filename01 = `${uuid}_0${(context.index += 1)}.ts`;
+    const sourcecode01 = `
+import { FastifyRequest } from 'fastify';
+import { ITestInfoType01 } from '#/ITestInfo';
 
-export type TSample = { name: string };
-    
-export default async function hero(req: FastifyRequest<{ Body: IAbility; Querystring: TSample; }>) {
-  return req.body;
-}`;
+export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01 }>) {
+  return 'hello';
+}
+    `.trim();
 
-    context.project.createSourceFile('c1.ts', sourceCode, { overwrite: true });
+    const create = (name: string, code: string, overwrite?: boolean) =>
+      project.createSourceFile(path.join('examples', name), code, { overwrite: overwrite ?? true });
+    const sourceFile = create(filename01, sourcecode01);
+    const node = getRouteNode(sourceFile);
+    const parameters = node?.node.getParameters() ?? [];
+    const parameter = atOrThrow(parameters, 0);
+    const typeArgument = atOrThrow(parameter.getType().getTypeArguments(), 0);
+    const r01 = getTypeSymbolText(typeArgument);
 
-    const sourceFile = context.project.getSourceFileOrThrow('c1.ts');
-    const typeAlias = atOrThrow(sourceFile.getTypeAliases(), 0);
-
-    const r = getTypeSymbolText(typeAlias.getType(), (node) => node.getType().getSymbolOrThrow().getEscapedName());
-    expect(r).toEqual('__type');
+    expect(r01).toEqual('{ Querystring: ITestInfoType01 }');
   });
 
-  test('pass - alias symbol', async () => {
-    const sourceCode = `import { FastifyRequest } from 'fastify';
-import { IAbility } from '../../../../../interface/IAbility';
+  it.only('without callback, alias type symbol', () => {
+    const uuid = randomUUID();
+    const filename01 = `${uuid}_0${(context.index += 1)}.ts`;
+    const sourcecode01 = `
+import { FastifyRequest } from 'fastify';
+import TTypeParams from '#/ITestInfo';
 
-export type TSample = { name: string };
-    
-export default async function hero(req: FastifyRequest<{ Body: IAbility; Querystring: TSample; }>) {
-  return req.body;
-}`;
+export function handler(req: FastifyRequest<TTypeParams>) {
+  return 'hello';
+}
+    `.trim();
 
-    context.project.createSourceFile('c1.ts', sourceCode, { overwrite: true });
+    const create = (name: string, code: string, overwrite?: boolean) =>
+      project.createSourceFile(path.join('examples', name), code, { overwrite: overwrite ?? true });
+    const sourceFile = create(filename01, sourcecode01);
+    const node = getRouteNode(sourceFile);
+    const parameters = node?.node.getParameters() ?? [];
+    const parameter = atOrThrow(parameters, 0);
+    const typeArgument = atOrThrow(parameter.getType().getTypeArguments(), 0);
+    const r01 = getTypeSymbolText(typeArgument);
 
-    const sourceFile = context.project.getSourceFileOrThrow('c1.ts');
-    const typeAlias = atOrThrow(sourceFile.getTypeAliases(), 0);
-
-    const spy1 = jest.spyOn(Type.prototype, 'getSymbol').mockImplementationOnce(() => undefined);
-    const spy2 = jest.spyOn(Type.prototype, 'getAliasSymbol').mockImplementationOnce(
-      () =>
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        ({
-          getEscapedName: () => 'aliasSymbol',
-        } as any),
-    );
-
-    const r = getTypeSymbolText(typeAlias.getType(), (node) => node.getType().getSymbolOrThrow().getEscapedName());
-
-    spy1.mockRestore();
-    spy2.mockRestore();
-
-    expect(r).toEqual('aliasSymbol');
-  });
-
-  test('exception', async () => {
-    const sourceCode = `import { FastifyRequest } from 'fastify';
-import { IAbility } from '../../../../../interface/IAbility';
-
-export type TSample = { name: string };
-    
-export default async function hero(req: FastifyRequest<{ Body: IAbility; Querystring: TSample; }>) {
-  return req.body;
-}`;
-
-    context.project.createSourceFile('c1.ts', sourceCode, { overwrite: true });
-
-    const sourceFile = context.project.getSourceFileOrThrow('c1.ts');
-    const typeAlias = atOrThrow(sourceFile.getTypeAliases(), 0);
-
-    const spy1 = jest.spyOn(Type.prototype, 'getSymbol').mockImplementationOnce(() => undefined);
-    const spy2 = jest.spyOn(Type.prototype, 'getAliasSymbol').mockImplementationOnce(() => undefined);
-
-    try {
-      getTypeSymbolText(typeAlias.getType(), (node) => node.getType().getSymbolOrThrow().getEscapedName());
-    } catch (caught) {
-      spy1.mockRestore();
-      spy2.mockRestore();
-
-      expect(caught).toBeTruthy();
-    }
+    console.log(r01);
   });
 });

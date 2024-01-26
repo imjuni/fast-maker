@@ -1,4 +1,4 @@
-import type IRouteConfiguration from '#/routes/interface/IRouteConfiguration';
+import type IRouteConfiguration from '#/routes/interfaces/IRouteConfiguration';
 import sortRoutePath from '#/routes/sortRoutePath';
 import sortRoutePaths from '#/routes/sortRoutePaths';
 import { loadJsonData } from '@maeum/test-utility';

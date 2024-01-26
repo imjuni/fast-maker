@@ -1,4 +1,4 @@
-import getCwd from '#/tools/getCwd';
+import getCwd from '#/modules/files/getCwd';
 import prettier, { type Options } from 'prettier';
 
 export interface IPrettierProcessingParam {

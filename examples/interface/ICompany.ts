@@ -1,4 +1,4 @@
-import { IAbility } from './IAbility';
+import type { IAbility } from './IAbility';
 
 export default interface ICompany {
   querystring: string;

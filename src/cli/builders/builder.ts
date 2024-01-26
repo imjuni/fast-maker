@@ -1,7 +1,7 @@
-import { CE_DEFAULT_VALUE } from '#/configs/interfaces/CE_DEFAULT_VALUE';
+import { CE_DEFAULT_VALUE } from '#/configs/const-enum/CE_DEFAULT_VALUE';
 import type { Argv } from 'yargs';
 
-export default function builder(args: Argv): Argv {
+export function builder(args: Argv): Argv {
   // ------------------------------------------------------------------------
   // with alias
   // ------------------------------------------------------------------------

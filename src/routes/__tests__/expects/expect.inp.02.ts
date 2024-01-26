@@ -1,4 +1,4 @@
-import { CE_ROUTE_METHOD } from '#/routes/interface/CE_ROUTE_METHOD';
+import { CE_ROUTE_METHOD } from '#/routes/const-enum/CE_ROUTE_METHOD';
 import * as env from '#/tools/__tests__/tools/env';
 import posixJoin from '#/tools/posixJoin';
 

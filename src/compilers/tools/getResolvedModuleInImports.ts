@@ -1,4 +1,4 @@
-import type IGetModuleInImports from '#/compilers/interfaces/IGetModuleInImports';
+import type IGetModuleInImports from '#/compilers/interfaces/IResolvedImportModule';
 import getNamedBindingName from '#/compilers/tools/getNamedBindingName';
 import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
 import type { TWatchOption } from '#/configs/interfaces/TWatchOption';

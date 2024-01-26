@@ -1,5 +1,5 @@
 import type IReason from '#/compilers/interfaces/IReason';
-import type IRouteHandler from '#/routes/interface/IRouteHandler';
+import type IRouteHandler from '#/routes/interfaces/IRouteHandler';
 
 export default class StateMachineError extends Error {
   accessor handler: IRouteHandler;

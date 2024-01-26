@@ -1,5 +1,5 @@
-import type IBaseOption from '#/configs/interfaces/IBaseOption';
-import type IResolvedPaths from '#/configs/interfaces/IResolvedPaths';
+import type { IBaseOption } from '#/configs/interfaces/IBaseOption';
+import type { IResolvedPaths } from '#/configs/interfaces/IResolvedPaths';
 
 export interface IWatchOption {
   kind: 'watch';

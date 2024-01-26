@@ -12,8 +12,6 @@ export interface IOptionStatement {
   node: Node;
 }
 
-type THandlerNode = IHandlerStatement | IOptionStatement;
+export type THandlerNode = IHandlerStatement | IOptionStatement;
 
 export type THandlerWithoutNode = Omit<IHandlerStatement, 'node'> | Omit<IOptionStatement, 'node'>;
-
-export default THandlerNode;

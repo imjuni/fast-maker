@@ -1,4 +1,4 @@
-import type summaryRouteHandlerFiles from '#/modules/summaryRouteHandlerFiles';
+import type summaryRouteHandlerFiles from '#/routes/summaryRoutePaths';
 import * as env from '#/tools/__tests__/tools/env';
 import posixJoin from '#/tools/posixJoin';
 import type { AsyncReturnType } from 'type-fest';

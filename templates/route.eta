@@ -1,0 +1,30 @@
+<% it.routes.forEach((route) => { %>
+<% if (route.typeArgument != null && route.typeArgument.text !== '' ) { %>
+fastify.route<<%= route.typeArgument.text %>>({
+  <% if (route.hasOption) { %>
+...option_<%= route.hash %>,
+  method: <%= JSON.stringify(route.methods) %>,
+  url: '<%= route.routePath %>'
+  handler: <%= route.handlerName %>,
+  <% } else { %>
+method: <%= JSON.stringify(route.methods) %>,
+  url: '<%= route.routePath %>'
+  handler: <%= route.handlerName %>,
+  <% } %>
+});
+<% } else { %>
+fastify.route({
+  <% if (route.hasOption) { %>
+...option_<%= route.hash %>,
+  method: <%= JSON.stringify(route.methods) %>,
+  url: '<%= route.routePath %>'
+  handler: <%= route.handlerName %>,
+  <% } else { %>
+method: <%= JSON.stringify(route.methods) %>,
+  url: '<%= route.routePath %>'
+  handler: <%= route.handlerName %>,
+  <% } %>
+});
+<% } %>
+
+<% }) %>

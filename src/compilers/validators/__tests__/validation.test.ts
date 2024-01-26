@@ -1,8 +1,8 @@
 import getHandlerWithOption from '#/compilers/navigate/getHandlerWithOption';
 import getPropertySignatures from '#/compilers/navigate/getPropertySignatures';
-import getTypeReferences from '#/compilers/tools/getTypeReferences';
+import getTypeReferences from '#/compilers/type-tools/getTypeReferences';
 import validatePropertySignature from '#/compilers/validators/validatePropertySignature';
-import validateTypeReferences from '#/compilers/validators/validateTypeReference';
+import validateTypeReferences from '#/compilers/validators/validateTypeReferences2';
 import JestContext from '#/tools/__tests__/tools/context';
 import * as env from '#/tools/__tests__/tools/env';
 import loadSourceData from '#/tools/__tests__/tools/loadSourceData';

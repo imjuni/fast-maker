@@ -1,15 +1,13 @@
-import type IImportConfiguration from '#/compilers/interfaces/IImportConfiguration';
-import logger from '#/tools/logger';
+import type { IImportConfiguration } from '#/compilers/interfaces/IImportConfiguration';
+import consola from 'consola';
 import type { LastArrayElement } from 'type-fest';
 
-const log = logger();
-
-export default function mergeImportConfiguration(
+export function mergeImportConfiguration(
   source: IImportConfiguration,
   target: IImportConfiguration,
 ): IImportConfiguration {
   if (source.importFile !== target.importFile) {
-    log.warn(`importFile is different: ${source.importFile} vs ${target.importFile}`);
+    consola.warn(`importFile is different: ${source.importFile} vs ${target.importFile}`);
   }
 
   const next = { ...source };

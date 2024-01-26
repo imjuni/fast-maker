@@ -1,8 +1,8 @@
-import getCwd from '#/tools/getCwd';
+import { getCwd } from '#/modules/files/getCwd';
 import { existsSync } from 'my-node-fp';
 import path from 'path';
 
-export default function getResolvePath(filePath: string): boolean {
+export function getResolvePath(filePath: string): boolean {
   if (existsSync(path.resolve(filePath))) {
     return true;
   }

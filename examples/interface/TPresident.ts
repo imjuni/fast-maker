@@ -1,4 +1,4 @@
-import { IAbility } from './IAbility';
+import type { IAbility } from './IAbility';
 import ICompany from './ICompany';
 
 type TPresident = {

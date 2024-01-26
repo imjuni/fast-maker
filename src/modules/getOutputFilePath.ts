@@ -1,7 +1,7 @@
 import { existsSync, isDirectorySync } from 'my-node-fp';
 import path from 'path';
 
-export default function getOutputFilePath(...filePaths: string[]) {
+export function getOutputFilePath(...filePaths: string[]) {
   const dirPath = path.resolve(path.join(...filePaths));
 
   if (existsSync(dirPath) && isDirectorySync(dirPath)) {

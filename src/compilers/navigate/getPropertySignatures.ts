@@ -1,11 +1,11 @@
 import { atOrThrow } from 'my-easy-fp';
-import type { ParameterDeclaration, Symbol } from 'ts-morph';
+import type * as tsm from 'ts-morph';
 
 interface IGetFirstTypeArgument {
-  parameter: ParameterDeclaration;
+  parameter: tsm.ParameterDeclaration;
 }
 
-export default function getPropertySignatures({ parameter }: IGetFirstTypeArgument): Symbol[] {
+export function getPropertySignatures({ parameter }: IGetFirstTypeArgument): tsm.Symbol[] {
   const typeName = parameter.getType().getSymbolOrThrow().getEscapedName();
 
   if (typeName === 'FastifyRequest') {

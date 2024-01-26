@@ -2,9 +2,7 @@ import type { IHandlerStatement } from '#/compilers/interfaces/THandlerNode';
 import { findOrThrow } from 'my-easy-fp';
 import * as tsm from 'ts-morph';
 
-export default function getFunctionDeclarationWithModifier(
-  nodes: tsm.ExportedDeclarations[],
-): IHandlerStatement | undefined {
+export function getFunctionDeclarationWithModifier(nodes: tsm.ExportedDeclarations[]): IHandlerStatement | undefined {
   const functionDeclarationNode = findOrThrow(
     nodes,
     (node) => node.getKind() === tsm.SyntaxKind.FunctionDeclaration,

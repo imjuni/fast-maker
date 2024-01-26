@@ -15,7 +15,7 @@ export interface IFuzzyWithCaseReturn {
   expectName: string;
 }
 
-export default function fuzzyWithCase(sources: string | string[], target: string): IFuzzyWithCaseReturn[] {
+export function fuzzyWithCase(sources: string | string[], target: string): IFuzzyWithCaseReturn[] {
   const fuse = new Fuse(Array.isArray(sources) ? sources : [sources], { includeScore: true });
   const fuzzinesses = fuse.search(target);
 
