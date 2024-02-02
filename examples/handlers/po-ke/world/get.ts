@@ -1,19 +1,14 @@
-// import { RouteShorthandOptions } from 'fastify';
-import { FastifyReply, FastifyRequest, RouteShorthandOptions } from 'fastify';
-import { Server } from 'http';
+import type { FastifyInstance, FastifyReply, FastifyRequest, RouteShorthandOptions } from 'fastify';
+import type { Server } from 'http';
 import type { IReqPokeHello } from '../../interfaces/IReqPokeHello';
 import schema from '../../interfaces/JSC_IReqPokeHello';
 
-// interface IQuerystring {
-//   name: string;
-// }
-
-export const option: RouteShorthandOptions = {
+export const option: (fastify: FastifyInstance) => RouteShorthandOptions = () => ({
   schema: {
     querystring: schema.properties?.Querystring,
     body: schema.properties?.Body,
   },
-};
+});
 
 export const handler = async (
   req: FastifyRequest<

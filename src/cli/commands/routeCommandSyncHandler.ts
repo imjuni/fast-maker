@@ -23,7 +23,9 @@ export async function routeCommandSyncHandler(options: TRouteOption) {
   Spinner.it.update(`load tsconfig.json: ${options.project}`, 'succeed');
 
   const routings = await routing(options, project);
-  await TemplateContainer.it.evaluate('routing', routings);
+  const evaluated = await TemplateContainer.it.evaluate('routing', routings);
+
+  show('log', evaluated);
 
   const table = createTable(routings.routes);
   show('log', table.toString());
