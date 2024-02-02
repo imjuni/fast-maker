@@ -12,7 +12,6 @@ import { getIncludePatterns } from '#/modules/files/getIncludePatterns';
 import { ExcludeContainer } from '#/modules/scopes/ExcludeContainer';
 import { IncludeContainer } from '#/modules/scopes/IncludeContainer';
 import { defaultExclude } from '#/modules/scopes/defaultExclude';
-import { TemplateContainer } from '#/template/TemplateContainer';
 import chalk from 'chalk';
 import consola from 'consola';
 import { isDescendant } from 'my-node-fp';
@@ -27,7 +26,6 @@ export async function routing(optionParams: TRouteOption, projectParams?: tsm.Pr
 
   Spinner.it.start('find handler files');
 
-  await TemplateContainer.bootstrap();
   const tsconfig = await getTypeScriptConfig(optionParams.project);
   const resolvedPaths = await getResolvedPaths(optionParams);
   const filePaths = project.getSourceFiles().map((sourceFile) => sourceFile.getFilePath().toString());
@@ -83,14 +81,14 @@ export async function routing(optionParams: TRouteOption, projectParams?: tsm.Pr
   const importConfigurations = routings.map((route) => route.imports).flat();
   const routeConfigurations = routings.map((route) => route.routes).flat();
 
-  const evaluated = await TemplateContainer.it.evaluate('routing', {
+  const result = {
     imports: importConfigurations,
     routes: routeConfigurations,
-  });
+  };
 
   Spinner.it.stop();
 
-  return evaluated;
+  return result;
 
   /*
   const routeCodes = routeCodeGenerator({ routeConfigurations: sortedRoutes });
