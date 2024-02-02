@@ -1,14 +1,14 @@
-import type { FastifyReply, FastifyRequest, RouteShorthandOptions } from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest, RouteShorthandOptions } from 'fastify';
 import type { Server } from 'http';
 import type { IReqPokeHelloMultiParam } from '../../interfaces/IReqPokeHelloMultiParam';
 import schema from '../../interfaces/JSC_IReqPokeHello';
 
-export const option: RouteShorthandOptions = {
+export const option: (fastify: FastifyInstance) => RouteShorthandOptions = () => ({
   schema: {
     querystring: schema.properties?.Querystring,
     body: schema.properties?.Body,
   },
-};
+});
 
 export const handler = async (req: FastifyRequest<IReqPokeHelloMultiParam, Server>, _reply: FastifyReply) => {
   console.debug(req.query);

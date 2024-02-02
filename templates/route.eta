@@ -2,7 +2,7 @@
 <% if (route.typeArgument != null && route.typeArgument.text !== '' ) { %>
 fastify.route<<%= route.typeArgument.text %>>({
   <% if (route.hasOption) { %>
-...option_<%= route.hash %>,
+...option_<%= route.hash %>(fastify),
   method: <%= JSON.stringify(route.methods) %>,
   url: '<%= route.routePath %>'
   handler: <%= route.handlerName %>,
@@ -15,7 +15,7 @@ method: <%= JSON.stringify(route.methods) %>,
 <% } else { %>
 fastify.route({
   <% if (route.hasOption) { %>
-...option_<%= route.hash %>,
+...option_<%= route.hash %>(fastify),
   method: <%= JSON.stringify(route.methods) %>,
   url: '<%= route.routePath %>'
   handler: <%= route.handlerName %>,
