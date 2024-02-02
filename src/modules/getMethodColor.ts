@@ -1,9 +1,9 @@
 import { CE_ROUTE_METHOD } from '#/routes/const-enum/CE_ROUTE_METHOD';
 import type chalk from 'chalk';
 
-function getMethodColor(method: CE_ROUTE_METHOD, type: 'background'): typeof chalk.BackgroundColor;
-function getMethodColor(method: CE_ROUTE_METHOD, type: 'foreground'): typeof chalk.ForegroundColor;
-function getMethodColor(
+export function getMethodColor(method: CE_ROUTE_METHOD, type: 'background'): typeof chalk.BackgroundColor;
+export function getMethodColor(method: CE_ROUTE_METHOD, type: 'foreground'): typeof chalk.ForegroundColor;
+export function getMethodColor(
   method: CE_ROUTE_METHOD,
   type: 'foreground' | 'background',
 ): typeof chalk.BackgroundColor | typeof chalk.ForegroundColor {
@@ -24,11 +24,11 @@ function getMethodColor(
   }
 
   if (method === CE_ROUTE_METHOD.PATCH) {
-    return type === 'background' ? 'bgMagenta' : 'magenta';
+    return type === 'background' ? 'bgCyan' : 'cyan';
   }
 
   if (method === CE_ROUTE_METHOD.OPTIONS) {
-    return type === 'background' ? 'bgMagenta' : 'magenta';
+    return type === 'background' ? 'bgGray' : 'gray';
   }
 
   if (method === CE_ROUTE_METHOD.HEAD) {
@@ -37,5 +37,3 @@ function getMethodColor(
 
   return type === 'background' ? 'bgMagenta' : 'magenta';
 }
-
-export default getMethodColor;
