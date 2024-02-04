@@ -23,10 +23,6 @@ export function routeMapTransform(routeConfigurations: IRouteConfiguration[]) {
   return routeConfigurations.reduce<TAggregatedRouteMap>((aggregation, route) => {
     const next = { ...aggregation };
 
-    if (route.methods.length > 1) {
-      console.log('>>> ', route.routePath, route.methods.length);
-    }
-
     route.methods.forEach((method) => {
       if (next[route.routePath] == null) {
         next[route.routePath] = {

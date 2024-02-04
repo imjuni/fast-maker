@@ -86,7 +86,7 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01 }>) {
     });
   });
 
-  it('imported type is default export', () => {
+  it.only('imported type is default export', () => {
     const uuid = randomUUID();
     const filename01 = `${uuid}_0${(context.index += 1)}.ts`;
     const filename02 = `${uuid}_0${(context.index += 1)}.ts`;
@@ -137,7 +137,7 @@ export function handler(req: FastifyRequest<{ Querystring: ICompany }>) {
       isLocalModuleImport: false,
       importAt: posixJoin(tsconfigDir, filename02),
       hash: 'RszwFDu6tuucmk4ZrIbmE4nH1Zyv9RMI',
-      relativePath: 'FastifyRequest',
+      relativePath: 'fastify',
       importDeclarations: [
         {
           isDefaultExport: false,

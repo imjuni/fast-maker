@@ -1,19 +1,21 @@
-import getTypeScriptConfig from '#/compilers/tools/getTypeScriptConfig';
-import getTypeScriptProject from '#/compilers/tools/getTypeScriptProject';
-import * as env from '#/tools/__tests__/tools/env';
-import 'jest';
-import path from 'path';
+import { getTypeScriptConfig } from '#/compilers/tools/getTypeScriptConfig';
+import { getTypeScriptProject } from '#/compilers/tools/getTypeScriptProject';
+import { posixJoin } from '#/tools/posixJoin';
+import { describe, expect, test } from 'vitest';
+
+const tsconfigDir = posixJoin(process.cwd(), 'examples');
+const tsconfigPath = posixJoin(tsconfigDir, 'tsconfig.example.json');
 
 describe('getTypeScriptProject', () => {
   test('pass', async () => {
-    const project = getTypeScriptProject(path.join(env.examplePath, 'tsconfig.json'));
+    const project = getTypeScriptProject(tsconfigPath);
     expect(project).toBeTruthy();
   });
 });
 
 describe('getTypeScriptConfig', () => {
   test('pass', async () => {
-    const r = await getTypeScriptConfig(path.join(env.examplePath, 'tsconfig.json'));
+    const r = await getTypeScriptConfig(tsconfigPath);
     const expectation = {
       options: {
         target: 8,

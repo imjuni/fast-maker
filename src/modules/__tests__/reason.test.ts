@@ -1,18 +1,18 @@
-import type IReason from '#/compilers/interfaces/IReason';
-import reasons from '#/modules/ReasonContainer';
-import 'jest';
+import type { IReason } from '#/compilers/interfaces/IReason';
+import { ReasonContainer } from '#/modules/ReasonContainer';
 import { atOrThrow } from 'my-easy-fp';
+import { describe, expect, it } from 'vitest';
 
 describe('Reason Container', () => {
-  test('add', async () => {
-    reasons.add({ type: 'error', message: '', filePath: '' } satisfies IReason);
-    const r = atOrThrow(reasons.reasons, 0);
+  it('add', async () => {
+    ReasonContainer.it.add({ type: 'error', message: '', filePath: '' } satisfies IReason);
+    const r = atOrThrow(ReasonContainer.it.reasons, 0);
     expect(r).toMatchObject({ type: 'error', message: '', filePath: '' });
   });
 
-  test('clear', async () => {
-    reasons.add({ type: 'error', message: '', filePath: '' } satisfies IReason);
-    reasons.clear();
-    expect(reasons.reasons.length).toEqual(0);
+  it('clear', async () => {
+    ReasonContainer.it.add({ type: 'error', message: '', filePath: '' } satisfies IReason);
+    ReasonContainer.it.clear();
+    expect(ReasonContainer.it.reasons.length).toEqual(0);
   });
 });
