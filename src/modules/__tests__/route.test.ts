@@ -12,14 +12,16 @@ describe('getMethodColor', () => {
     const c5 = getMethodColor('patch', 'background');
     const c6 = getMethodColor('options', 'background');
     const c7 = getMethodColor('head', 'background');
+    const c8 = getMethodColor('search', 'background');
 
     expect(c1).toEqual('bgBlue');
     expect(c2).toEqual('bgGreen');
     expect(c3).toEqual('bgYellow');
     expect(c4).toEqual('bgRed');
-    expect(c5).toEqual('bgMagenta');
-    expect(c6).toEqual('bgMagenta');
+    expect(c5).toEqual('bgCyan');
+    expect(c6).toEqual('bgGray');
     expect(c7).toEqual('bgMagenta');
+    expect(c8).toEqual('bgMagenta');
   });
 
   it('pass - foreground', () => {
@@ -30,14 +32,16 @@ describe('getMethodColor', () => {
     const c5 = getMethodColor('patch', 'foreground');
     const c6 = getMethodColor('options', 'foreground');
     const c7 = getMethodColor('head', 'foreground');
+    const c8 = getMethodColor('search', 'foreground');
 
     expect(c1).toEqual('blueBright');
     expect(c2).toEqual('greenBright');
     expect(c3).toEqual('yellow');
     expect(c4).toEqual('red');
-    expect(c5).toEqual('magenta');
-    expect(c6).toEqual('magenta');
+    expect(c5).toEqual('cyan');
+    expect(c6).toEqual('gray');
     expect(c7).toEqual('magenta');
+    expect(c8).toEqual('magenta');
   });
 });
 

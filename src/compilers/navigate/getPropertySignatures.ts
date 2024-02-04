@@ -1,17 +1,18 @@
 import { atOrThrow } from 'my-easy-fp';
-import type * as tsm from 'ts-morph';
+import * as tsm from 'ts-morph';
 
-interface IGetFirstTypeArgument {
-  parameter: tsm.ParameterDeclaration;
-}
+export function getPropertySignatures(parameter: tsm.ParameterDeclaration): tsm.Symbol[] {
+  const parameterNode = parameter.getTypeNodeOrThrow();
 
-export function getPropertySignatures({ parameter }: IGetFirstTypeArgument): tsm.Symbol[] {
-  const typeName = parameter.getType().getSymbolOrThrow().getEscapedName();
+  if (parameterNode.getText().indexOf('FastifyRequest') >= 0) {
+    const typeArguments = parameterNode.asKindOrThrow(tsm.SyntaxKind.TypeReference).getTypeArguments();
 
-  if (typeName === 'FastifyRequest') {
-    const typeArguments = parameter.getType().getTypeArguments();
-    const headTypeArgument = atOrThrow(typeArguments, 0);
-    const propertySymbols = headTypeArgument.getProperties();
+    if (typeArguments.length <= 0) {
+      return [];
+    }
+
+    const typeArgument = atOrThrow(typeArguments, 0);
+    const propertySymbols = typeArgument.getType().getProperties();
     return propertySymbols;
   }
 

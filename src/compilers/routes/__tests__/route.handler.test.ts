@@ -1,7 +1,7 @@
 import { getRouteHandler } from '#/compilers/routes/getRouteHandler';
-import { CE_REQUEST_KIND } from '#/compilers/type-tools/const-enum/CE_REQUEST_KIND';
 import { CE_EXT_KIND } from '#/configs/const-enum/CE_EXT_KIND';
 import { getHash } from '#/tools/getHash';
+import { posixJoin } from '#/tools/posixJoin';
 import { atOrThrow } from 'my-easy-fp';
 import { startSepAppend } from 'my-node-fp';
 import { randomUUID } from 'node:crypto';
@@ -9,8 +9,8 @@ import path from 'node:path';
 import * as tsm from 'ts-morph';
 import { describe, expect, it } from 'vitest';
 
-const tsconfigDir = path.join(process.cwd(), 'examples');
-const tsconfigPath = path.join(tsconfigDir, 'tsconfig.example.json');
+const tsconfigDir = posixJoin(process.cwd(), 'examples');
+const tsconfigPath = posixJoin(tsconfigDir, 'tsconfig.example.json');
 const project = new tsm.Project({ tsConfigFilePath: tsconfigPath });
 const context: { index: number } = { index: 0 };
 const abilityInterfaceSourceCode = `
@@ -74,63 +74,74 @@ export function handler(req: FastifyRequest<{ Body: ITestInfoType01, Querystring
   return req.body;
 }`;
 
-    const pathjoin = (...dir: string[]) => path.join(tsconfigDir, ...dir);
-    project.createSourceFile(pathjoin(filename01), abilityInterfaceSourceCode.trim(), {
-      overwrite: true,
-    });
-    const sourceFile02 = project.createSourceFile(pathjoin(handlerDir, handlerMethod), source02.trim(), {
-      overwrite: true,
-    });
+    const create = (name: string, code: string, overwrite: boolean) =>
+      project.createSourceFile(posixJoin('examples', name), code, { overwrite });
 
-    const resultHash = getHash(startSepAppend(path.join(handlerHash, handlerMethod)));
+    create(posixJoin(tsconfigDir, filename01), abilityInterfaceSourceCode, true);
+    const sourceFile02 = create(posixJoin(handlerDir, handlerMethod), source02, true);
+
+    const resultHash = getHash(startSepAppend(posixJoin(handlerHash, handlerMethod)));
     const r01 = await getRouteHandler(sourceFile02, {
-      output: path.join('examples', 'handlers'),
-      handler: path.join('examples', 'handlers'),
+      output: posixJoin('examples', 'handlers'),
+      handler: posixJoin('examples', 'handlers'),
       extKind: CE_EXT_KIND.NONE,
     });
 
-    expect(r01).toMatchObject({
-      imports: [
+    expect(r01?.imports.at(0)).toMatchObject({
+      hash: 'YAmRjm1AR7PPkzafdNY8XtgLFYvkO9zx',
+      namedBindings: [
         {
-          hash: 'j6L182tj9Mkyt303boClySeNZr88a8Ok',
-          namedBindings: [
-            {
-              name: 'ITestInfoType01',
-              alias: 'ITestInfoType01',
-              isPureType: true,
-            },
-          ],
-          importFile: path.join(tsconfigDir, 'interface', 'ITestInfo.ts'),
-          relativePath: '../interface/ITestInfo',
-        },
-        {
-          hash: resultHash,
-          namedBindings: [
-            {
-              name: 'option',
-              alias: `option_${resultHash}`,
-              isPureType: false,
-            },
-          ],
-          importFile: path.join(tsconfigDir, handlerDir, handlerMethod),
-          relativePath: `./${handlerHash}/get`,
+          alias: 'FastifyRequest',
+          isPureType: true,
+          name: 'FastifyRequest',
         },
       ],
-      routes: [
+      relativePath: 'fastify',
+    });
+
+    expect(r01?.imports.at(1)).toMatchObject({
+      hash: 'j6L182tj9Mkyt303boClySeNZr88a8Ok',
+      namedBindings: [
         {
-          methods: ['get'],
-          routePath: startSepAppend(atOrThrow(handlerDir.split(path.posix.sep), 1)),
-          hash: resultHash,
-          hasOption: true,
-          handlerName: `handler_${resultHash}`,
-          typeArgument: {
-            request: 'fastify-request',
-            kind: 'type-literal',
-            text: '{ Body: ITestInfoType01, Querystring: ITestInfoType01 }',
-          },
-          sourceFilePath: path.join(tsconfigDir, handlerDir, handlerMethod),
+          name: 'ITestInfoType01',
+          alias: 'ITestInfoType01',
+          isPureType: true,
         },
       ],
+      importFile: posixJoin(tsconfigDir, 'interface', 'ITestInfo.ts'),
+      relativePath: '../interface/ITestInfo',
+    });
+
+    expect(r01?.imports.at(2)).toMatchObject({
+      hash: resultHash,
+      namedBindings: [
+        {
+          name: 'option',
+          alias: `option_${resultHash}`,
+          isPureType: false,
+        },
+        {
+          name: 'handler',
+          alias: `handler_${resultHash}`,
+          isPureType: false,
+        },
+      ],
+      importFile: posixJoin(tsconfigDir, handlerDir, handlerMethod),
+      relativePath: `./${handlerHash}/get`,
+    });
+
+    expect(r01?.routes.at(0)).toMatchObject({
+      methods: ['get'],
+      routePath: startSepAppend(atOrThrow(handlerDir.split(path.posix.sep), 1)),
+      hash: resultHash,
+      hasOption: true,
+      handlerName: `handler_${resultHash}`,
+      typeArgument: {
+        request: 'fastify-request',
+        kind: tsm.SyntaxKind.TypeLiteral,
+        text: '{ Body: ITestInfoType01, Querystring: ITestInfoType01 }',
+      },
+      sourceFilePath: posixJoin(tsconfigDir, handlerDir, handlerMethod),
     });
   });
 
@@ -149,51 +160,70 @@ export function handler(req: FastifyRequest<{ Body: ITestInfoType01, Querystring
   return req.body;
 }`;
 
-    const pathjoin = (...dir: string[]) => path.join(tsconfigDir, ...dir);
-    project.createSourceFile(pathjoin(filename01), abilityInterfaceSourceCode.trim(), {
-      overwrite: true,
-    });
-    const sourceFile02 = project.createSourceFile(pathjoin(handlerDir, handlerMethod), source02.trim(), {
-      overwrite: true,
-    });
+    const create = (name: string, code: string, overwrite: boolean) =>
+      project.createSourceFile(posixJoin('examples', name), code, { overwrite });
+
+    create(posixJoin(tsconfigDir, filename01), abilityInterfaceSourceCode, true);
+    const sourceFile02 = create(posixJoin(handlerDir, handlerMethod), source02, true);
+
+    const resultHash = getHash(startSepAppend(posixJoin(handlerHash, handlerMethod)));
 
     const r01 = await getRouteHandler(sourceFile02, {
-      output: path.join('examples', 'handlers'),
-      handler: path.join('examples', 'handlers'),
+      output: posixJoin('examples', 'handlers'),
+      handler: posixJoin('examples', 'handlers'),
       extKind: CE_EXT_KIND.NONE,
     });
 
-    const resultHash = getHash(startSepAppend(path.join(handlerHash, handlerMethod)));
-    expect(r01).toMatchObject({
-      imports: [
+    expect(r01?.imports.at(0)).toMatchObject({
+      hash: 'YAmRjm1AR7PPkzafdNY8XtgLFYvkO9zx',
+      namedBindings: [
         {
-          hash: 'j6L182tj9Mkyt303boClySeNZr88a8Ok',
-          namedBindings: [
-            {
-              name: 'ITestInfoType01',
-              alias: 'ITestInfoType01',
-              isPureType: true,
-            },
-          ],
-          importFile: path.join(process.cwd(), '/examples', 'interface', 'ITestInfo.ts'),
-          relativePath: '../interface/ITestInfo',
+          name: 'FastifyRequest',
+          alias: 'FastifyRequest',
+          isPureType: true,
         },
       ],
-      routes: [
+      relativePath: 'fastify',
+    });
+
+    expect(r01?.imports.at(1)).toMatchObject({
+      hash: 'j6L182tj9Mkyt303boClySeNZr88a8Ok',
+      namedBindings: [
         {
-          methods: ['get'],
-          routePath: startSepAppend(handlerHash),
-          hash: resultHash,
-          hasOption: false,
-          handlerName: `handler_${resultHash}`,
-          typeArgument: {
-            request: 'fastify-request',
-            kind: 'type-literal',
-            text: '{ Body: ITestInfoType01, Querystring: ITestInfoType01 }',
-          },
-          sourceFilePath: path.join(process.cwd(), 'examples', handlerDir, handlerMethod),
+          name: 'ITestInfoType01',
+          alias: 'ITestInfoType01',
+          isPureType: true,
         },
       ],
+      importFile: posixJoin(tsconfigDir, 'interface', 'ITestInfo.ts'),
+      relativePath: '../interface/ITestInfo',
+    });
+
+    expect(r01?.imports.at(2)).toMatchObject({
+      hash: resultHash,
+      namedBindings: [
+        {
+          name: 'handler',
+          alias: `handler_${resultHash}`,
+          isPureType: false,
+        },
+      ],
+      importFile: posixJoin(tsconfigDir, handlerDir, handlerMethod),
+      relativePath: `./${handlerHash}/get`,
+    });
+
+    expect(r01?.routes.at(0)).toMatchObject({
+      methods: ['get'],
+      routePath: startSepAppend(handlerHash),
+      hash: resultHash,
+      hasOption: false,
+      handlerName: `handler_${resultHash}`,
+      typeArgument: {
+        request: 'fastify-request',
+        kind: tsm.SyntaxKind.TypeLiteral,
+        text: '{ Body: ITestInfoType01, Querystring: ITestInfoType01 }',
+      },
+      sourceFilePath: posixJoin(tsconfigDir, handlerDir, handlerMethod),
     });
   });
 
@@ -214,51 +244,62 @@ export function handler(req: FastifyRequest) {
   return req.body;
 }`;
 
-    const pathjoin = (...dir: string[]) => path.join(tsconfigDir, ...dir);
-    project.createSourceFile(pathjoin(filename01), abilityInterfaceSourceCode.trim(), {
-      overwrite: true,
-    });
-    const sourceFile02 = project.createSourceFile(pathjoin(handlerDir, handlerMethod), source02.trim(), {
-      overwrite: true,
-    });
+    const create = (name: string, code: string, overwrite: boolean) =>
+      project.createSourceFile(posixJoin('examples', name), code, { overwrite });
+
+    create(posixJoin(tsconfigDir, filename01), abilityInterfaceSourceCode, true);
+    const sourceFile02 = create(posixJoin(handlerDir, handlerMethod), source02, true);
 
     const r01 = await getRouteHandler(sourceFile02, {
-      output: path.join('examples', 'handlers'),
-      handler: path.join('examples', 'handlers'),
+      output: posixJoin('examples', 'handlers'),
+      handler: posixJoin('examples', 'handlers'),
       extKind: CE_EXT_KIND.NONE,
     });
 
-    const resultHash = getHash(startSepAppend(path.join(handlerHash, handlerMethod)));
-    expect(r01).toMatchObject({
-      imports: [
+    const resultHash = getHash(startSepAppend(posixJoin(handlerHash, handlerMethod)));
+
+    expect(r01?.imports.at(0)).toMatchObject({
+      hash: 'YAmRjm1AR7PPkzafdNY8XtgLFYvkO9zx',
+      namedBindings: [
         {
-          hash: resultHash,
-          namedBindings: [
-            {
-              name: 'option',
-              alias: `option_${resultHash}`,
-              isPureType: false,
-            },
-          ],
-          importFile: path.join(process.cwd(), 'examples', handlerDir, handlerMethod),
-          relativePath: `./${handlerHash}/get`,
+          name: 'FastifyRequest',
+          alias: 'FastifyRequest',
+          isPureType: true,
         },
       ],
-      routes: [
+      relativePath: 'fastify',
+    });
+
+    expect(r01?.imports.at(1)).toMatchObject({
+      hash: resultHash,
+      namedBindings: [
         {
-          methods: ['get'],
-          routePath: startSepAppend(handlerHash),
-          hash: resultHash,
-          hasOption: true,
-          handlerName: `handler_${resultHash}`,
-          typeArgument: {
-            request: CE_REQUEST_KIND.FASTIFY_REQUEST,
-            kind: undefined,
-            text: '',
-          },
-          sourceFilePath: path.join(process.cwd(), 'examples', handlerDir, handlerMethod),
+          name: 'option',
+          alias: `option_${resultHash}`,
+          isPureType: false,
+        },
+        {
+          name: 'handler',
+          alias: `handler_${resultHash}`,
+          isPureType: false,
         },
       ],
+      importFile: posixJoin(tsconfigDir, handlerDir, handlerMethod),
+      relativePath: `./${handlerHash}/get`,
+    });
+
+    expect(r01?.routes.at(0)).toMatchObject({
+      methods: ['get'],
+      routePath: `/${handlerHash}`,
+      hash: resultHash,
+      hasOption: true,
+      handlerName: `handler_${resultHash}`,
+      typeArgument: {
+        request: 'fastify-request',
+        kind: undefined,
+        text: '',
+      },
+      sourceFilePath: posixJoin(tsconfigDir, handlerDir, handlerMethod),
     });
   });
 
@@ -279,52 +320,50 @@ export function handler() {
   return { name: 'ironman', status: 'healthy!' };
 }`;
 
-    const pathjoin = (...dir: string[]) => path.join(tsconfigDir, ...dir);
-    project.createSourceFile(pathjoin(filename01), abilityInterfaceSourceCode.trim(), {
-      overwrite: true,
-    });
-    const sourceFile02 = project.createSourceFile(pathjoin(handlerDir, handlerMethod), source02.trim(), {
-      overwrite: true,
-    });
+    const create = (name: string, code: string, overwrite: boolean) =>
+      project.createSourceFile(posixJoin('examples', name), code, { overwrite });
+
+    create(posixJoin(tsconfigDir, filename01), abilityInterfaceSourceCode, true);
+    const sourceFile02 = create(posixJoin(handlerDir, handlerMethod), source02, true);
 
     const r01 = await getRouteHandler(sourceFile02, {
-      output: path.join('examples', 'handlers'),
-      handler: path.join('examples', 'handlers'),
+      output: posixJoin('examples', 'handlers'),
+      handler: posixJoin('examples', 'handlers'),
       extKind: CE_EXT_KIND.NONE,
     });
 
-    const resultHash = getHash(startSepAppend(path.join(handlerHash, handlerMethod)));
+    const resultHash = getHash(startSepAppend(posixJoin(handlerHash, handlerMethod)));
 
-    expect(r01).toMatchObject({
-      imports: [
+    expect(r01?.imports.at(0)).toMatchObject({
+      hash: resultHash,
+      namedBindings: [
         {
-          hash: resultHash,
-          namedBindings: [
-            {
-              name: 'option',
-              alias: `option_${resultHash}`,
-              isPureType: false,
-            },
-          ],
-          importFile: path.join(process.cwd(), 'examples', handlerDir, handlerMethod),
-          relativePath: `./${handlerHash}/get`,
+          name: 'option',
+          alias: `option_${resultHash}`,
+          isPureType: false,
+        },
+        {
+          name: 'handler',
+          alias: `handler_${resultHash}`,
+          isPureType: false,
         },
       ],
-      routes: [
-        {
-          methods: ['get'],
-          routePath: startSepAppend(handlerHash),
-          hash: resultHash,
-          hasOption: true,
-          handlerName: `handler_${resultHash}`,
-          typeArgument: {
-            request: CE_REQUEST_KIND.PROPERTY_SIGNATURE,
-            kind: undefined,
-            text: '',
-          },
-          sourceFilePath: path.join(process.cwd(), 'examples', handlerDir, handlerMethod),
-        },
-      ],
+      importFile: posixJoin(tsconfigDir, handlerDir, handlerMethod),
+      relativePath: `./${handlerHash}/get`,
+    });
+
+    expect(r01?.routes.at(0)).toMatchObject({
+      methods: ['get'],
+      routePath: `/${handlerHash}`,
+      hash: resultHash,
+      hasOption: true,
+      handlerName: `handler_${resultHash}`,
+      typeArgument: {
+        request: 'property-signature',
+        kind: undefined,
+        text: '',
+      },
+      sourceFilePath: posixJoin(tsconfigDir, handlerDir, handlerMethod),
     });
   });
 });

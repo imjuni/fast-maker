@@ -17,7 +17,7 @@ describe('getInlineExcludedFiles', () => {
     const filename01 = `${uuid}_0${(context.index += 1)}.ts`;
     const source01 = `
 /**
- * @maeum-file-exclude fast-maker
+ * @route-file-exclude fast-maker
  */
 import path from 'node:path';
 
@@ -54,14 +54,14 @@ export class SuperHero {
 
     expect(excluded).toMatchObject([
       {
-        commentCode: '/**\n * @maeum-file-exclude fast-maker\n */',
+        commentCode: '/**\n * @route-file-exclude fast-maker\n */',
         filePath: path.join(tsconfigDirPath, filename01),
         pos: {
           start: 42,
           line: 4,
           column: 1,
         },
-        tag: 'maeum-file-exclude',
+        tag: 'route-file-exclude',
         workspaces: ['fast-maker'],
       },
     ]);
@@ -95,7 +95,7 @@ export class MarvelHero {
   }
 }
 
-// @maeum-file-exclude fast-maker
+// @route-file-exclude fast-maker
 export class DCHero {
   #name: string;
 
@@ -113,14 +113,14 @@ export class DCHero {
 
     expect(excluded).toMatchObject([
       {
-        commentCode: '// @maeum-file-exclude fast-maker',
+        commentCode: '// @route-file-exclude fast-maker',
         filePath: path.join(tsconfigDirPath, filename02),
         pos: {
           start: 171,
           line: 12,
           column: 1,
         },
-        tag: 'maeum-file-exclude',
+        tag: 'route-file-exclude',
         workspaces: ['fast-maker'],
       },
     ]);

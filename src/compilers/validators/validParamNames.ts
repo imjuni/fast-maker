@@ -3,5 +3,5 @@ const validParamNamesFromCustomType = ['Body', 'Querystring', 'Params', 'Headers
 
 export const validParamNames = {
   fastify: validParamNamesFromFastifyRequest,
-  custom: validParamNamesFromCustomType,
+  typeLiteral: validParamNamesFromCustomType,
 };

@@ -89,10 +89,12 @@ export async function routing(optionParams: TRouteOption, projectParams?: tsm.Pr
 
   const importConfigurations = validRoutings.map((route) => route.imports).flat();
   const routeConfigurations = validRoutings.map((route) => route.routes).flat();
+  const reasons = routings.map((route) => route.reasons).flat();
 
   const result = {
     imports: appendFastifyInstance(dedupeImportConfiguration(importConfigurations)),
     routes: routeConfigurations,
+    reasons,
   };
 
   Spinner.it.stop();

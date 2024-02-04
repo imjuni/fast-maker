@@ -44,7 +44,8 @@ export async function routeCommandSyncHandler(options: TRouteOption) {
 
   const table = createTable(routings.routes);
 
-  if (ReasonContainer.it.reasons.length > 0) {
+  if (routings.reasons.length > 0) {
+    ReasonContainer.it.add(...routings.reasons);
     show('log', ReasonContainer.it.show());
   }
 
