@@ -5,6 +5,7 @@ import { CE_EXT_KIND } from '#/configs/const-enum/CE_EXT_KIND';
 import type { IBaseOption } from '#/configs/interfaces/IBaseOption';
 import { getHash } from '#/tools/getHash';
 import { getRelativeModulePath } from '#/tools/getRelativeModulePath';
+import { removeQuote } from '#/tools/removeQuote';
 import { atOrUndefined } from 'my-easy-fp';
 import type * as tsm from 'ts-morph';
 import { SyntaxKind } from 'ts-morph';
@@ -66,7 +67,9 @@ export function getResolvedImportedModules({
         hash: getHash(importStatement.typeName),
         importAt: sourceFilePath,
         exportFrom: importStatement.typeName,
-        relativePath: importStatement.typeName,
+        relativePath: removeQuote(
+          importStatement.importDeclaration.getModuleSpecifier().getText() ?? importStatement.typeName,
+        ),
         importDeclarations: [
           {
             isDefaultExport: defaultImport != null,
@@ -85,10 +88,11 @@ export function getResolvedImportedModules({
       };
     }
 
+    // importStatement.importDeclaration.getModuleSpecifier().getText();
     const moduleSourceFilePath = moduleSourceFile.getFilePath();
     const declarationMap = moduleSourceFile.getExportedDeclarations();
     const relativePath = importStatement.isExternalModule
-      ? importStatement.typeName
+      ? removeQuote(importStatement.importDeclaration.getModuleSpecifier().getText() ?? importStatement.typeName)
       : getRelativeModulePath({
           modulePath: moduleSourceFilePath,
           output: options.output,

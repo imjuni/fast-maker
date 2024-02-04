@@ -113,13 +113,20 @@ module.exports = {
       },
     },
     {
-      files: ['**/__tests__/*.ts', 'vitest.config.ts'],
+      files: ['**/__tests__/*.ts'],
       rules: {
         '@typescript-eslint/no-unsafe-assignment': ['off'],
         '@typescript-eslint/no-unsafe-argument': ['off'],
         '@typescript-eslint/no-unsafe-member-access': ['off'],
         '@typescript-eslint/ban-ts-comment': ['off'],
         'no-console': ['off'],
+      },
+    },
+    {
+      files: ['vitest.config.ts'],
+      rules: {
+        'import/no-extraneous-dependencies': ['off'],
+        'import/no-default-export': ['off'],
       },
     },
   ],

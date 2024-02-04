@@ -1,11 +1,38 @@
 import { getCwd } from '#/modules/files/getCwd';
 import { getRelativeCwd } from '#/tools/getRelativeCwd';
+import { removeQuote } from '#/tools/removeQuote';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vitest } from 'vitest';
 
 describe('getRelativeCwd', () => {
   it('pass case of getRelativeCwd', () => {
     expect(getRelativeCwd('/a/b/c', '/a/b/c/d/test.ts')).toEqual('d/test.ts');
+  });
+});
+
+describe.only('removeQuote', () => {
+  it('single quote', () => {
+    const r01 = removeQuote(`'hello'`);
+    expect(r01).toEqual('hello');
+  });
+
+  it('double quote', () => {
+    const r01 = removeQuote(`"world"`);
+    expect(r01).toEqual('world');
+  });
+
+  it('non quote', () => {
+    const r01 = removeQuote(`typescript`);
+    expect(r01).toEqual('typescript');
+  });
+
+  it('empty string', () => {
+    vitest.spyOn(String.prototype, 'trim').mockImplementationOnce(() => {
+      throw Error('raise error');
+    });
+
+    const r01 = removeQuote(' test ');
+    expect(r01).toEqual(' test ');
   });
 });
 

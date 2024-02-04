@@ -7,6 +7,8 @@ import { getTypeScriptProject } from '#/compilers/tools/getTypeScriptProject';
 import { getDiagnostics } from '#/compilers/validators/getDiagnostics';
 import { getResolvedPaths } from '#/configs/getResolvedPaths';
 import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
+import { appendFastifyInstance } from '#/generators/appendFastifyInstance';
+import { dedupeImportConfiguration } from '#/generators/dedupeImportConfiguration';
 import { getExcludePatterns } from '#/modules/files/getExcludePatterns';
 import { getIncludePatterns } from '#/modules/files/getIncludePatterns';
 import { ExcludeContainer } from '#/modules/scopes/ExcludeContainer';
@@ -82,7 +84,7 @@ export async function routing(optionParams: TRouteOption, projectParams?: tsm.Pr
   const routeConfigurations = routings.map((route) => route.routes).flat();
 
   const result = {
-    imports: importConfigurations,
+    imports: appendFastifyInstance(dedupeImportConfiguration(importConfigurations)),
     routes: routeConfigurations,
   };
 

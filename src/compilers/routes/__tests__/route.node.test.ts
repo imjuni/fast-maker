@@ -1,10 +1,11 @@
 import { getRouteNode } from '#/compilers/routes/getRouteNode';
+import { posixJoin } from '#/tools/posixJoin';
 import { randomUUID } from 'node:crypto';
-import path from 'node:path';
 import * as tsm from 'ts-morph';
 import { describe, expect, it } from 'vitest';
 
-const tsconfigPath = path.join(process.cwd(), 'examples', 'tsconfig.example.json');
+const tsconfigDir = posixJoin(process.cwd(), 'examples');
+const tsconfigPath = posixJoin(tsconfigDir, 'tsconfig.example.json');
 const project = new tsm.Project({ tsConfigFilePath: tsconfigPath });
 const context: { index: number } = { index: 0 };
 const abilityInterfaceSourceCode = `

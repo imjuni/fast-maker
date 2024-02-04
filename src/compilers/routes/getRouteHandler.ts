@@ -7,7 +7,6 @@ import { CE_REQUEST_KIND } from '#/compilers/type-tools/const-enum/CE_REQUEST_KI
 import { getRequestTypeParameter } from '#/compilers/type-tools/getRequestTypeParameter';
 import { getTypeReferences } from '#/compilers/type-tools/getTypeReferences';
 import type { IBaseOption } from '#/configs/interfaces/IBaseOption';
-import { dedupeImportConfiguration } from '#/generators/dedupeImportConfiguration';
 import { getImportConfigurationFromResolutions } from '#/generators/getImportConfigurationFromResolutions';
 import { getExtraMethod } from '#/routes/extractors/getExtraMethod';
 import type { IRouteConfiguration } from '#/routes/interfaces/IRouteConfiguration';
@@ -71,7 +70,7 @@ export async function getRouteHandler(
   };
 
   const imports = [
-    ...dedupeImportConfiguration(getImportConfigurationFromResolutions(importedModules)),
+    ...getImportConfigurationFromResolutions(importedModules),
     {
       hash,
       namedBindings: [
