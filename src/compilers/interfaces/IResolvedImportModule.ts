@@ -1,6 +1,8 @@
 export interface IResolvedImportModule {
-  /** 외부 모듈인지 나타낸다 */
-  isExternalLibraryImport: boolean;
+  /** it is indicate that module is external like `FastifyRequest` */
+  isExternalModuleImport: boolean;
+  /** it is indicate that module is local (in-file) */
+  isLocalModuleImport: boolean;
   /** 이 모듈을 import 한 파일 */
   importAt: string;
   /** 이 모듈이 export 된 파일 */

@@ -13,11 +13,15 @@
 
   function getNmaedBinding(namedBindings) {
     const bindings = namedBindings.map((namedBinding) => {
-      if (namedBinding.isPureType) {
-        return `type ${namedBinding.alias}`;
+      if (namedBinding.isPureType && namedBinding.alias === namedBinding.name) {
+        return `type ${namedBinding.name}`;
+      } else if (namedBinding.isPureType && namedBinding.alias !== namedBinding.name) {
+        return `type ${namedBinding.name} as ${namedBinding.alias}`;
+      } else if (!namedBinding.isPureType && namedBinding.alias !== namedBinding.name) {
+        return `${namedBinding.name} as ${namedBinding.alias}`;
       }
 
-      return namedBinding.alias;
+      return namedBinding.name;
     }).join(', ');
 
     if (bindings.length > 0) {

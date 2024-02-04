@@ -1,12 +1,11 @@
 import type { IResolvedImportModule } from '#/compilers/interfaces/IResolvedImportModule';
-import getNamedBindingName from '#/compilers/tools/getNamedBindingName';
+import { getNamedBindingName } from '#/compilers/tools/getNamedBindingName';
+import { isExternalModule } from '#/compilers/type-tools/isExternalModule';
 import { CE_EXT_KIND } from '#/configs/const-enum/CE_EXT_KIND';
 import type { IBaseOption } from '#/configs/interfaces/IBaseOption';
-import { appendPostfixHash } from '#/tools/appendPostfixHash';
 import { getHash } from '#/tools/getHash';
 import { getRelativeModulePath } from '#/tools/getRelativeModulePath';
 import { atOrUndefined } from 'my-easy-fp';
-import { basenames } from 'my-node-fp';
 import type * as tsm from 'ts-morph';
 import { SyntaxKind } from 'ts-morph';
 
@@ -31,109 +30,126 @@ export function getResolvedImportedModules({
     imports: sourceFile.getImportDeclarations(),
   };
 
-  const innerImportDeclarations = data.imports.filter((importDeclaration) => {
-    const moduleSpecifierSourceFile = importDeclaration.getModuleSpecifierSourceFile();
+  const typeNameWithImportDeclarations = data.imports
+    .map((statement) => {
+      const importClause = statement.getImportClauseOrThrow();
+      const defaultImport = importClause.getDefaultImport();
 
-    if (moduleSpecifierSourceFile == null) {
-      return false;
+      const namedBindings =
+        defaultImport != null
+          ? [defaultImport.getText(), ...getNamedBindingName(importClause.getNamedBindings())]
+          : getNamedBindingName(importClause.getNamedBindings());
+
+      return namedBindings.map((binding) => {
+        return {
+          isExternalModule: isExternalModule(statement),
+          typeName: binding,
+          importDeclaration: statement,
+        };
+      });
+    })
+    .flat()
+    .filter((importStatement) => data.names.includes(importStatement.typeName));
+
+  const nonDedupeResolutions = typeNameWithImportDeclarations.map<IResolvedImportModule>((importStatement) => {
+    const importClause = importStatement.importDeclaration.getImportClauseOrThrow();
+    const defaultImport = importClause.getDefaultImport();
+    const sourceFilePath = importStatement.importDeclaration.getSourceFile().getFilePath();
+    // node.js primitive type인 경우, SourceFile 객체를 가져올 수 없다
+    // 예를들면, `import { Server } from 'http';`와 같이 http 모듈을 사용하는 경우가 이에 해당한다
+    const moduleSourceFile = importStatement.importDeclaration.getModuleSpecifierSourceFile();
+
+    if (moduleSourceFile == null) {
+      return {
+        isExternalModuleImport: importStatement.isExternalModule,
+        isLocalModuleImport: false,
+        hash: getHash(importStatement.typeName),
+        importAt: sourceFilePath,
+        exportFrom: importStatement.typeName,
+        relativePath: importStatement.typeName,
+        importDeclarations: [
+          {
+            isDefaultExport: defaultImport != null,
+            ...(defaultImport != null
+              ? {
+                  importModuleNameFrom: defaultImport.getText(),
+                  importModuleNameTo: defaultImport.getText(),
+                }
+              : {
+                  importModuleNameTo: importStatement.typeName,
+                  importModuleNameFrom: importStatement.typeName,
+                }),
+            isPureType: false,
+          },
+        ],
+      };
     }
 
-    return !moduleSpecifierSourceFile.isFromExternalLibrary();
-  });
+    const moduleSourceFilePath = moduleSourceFile.getFilePath();
+    const declarationMap = moduleSourceFile.getExportedDeclarations();
+    const relativePath = importStatement.isExternalModule
+      ? importStatement.typeName
+      : getRelativeModulePath({
+          modulePath: moduleSourceFilePath,
+          output: options.output,
+          extKind: CE_EXT_KIND.NONE,
+        });
+    const moduleHash = getHash(relativePath);
 
-  const fullTypeNameWithImportDeclarations = data.names
-    .map((textTypeName) => innerImportDeclarations.map((importDeclaration) => ({ textTypeName, importDeclaration })))
-    .flat();
-
-  const typeNameWithImportDeclarations = fullTypeNameWithImportDeclarations.filter((typeNameWithImportDeclaration) => {
-    const { textTypeName, importDeclaration } = typeNameWithImportDeclaration;
-    const importClause = importDeclaration.getImportClauseOrThrow();
-    const defaultImport = importClause.getDefaultImport();
-
-    const namedBindings =
-      defaultImport != null
-        ? [defaultImport.getText(), ...getNamedBindingName(importClause.getNamedBindings())]
-        : getNamedBindingName(importClause.getNamedBindings());
-
-    return namedBindings.find((namedBinding) => namedBinding === textTypeName) != null;
-  });
-
-  const nonDedupeResolutions = typeNameWithImportDeclarations.map<IResolvedImportModule>(
-    (typeNameWithImportDeclaration) => {
-      const importClause = typeNameWithImportDeclaration.importDeclaration.getImportClauseOrThrow();
-      const defaultImport = importClause.getDefaultImport();
-      const sourceFilePath = typeNameWithImportDeclaration.importDeclaration.getSourceFile().getFilePath();
-      const moduleSourceFile = typeNameWithImportDeclaration.importDeclaration.getModuleSpecifierSourceFileOrThrow();
-      const moduleSourceFilePath = moduleSourceFile.getFilePath();
-      const declarationMap = moduleSourceFile.getExportedDeclarations();
-      const relativePath = getRelativeModulePath({
-        modulePath: moduleSourceFilePath,
-        output: options.output,
-        extKind: CE_EXT_KIND.NONE,
-      });
-      const moduleHash = getHash(relativePath);
-
-      // default import 인 경우
-      // 생각 좀 해봤는데 이 경우 filename + hash로 처리하는게 더 효율적인 것 같다(handler 일 때처럼)
-      // 이건 여러파일에 동일한 이름으로 export 한 뒤 이름만 바꿔서 사용하는 그런 경우도 있을 것 같아서
-      // 오류 방지 차원에서 filename + hash로 처리한다
-      if (defaultImport != null) {
-        const baseFilename = basenames(relativePath, [
-          CE_EXT_KIND.JS,
-          CE_EXT_KIND.CJS,
-          CE_EXT_KIND.MJS,
-          CE_EXT_KIND.TS,
-          CE_EXT_KIND.CTS,
-          CE_EXT_KIND.MTS,
-        ]);
-        const defaultImportModuleType = atOrUndefined(declarationMap.get('default') ?? [], 0);
-
-        return {
-          isExternalLibraryImport: false,
-          hash: moduleHash,
-          importAt: sourceFilePath,
-          exportFrom: moduleSourceFilePath,
-          relativePath,
-          importDeclarations: [
-            {
-              isDefaultExport: true,
-              importModuleNameFrom: defaultImport.getText(),
-              importModuleNameTo: appendPostfixHash(baseFilename, moduleHash),
-              isPureType:
-                defaultImportModuleType == null
-                  ? false
-                  : defaultImportModuleType.getKind() === SyntaxKind.TypeAliasDeclaration ||
-                    defaultImportModuleType.getKind() === SyntaxKind.ClassDeclaration ||
-                    defaultImportModuleType.getKind() === SyntaxKind.InterfaceDeclaration,
-            },
-          ],
-        } satisfies IResolvedImportModule;
-      }
-
-      const importModuleType = atOrUndefined(declarationMap.get(typeNameWithImportDeclaration.textTypeName) ?? [], 0);
+    // default import 인 경우
+    // 생각 좀 해봤는데 이 경우 filename + hash로 처리하는게 더 효율적인 것 같다(handler 일 때처럼)
+    // 이건 여러파일에 동일한 이름으로 export 한 뒤 이름만 바꿔서 사용하는 그런 경우도 있을 것 같아서
+    // 오류 방지 차원에서 filename + hash로 처리한다
+    if (defaultImport != null) {
+      const defaultImportModuleType = atOrUndefined(declarationMap.get('default') ?? [], 0);
 
       return {
-        isExternalLibraryImport: false,
+        isExternalModuleImport: importStatement.isExternalModule,
+        isLocalModuleImport: false,
+        hash: moduleHash,
         importAt: sourceFilePath,
         exportFrom: moduleSourceFilePath,
-        hash: moduleHash,
         relativePath,
         importDeclarations: [
           {
-            isDefaultExport: false,
-            importModuleNameTo: typeNameWithImportDeclaration.textTypeName,
-            importModuleNameFrom: typeNameWithImportDeclaration.textTypeName,
+            isDefaultExport: true,
+            importModuleNameFrom: defaultImport.getText(),
+            importModuleNameTo: defaultImport.getText(),
             isPureType:
-              importModuleType == null
+              defaultImportModuleType == null
                 ? false
-                : importModuleType.getKind() === SyntaxKind.TypeAliasDeclaration ||
-                  importModuleType.getKind() === SyntaxKind.ClassDeclaration ||
-                  importModuleType.getKind() === SyntaxKind.InterfaceDeclaration,
+                : defaultImportModuleType.getKind() === SyntaxKind.TypeAliasDeclaration ||
+                  defaultImportModuleType.getKind() === SyntaxKind.ClassDeclaration ||
+                  defaultImportModuleType.getKind() === SyntaxKind.InterfaceDeclaration,
           },
         ],
-      } satisfies IResolvedImportModule;
-    },
-  );
+      };
+    }
+
+    const importModuleType = atOrUndefined(declarationMap.get(importStatement.typeName) ?? [], 0);
+
+    return {
+      isExternalModuleImport: importStatement.isExternalModule,
+      isLocalModuleImport: false,
+      hash: moduleHash,
+      importAt: sourceFilePath,
+      exportFrom: moduleSourceFilePath,
+      relativePath,
+      importDeclarations: [
+        {
+          isDefaultExport: false,
+          importModuleNameTo: importStatement.typeName,
+          importModuleNameFrom: importStatement.typeName,
+          isPureType:
+            importModuleType == null
+              ? false
+              : importModuleType.getKind() === SyntaxKind.TypeAliasDeclaration ||
+                importModuleType.getKind() === SyntaxKind.ClassDeclaration ||
+                importModuleType.getKind() === SyntaxKind.InterfaceDeclaration,
+        },
+      ],
+    };
+  });
 
   const resolutionRecord = nonDedupeResolutions.reduce<Record<string, IResolvedImportModule>>(
     (aggregation, current) => {
