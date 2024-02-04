@@ -1,7 +1,7 @@
-import type { ParameterDeclaration, TypeReferenceNode } from 'ts-morph';
+import type * as tsm from 'ts-morph';
 import { SyntaxKind } from 'ts-morph';
 
-export function getTypeReferences(parameter: ParameterDeclaration, dedupe?: boolean) {
+export function getTypeReferences(parameter: tsm.ParameterDeclaration, dedupe?: boolean) {
   const doDedupe = dedupe ?? true;
 
   const typeReferenceNodes = parameter
@@ -15,7 +15,7 @@ export function getTypeReferences(parameter: ParameterDeclaration, dedupe?: bool
     return typeReferenceNodes;
   }
 
-  const typeReferenceRecord = typeReferenceNodes.reduce<Record<string, TypeReferenceNode>>((aggregated, node) => {
+  const typeReferenceRecord = typeReferenceNodes.reduce<Record<string, tsm.TypeReferenceNode>>((aggregated, node) => {
     const type = node.getText();
 
     if (aggregated[type] == null) {

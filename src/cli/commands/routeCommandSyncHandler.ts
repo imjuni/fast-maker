@@ -5,6 +5,7 @@ import { getTypeScriptProject } from '#/compilers/tools/getTypeScriptProject';
 import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
 import { prettierProcessing } from '#/generators/prettierProcessing';
 import { routeMapTransform } from '#/generators/routeMapTransform';
+import { ReasonContainer } from '#/modules/ReasonContainer';
 import { routing } from '#/modules/commands/routing';
 import { getOutputFilePath } from '#/modules/getOutputFilePath';
 import { writeOutputFile } from '#/modules/writeOutputFile';
@@ -42,5 +43,10 @@ export async function routeCommandSyncHandler(options: TRouteOption) {
   }
 
   const table = createTable(routings.routes);
+
+  if (ReasonContainer.it.reasons.length > 0) {
+    show('log', ReasonContainer.it.show());
+  }
+
   show('log', table.toString());
 }
