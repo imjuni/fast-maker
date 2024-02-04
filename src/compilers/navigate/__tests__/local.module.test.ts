@@ -1,6 +1,7 @@
 import { getResolvedInFileImportedModules } from '#/compilers/navigate/getResolvedInFileImportedModules';
 import { getRouteNode } from '#/compilers/routes/getRouteNode';
 import { getTypeReferences } from '#/compilers/type-tools/getTypeReferences';
+import { CE_EXT_KIND } from '#/configs/const-enum/CE_EXT_KIND';
 import { atOrThrow, orThrow } from 'my-easy-fp';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
@@ -47,7 +48,7 @@ export function handler(req: FastifyRequest<{ Querystring: TQuerystring, Params:
 
     const imports = getResolvedInFileImportedModules({
       sourceFile,
-      options: { output: tsconfigDirPath },
+      options: { output: tsconfigDirPath, extKind: CE_EXT_KIND.NONE },
       typeReferenceNodes: types,
     });
 

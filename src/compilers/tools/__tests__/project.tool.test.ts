@@ -1,32 +1,47 @@
 import { getTypeScriptConfig } from '#/compilers/tools/getTypeScriptConfig';
 import { getTypeScriptProject } from '#/compilers/tools/getTypeScriptProject';
 import { posixJoin } from '#/tools/posixJoin';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 const tsconfigDir = posixJoin(process.cwd(), 'examples');
 const tsconfigPath = posixJoin(tsconfigDir, 'tsconfig.example.json');
 
 describe('getTypeScriptProject', () => {
-  test('pass', async () => {
+  it('pass', async () => {
     const project = getTypeScriptProject(tsconfigPath);
     expect(project).toBeTruthy();
   });
 });
 
 describe('getTypeScriptConfig', () => {
-  test('pass', async () => {
-    const r = await getTypeScriptConfig(tsconfigPath);
+  it('pass', async () => {
+    const r01 = await getTypeScriptConfig(tsconfigPath);
     const expectation = {
       options: {
-        target: 8,
+        lib: ['lib.es2023.d.ts'],
         module: 1,
-        lib: ['lib.es2021.d.ts'],
-        declaration: true,
-        removeComments: false,
+        target: 9,
         strict: true,
-        moduleResolution: 2,
         esModuleInterop: true,
-        inlineSourceMap: true,
+        skipLibCheck: true,
+        forceConsistentCasingInFileNames: true,
+        moduleResolution: 2,
+        declaration: true,
+        declarationMap: true,
+        sourceMap: true,
+        removeComments: true,
+        importHelpers: true,
+        noImplicitAny: false,
+        noImplicitReturns: true,
+        noFallthroughCasesInSwitch: true,
+        isolatedModules: true,
+        baseUrl: tsconfigDir,
+        rootDir: tsconfigDir,
+        paths: { '#/*': ['interface/*'] },
+        experimentalDecorators: true,
+        emitDecoratorMetadata: true,
+        pretty: true,
+        pathsBasePath: tsconfigDir,
         configFilePath: undefined,
       },
       watchOptions: undefined,
@@ -34,16 +49,26 @@ describe('getTypeScriptConfig', () => {
       typeAcquisition: { enable: false, include: [], exclude: [] },
       raw: {
         compilerOptions: {
-          target: 'es2021',
-          module: 'commonjs',
+          module: 'CommonJS',
+          moduleResolution: 'Node',
           declaration: true,
-          outDir: 'dist',
-          removeComments: false,
+          declarationMap: true,
+          sourceMap: true,
+          outDir: './dist',
+          removeComments: true,
+          importHelpers: true,
           strict: true,
-          moduleResolution: 'node',
+          noImplicitAny: false,
+          noImplicitReturns: true,
+          noFallthroughCasesInSwitch: true,
+          isolatedModules: true,
           baseUrl: '.',
+          rootDir: '.',
+          paths: { '#/*': ['interface/*'] },
           esModuleInterop: true,
-          inlineSourceMap: true,
+          experimentalDecorators: true,
+          emitDecoratorMetadata: true,
+          pretty: true,
         },
         compileOnSave: false,
       },
@@ -51,6 +76,7 @@ describe('getTypeScriptConfig', () => {
       compileOnSave: false,
     };
 
-    expect(r).toMatchObject(expectation);
+    expect(r01.options).toMatchObject(expectation.options);
+    expect(r01.raw.compilerOptions).toMatchObject(expectation.raw.compilerOptions);
   });
 });

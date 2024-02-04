@@ -5,7 +5,7 @@ import type * as tsm from 'ts-morph';
 export function getRequestTypeParameter(parameter: tsm.ParameterDeclaration) {
   const parameterNode = parameter.getTypeNodeOrThrow();
 
-  if (parameterNode.getText() === 'FastifyRequest') {
+  if (parameterNode.getText().indexOf('FastifyRequest') >= 0) {
     return getFastifyRequestTypeArgument(parameter);
   }
 

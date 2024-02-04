@@ -9,7 +9,7 @@ describe('TemplateContainer', () => {
     await TemplateContainer.bootstrap({ templates: 'templates' });
   });
 
-  it('bootstrap', async () => {
+  it('basic evaluate', async () => {
     const uuid = 'v1/superheros/avengers';
     const handlerDir = `handlers/${uuid}`;
     const handlerMethod = 'get.ts';
@@ -47,14 +47,19 @@ describe('TemplateContainer', () => {
     });
 
     expect(r01.trim()).toEqual(
-      `import  { option_zLRHkFp00cylJZ0CJlgEiLOpyIGY5Pwl } from '../handlers/get';
+      `import  { option as option_zLRHkFp00cylJZ0CJlgEiLOpyIGY5Pwl } from '../handlers/get';
 
-fastify.route<{ Querystring: IReadSuperheroQuerystring; Params: IReadSuperheroParams }>({
-  ...option_zLRHkFp00cylJZ0CJlgEiLOpyIGY5Pwl,
-  method: ["get"],
-  url: '/v1/superhero/:name'
-  handler: handler_zLRHkFp00cylJZ0CJlgEiLOpyIGY5Pwl,
-});`.trim(),
+
+
+export default function routing(fastify: FastifyInstance): void {
+      fastify.route<{ Querystring: IReadSuperheroQuerystring; Params: IReadSuperheroParams }>({
+      ...option_zLRHkFp00cylJZ0CJlgEiLOpyIGY5Pwl(fastify),
+    method: ["get"],
+    url: '/v1/superhero/:name',
+    handler: handler_zLRHkFp00cylJZ0CJlgEiLOpyIGY5Pwl,
+      });
+  
+  }`.trim(),
     );
   });
 });

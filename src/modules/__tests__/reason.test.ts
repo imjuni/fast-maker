@@ -1,9 +1,13 @@
 import type { IReason } from '#/compilers/interfaces/IReason';
 import { ReasonContainer } from '#/modules/ReasonContainer';
 import { atOrThrow } from 'my-easy-fp';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 describe('Reason Container', () => {
+  beforeAll(() => {
+    ReasonContainer.bootstrap();
+  });
+
   it('add', async () => {
     ReasonContainer.it.add({ type: 'error', message: '', filePath: '' } satisfies IReason);
     const r = atOrThrow(ReasonContainer.it.reasons, 0);

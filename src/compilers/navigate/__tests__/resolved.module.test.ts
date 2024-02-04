@@ -36,7 +36,7 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01 }>) {
 }`.trim();
 
     const create = (name: string, code: string, overwrite: boolean) =>
-      project.createSourceFile(path.join('examples', name), code, { overwrite });
+      project.createSourceFile(posixJoin('examples', name), code, { overwrite });
 
     create(filename01, abilityInterfaceSourceCode, true);
     const sourceFile02 = create(filename02, source02.trim(), true);
@@ -73,8 +73,8 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01 }>) {
       isExternalModuleImport: true,
       isLocalModuleImport: false,
       importAt: posixJoin(tsconfigDir, filename02),
-      hash: 'RszwFDu6tuucmk4ZrIbmE4nH1Zyv9RMI',
-      relativePath: 'FastifyRequest',
+      hash: 'YAmRjm1AR7PPkzafdNY8XtgLFYvkO9zx',
+      relativePath: 'fastify',
       importDeclarations: [
         {
           isDefaultExport: false,
@@ -86,7 +86,7 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01 }>) {
     });
   });
 
-  it.only('imported type is default export', () => {
+  it('imported type is default export', () => {
     const uuid = randomUUID();
     const filename01 = `${uuid}_0${(context.index += 1)}.ts`;
     const filename02 = `${uuid}_0${(context.index += 1)}.ts`;
@@ -136,7 +136,7 @@ export function handler(req: FastifyRequest<{ Querystring: ICompany }>) {
       isExternalModuleImport: true,
       isLocalModuleImport: false,
       importAt: posixJoin(tsconfigDir, filename02),
-      hash: 'RszwFDu6tuucmk4ZrIbmE4nH1Zyv9RMI',
+      hash: 'YAmRjm1AR7PPkzafdNY8XtgLFYvkO9zx',
       relativePath: 'fastify',
       importDeclarations: [
         {
@@ -202,7 +202,7 @@ export function handler(req: FastifyRequest<{ Querystring: ICompany }, Server>) 
       hash: 'MkNjkKmEcQIWwNEbwXf3yzgEAsdoSE2B',
       importAt: posixJoin(tsconfigDir, filename02),
       exportFrom: 'Server',
-      relativePath: 'Server',
+      relativePath: 'http',
       importDeclarations: [
         {
           isDefaultExport: false,
@@ -216,9 +216,9 @@ export function handler(req: FastifyRequest<{ Querystring: ICompany }, Server>) 
     expect(r01.at(2)).toMatchObject({
       isExternalModuleImport: true,
       isLocalModuleImport: false,
-      hash: 'RszwFDu6tuucmk4ZrIbmE4nH1Zyv9RMI',
+      hash: 'YAmRjm1AR7PPkzafdNY8XtgLFYvkO9zx',
       importAt: posixJoin(tsconfigDir, filename02),
-      relativePath: 'FastifyRequest',
+      relativePath: 'fastify',
       importDeclarations: [
         {
           isDefaultExport: false,
@@ -284,7 +284,7 @@ export function handler(req: FastifyRequest<{ Querystring: ICompany }, Server>) 
       hash: 'MkNjkKmEcQIWwNEbwXf3yzgEAsdoSE2B',
       importAt: posixJoin(tsconfigDir, filename02),
       exportFrom: 'Server',
-      relativePath: 'Server',
+      relativePath: 'http',
       importDeclarations: [
         {
           isDefaultExport: false,
@@ -298,9 +298,9 @@ export function handler(req: FastifyRequest<{ Querystring: ICompany }, Server>) 
     expect(r01.at(2)).toMatchObject({
       isExternalModuleImport: true,
       isLocalModuleImport: false,
-      hash: 'RszwFDu6tuucmk4ZrIbmE4nH1Zyv9RMI',
+      hash: 'YAmRjm1AR7PPkzafdNY8XtgLFYvkO9zx',
       importAt: posixJoin(tsconfigDir, filename02),
-      relativePath: 'FastifyRequest',
+      relativePath: 'fastify',
       importDeclarations: [
         {
           isDefaultExport: false,

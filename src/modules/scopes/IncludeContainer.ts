@@ -9,8 +9,9 @@ export class IncludeContainer {
 
   constructor(params: { patterns: string[]; options: GlobOptions }) {
     const globs = new Glob(params.patterns, params.options);
+    const files = getGlobFiles(globs).map<[string, boolean]>((filePath) => [filePath, true]);
 
-    this.#map = new Map<string, boolean>(getGlobFiles(globs).map((filePath) => [filePath, true]));
+    this.#map = new Map<string, boolean>(files);
     this.#globs = [globs];
   }
 

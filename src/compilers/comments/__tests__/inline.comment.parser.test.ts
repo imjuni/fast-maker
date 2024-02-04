@@ -43,7 +43,7 @@ describe('getSourceFileComments', () => {
     const filename = `${uuid}.ts`;
     const source = `
 /**
- * @maeum-file-exclude
+ * @route-file-exclude
  */
 import path from 'node:path';
 
@@ -65,8 +65,8 @@ export default class Hero {
     expect(comments).toMatchObject({
       filePath: path.join(process.cwd(), filename),
       comments: [
-        { kind: tsm.SyntaxKind.MultiLineCommentTrivia, pos: { column: 1, line: 4, start: 32 } },
-        { kind: tsm.SyntaxKind.MultiLineCommentTrivia, pos: { column: 1, line: 9, start: 99 } },
+        { kind: tsm.SyntaxKind.MultiLineCommentTrivia, pos: { column: 1, line: 4, start: 31 } },
+        { kind: tsm.SyntaxKind.MultiLineCommentTrivia, pos: { column: 1, line: 9, start: 98 } },
       ],
     });
   });
@@ -76,7 +76,7 @@ export default class Hero {
     const filename = `${uuid}.ts`;
     const source = `
 /*
- * @maeum-file-exclude
+ * @route-file-exclude
  */
 import path from 'node:path';
 
@@ -98,8 +98,8 @@ export default class Hero {
     expect(comments).toMatchObject({
       filePath: path.join(process.cwd(), filename),
       comments: [
-        { kind: tsm.SyntaxKind.MultiLineCommentTrivia, pos: { column: 1, line: 4, start: 31 } },
-        { kind: tsm.SyntaxKind.MultiLineCommentTrivia, pos: { column: 1, line: 9, start: 96 } },
+        { kind: tsm.SyntaxKind.MultiLineCommentTrivia, pos: { column: 1, line: 4, start: 30 } },
+        { kind: tsm.SyntaxKind.MultiLineCommentTrivia, pos: { column: 1, line: 9, start: 95 } },
       ],
     });
   });
@@ -108,7 +108,7 @@ export default class Hero {
     const uuid = randomUUID();
     const filename = `${uuid}.ts`;
     const source = `
-// @maeum-file-exclude
+// @route-file-exclude
 import path from 'node:path';
 
 // eslint-disable-next-line
@@ -127,8 +127,8 @@ export default class Hero {
     expect(comments).toMatchObject({
       filePath: path.join(process.cwd(), filename),
       comments: [
-        { kind: tsm.SyntaxKind.SingleLineCommentTrivia, pos: { column: 1, line: 2, start: 24 } },
-        { kind: tsm.SyntaxKind.SingleLineCommentTrivia, pos: { column: 1, line: 5, start: 83 } },
+        { kind: tsm.SyntaxKind.SingleLineCommentTrivia, pos: { column: 1, line: 2, start: 23 } },
+        { kind: tsm.SyntaxKind.SingleLineCommentTrivia, pos: { column: 1, line: 5, start: 82 } },
       ],
     });
   });
@@ -137,7 +137,7 @@ export default class Hero {
     const uuid = randomUUID();
     const filename = `${uuid}.ts`;
     const source = `
-/// @maeum-file-exclude
+/// @route-file-exclude
 import path from 'node:path';
 
 /// eslint-disable-next-line
@@ -156,8 +156,8 @@ export default class Hero {
     expect(comments).toMatchObject({
       filePath: path.join(process.cwd(), filename),
       comments: [
-        { kind: tsm.SyntaxKind.SingleLineCommentTrivia, pos: { column: 1, line: 2, start: 25 } },
-        { kind: tsm.SyntaxKind.SingleLineCommentTrivia, pos: { column: 1, line: 5, start: 85 } },
+        { kind: tsm.SyntaxKind.SingleLineCommentTrivia, pos: { column: 1, line: 2, start: 24 } },
+        { kind: tsm.SyntaxKind.SingleLineCommentTrivia, pos: { column: 1, line: 5, start: 84 } },
       ],
     });
   });
@@ -175,7 +175,7 @@ describe('getInlineExclude', () => {
         start: 1,
       },
       filePath: path.join(process.cwd(), filename),
-      range: '/**\n * @maeum-file-exclude\n */',
+      range: '/**\n * @route-file-exclude\n */',
     };
 
     const r01 = getInlineExclude({
@@ -186,9 +186,9 @@ describe('getInlineExclude', () => {
     });
 
     expect(r01).toMatchObject({
-      commentCode: '/**\n * @maeum-file-exclude\n */',
+      commentCode: '/**\n * @route-file-exclude\n */',
       filePath: path.join(process.cwd(), filename),
-      tag: 'inline-file-exclude',
+      tag: 'route-file-exclude',
       pos: {
         line: 1,
         column: 1,
@@ -209,7 +209,7 @@ describe('getInlineExclude', () => {
         start: 2,
       },
       filePath: path.join(process.cwd(), filename),
-      range: '/*\n\n * @maeum-file-exclude\n */',
+      range: '/*\n\n * @route-file-exclude\n */',
     };
 
     const r01 = getInlineExclude({
@@ -220,9 +220,9 @@ describe('getInlineExclude', () => {
     });
 
     expect(r01).toMatchObject({
-      commentCode: '/*\n\n * @maeum-file-exclude\n */',
+      commentCode: '/*\n\n * @route-file-exclude\n */',
       filePath: path.join(process.cwd(), filename),
-      tag: 'inline-file-exclude',
+      tag: 'route-file-exclude',
       pos: {
         line: 2,
         column: 2,
@@ -240,7 +240,7 @@ describe('getInlineExclude', () => {
       `\n * @augments PostEffect\n * @param {GraphicsDevice} graphicsDevice - The graphics device of the application.`,
       `\n * @property {Texture} blendMap The texture with which to blend the input render target with.`,
       `\n * @property {number} mixRatio The amount of blending between the input and the blendMap. Ranges from 0 to 1.`,
-      `\n *\n * @maeum-file-exclude\n */`,
+      `\n *\n * @route-file-exclude\n */`,
     ].join('');
     const comment: IStatementComments = {
       kind: tsm.SyntaxKind.MultiLineCommentTrivia,
@@ -262,7 +262,7 @@ describe('getInlineExclude', () => {
 
     expect(r01).toMatchObject({
       commentCode: range,
-      tag: 'inline-file-exclude',
+      tag: 'route-file-exclude',
       pos: {
         line: 3,
         column: 3,
@@ -277,7 +277,7 @@ describe('getInlineExclude', () => {
     const uuid = randomUUID();
     const filename = `${uuid}.ts`;
     const range = [
-      `/**\n * @maeum-file-exclude\n * @class\n * @name BlendEffect\n * @classdesc Blends the input render target with another texture.\n * @description Creates new instance of the post effect.`,
+      `/**\n * @route-file-exclude\n * @class\n * @name BlendEffect\n * @classdesc Blends the input render target with another texture.\n * @description Creates new instance of the post effect.`,
       `\n * @augments PostEffect\n * @param {GraphicsDevice} graphicsDevice - The graphics device of the application.`,
       `\n * @property {Texture} blendMap The texture with which to blend the input render target with.`,
       `\n * @property {number} mixRatio The amount of blending between the input and the blendMap. Ranges from 0 to 1.`,
@@ -303,7 +303,7 @@ describe('getInlineExclude', () => {
 
     expect(r01).toMatchObject({
       commentCode: range,
-      tag: 'inline-file-exclude',
+      tag: 'route-file-exclude',
       pos: {
         line: 4,
         column: 4,
@@ -322,7 +322,7 @@ describe('getInlineExclude', () => {
       `\n * @augments PostEffect\n * @param {GraphicsDevice} graphicsDevice - The graphics device of the application.`,
       `\n * @property {Texture} blendMap The texture with which to blend the input render target with.`,
       `\n * @property {number} mixRatio The amount of blending between the input and the blendMap. Ranges from 0 to 1.`,
-      `\n *\n * @maeum-file-exclude i-am-ironman\n */`,
+      `\n *\n * @route-file-exclude i-am-ironman\n */`,
     ].join('');
     const comment: IStatementComments = {
       kind: tsm.SyntaxKind.MultiLineCommentTrivia,
@@ -344,7 +344,7 @@ describe('getInlineExclude', () => {
 
     expect(r01).toMatchObject({
       commentCode: range,
-      tag: 'inline-file-exclude',
+      tag: 'route-file-exclude',
       pos: {
         line: 5,
         column: 5,
@@ -363,7 +363,7 @@ describe('getInlineExclude', () => {
       `\n * @augments PostEffect\n * @param {GraphicsDevice} graphicsDevice - The graphics device of the application.`,
       `\n * @property {Texture} blendMap The texture with which to blend the input render target with.`,
       `\n * @property {number} mixRatio The amount of blending between the input and the blendMap. Ranges from 0 to 1.`,
-      `\n *\n * @maeum-file-exclude i-am-ironman, i-am-marvel\n */`,
+      `\n *\n * @route-file-exclude i-am-ironman, i-am-marvel\n */`,
     ].join('');
     const comment: IStatementComments = {
       kind: tsm.SyntaxKind.MultiLineCommentTrivia,
@@ -385,7 +385,7 @@ describe('getInlineExclude', () => {
 
     expect(r01).toMatchObject({
       commentCode: range,
-      tag: 'inline-file-exclude',
+      tag: 'route-file-exclude',
       pos: {
         line: 6,
         column: 6,
@@ -399,7 +399,7 @@ describe('getInlineExclude', () => {
   it('multiline statement comment string, no namespace', () => {
     const uuid = randomUUID();
     const filename = `${uuid}.ts`;
-    const range = '/** @maeum-file-exclude */';
+    const range = '/** @route-file-exclude */';
     const comment: IStatementComments = {
       kind: tsm.SyntaxKind.MultiLineCommentTrivia,
       pos: {
@@ -420,7 +420,7 @@ describe('getInlineExclude', () => {
 
     expect(r01).toMatchObject({
       commentCode: range,
-      tag: 'inline-file-exclude',
+      tag: 'route-file-exclude',
       pos: {
         line: 7,
         column: 7,

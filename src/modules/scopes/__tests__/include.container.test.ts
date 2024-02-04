@@ -1,5 +1,6 @@
 import { getGlobFiles } from '#/modules/files/getGlobFiles';
 import { IncludeContainer } from '#/modules/scopes/IncludeContainer';
+import { posixJoin } from '#/tools/posixJoin';
 import { Glob } from 'glob';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -31,13 +32,13 @@ describe('IncludeContainer', () => {
   it('isInclude', () => {
     const container = new IncludeContainer({
       patterns: ['src/cli/**/*.ts', 'src/compilers/**/*.ts', 'examples/**/*.ts'],
-      options: { absolute: true, ignore: defaultExclude, cwd: tsconfigDir },
+      options: { absolute: true, ignore: defaultExclude, cwd: process.cwd() },
     });
 
     const r01 = container.isInclude('src/files/IncludeContainer.ts');
-    const r02 = container.isInclude('src/cli/builders/setModeBundleOptions.ts');
-    const r03 = container.isInclude(path.join(process.cwd(), 'src/files/IncludeContainer.ts'));
-    const r04 = container.isInclude(path.join(process.cwd(), 'src/cli/builders/setModeBundleOptions.ts'));
+    const r02 = container.isInclude('src/compilers/routes/getRouteHandler.ts');
+    const r03 = container.isInclude(posixJoin(process.cwd(), 'src/files/IncludeContainer.ts'));
+    const r04 = container.isInclude(posixJoin(process.cwd(), 'src/compilers/routes/getRouteHandler.ts'));
 
     expect(r01).toBeFalsy();
     expect(r02).toBeTruthy();
@@ -50,17 +51,17 @@ describe('IncludeContainer', () => {
       patterns: [
         'src/cli/**/*.ts',
         'src/compilers/**/*.ts',
-        '!src/compilers/getTypeScriptProject.ts',
+        '!src/compilers/tools/getTypeScriptProject.ts',
         'examples/**/*.ts',
       ],
-      options: { absolute: true, ignore: defaultExclude, cwd: tsconfigDir },
+      options: { absolute: true, ignore: defaultExclude, cwd: process.cwd() },
     });
 
     const r01 = container.isInclude('src/files/IncludeContainer.ts');
-    const r02 = container.isInclude('src/cli/builders/setModeBundleOptions.ts');
-    const r03 = container.isInclude(path.join(process.cwd(), 'src/files/IncludeContainer.ts'));
-    const r04 = container.isInclude(path.join(process.cwd(), 'src/cli/builders/setModeBundleOptions.ts'));
-    const r05 = container.isInclude(path.join(process.cwd(), 'src/cli/compilers/getTypeScriptProject.ts'));
+    const r02 = container.isInclude('src/compilers/routes/getRouteHandler.ts');
+    const r03 = container.isInclude(posixJoin(process.cwd(), 'src/files/IncludeContainer.ts'));
+    const r04 = container.isInclude(posixJoin(process.cwd(), 'src/compilers/routes/getRouteHandler.ts'));
+    const r05 = container.isInclude(posixJoin(process.cwd(), 'src/cli/compilers/tools/getTypeScriptProject.ts'));
 
     expect(r01).toBeFalsy();
     expect(r02).toBeTruthy();

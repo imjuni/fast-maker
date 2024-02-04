@@ -1,4 +1,5 @@
 import type { IImportConfiguration } from '#/compilers/interfaces/IImportConfiguration';
+import { getPropertySignatures } from '#/compilers/navigate/getPropertySignatures';
 import { getResolvedImportedModules } from '#/compilers/navigate/getResolvedImportedModules';
 import { getResolvedInFileImportedModules } from '#/compilers/navigate/getResolvedInFileImportedModules';
 import { getRouteNode } from '#/compilers/routes/getRouteNode';
@@ -6,10 +7,11 @@ import { getRouteOptions } from '#/compilers/routes/getRouteOptions';
 import { CE_REQUEST_KIND } from '#/compilers/type-tools/const-enum/CE_REQUEST_KIND';
 import { getRequestTypeParameter } from '#/compilers/type-tools/getRequestTypeParameter';
 import { getTypeReferences } from '#/compilers/type-tools/getTypeReferences';
+import { getPropertySignatureValidateReason } from '#/compilers/validators/getPropertySignatureValidateReason';
+import { validatePropertySignature } from '#/compilers/validators/validatePropertySignature';
 import { validateTypeReferences } from '#/compilers/validators/validateTypeReferences';
 import type { IBaseOption } from '#/configs/interfaces/IBaseOption';
 import { getImportConfigurationFromResolutions } from '#/generators/getImportConfigurationFromResolutions';
-import { ReasonContainer } from '#/modules/ReasonContainer';
 import { getExtraMethod } from '#/routes/extractors/getExtraMethod';
 import type { IRouteConfiguration } from '#/routes/interfaces/IRouteConfiguration';
 import { getRoutePath } from '#/routes/paths/getRoutePath';
@@ -37,7 +39,7 @@ export async function getRouteHandler(
   const parameters = node.node.getParameters();
   const parameter = parameters.at(0);
   const typeReferenceNodes = parameter == null ? [] : getTypeReferences(parameter);
-  const exportedErrorReasons = validateTypeReferences(sourceFile, typeReferenceNodes);
+  const isValidTypeReference = validateTypeReferences(sourceFile, typeReferenceNodes);
   const extraMethods = await getExtraMethod(sourceFile.getFilePath().toString());
   const routePathConfiguration = await getRoutePath(relativeFilePath);
   const routeOptions = getRouteOptions(sourceFile);
@@ -61,6 +63,18 @@ export async function getRouteHandler(
           text: '',
         }
       : getRequestTypeParameter(parameter);
+
+  const isValidPropertySignature =
+    parameter == null
+      ? []
+      : getPropertySignatureValidateReason(
+          typeArgument.request,
+          node.node,
+          validatePropertySignature({
+            propertySignatures: getPropertySignatures(parameter),
+            kind: typeArgument.request,
+          }),
+        );
 
   const routeConfiguration: IRouteConfiguration = {
     methods: [routePathConfiguration.method, ...extraMethods],
@@ -101,13 +115,12 @@ export async function getRouteHandler(
     } satisfies IImportConfiguration,
   ].filter((statement): statement is IImportConfiguration => statement != null);
 
-  if (exportedErrorReasons.length > 0) {
-    ReasonContainer.it.add(...exportedErrorReasons);
-  }
+  const reasons = [...isValidTypeReference, ...isValidPropertySignature];
 
   return {
-    valid: exportedErrorReasons.length <= 0,
+    valid: reasons.length <= 0,
     imports,
     routes: [routeConfiguration],
+    reasons,
   };
 }

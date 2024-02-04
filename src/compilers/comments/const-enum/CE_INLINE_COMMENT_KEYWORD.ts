@@ -1,5 +1,5 @@
 export const CE_INLINE_COMMENT_KEYWORD = {
-  FILE_EXCLUDE_KEYWORD: '@maeum-file-exclude',
+  FILE_EXCLUDE_KEYWORD: '@route-file-exclude',
   FAST_MAKER_WORKSPACE: 'fast-maker',
 } as const;
 
