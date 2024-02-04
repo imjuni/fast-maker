@@ -72,24 +72,31 @@ export async function getRouteHandler(
 
   const imports = [
     ...dedupeImportConfiguration(getImportConfigurationFromResolutions(importedModules)),
-    routeOptions.has.option
-      ? ({
-          hash,
-          namedBindings: [
-            {
-              name: 'option',
-              alias: `${appendPostfixHash('option', hash)}`,
-              isPureType: false,
-            },
-          ],
-          importFile: sourceFile.getFilePath().toString(),
-          relativePath: getRelativeModulePath({
-            modulePath: sourceFile.getFilePath().toString(),
-            output: options.output,
-            extKind: options.extKind,
-          }),
-        } satisfies IImportConfiguration)
-      : undefined,
+    {
+      hash,
+      namedBindings: [
+        ...(routeOptions.has.option
+          ? [
+              {
+                name: 'option',
+                alias: `${appendPostfixHash('option', hash)}`,
+                isPureType: false,
+              },
+            ]
+          : []),
+        {
+          name: 'handler',
+          alias: `${appendPostfixHash('handler', hash)}`,
+          isPureType: false,
+        },
+      ],
+      importFile: sourceFile.getFilePath().toString(),
+      relativePath: getRelativeModulePath({
+        modulePath: sourceFile.getFilePath().toString(),
+        output: options.output,
+        extKind: options.extKind,
+      }),
+    } satisfies IImportConfiguration,
   ].filter((statement): statement is IImportConfiguration => statement != null);
 
   return {

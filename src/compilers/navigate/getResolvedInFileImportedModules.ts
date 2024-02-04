@@ -51,13 +51,14 @@ export function getResolvedInFileImportedModules({
   // local export는 default export 일 수 없다. default export는 route handler function 전용으로
   // 제한되어 있기 때문이다
   const importCodeBases = [
-    matchAndExportedInTypeAliases.map((typeAlias) => {
+    matchAndExportedInTypeAliases.map<IResolvedImportModule>((typeAlias) => {
       const moduleName = getTypeSymbolText(typeAlias.getType(), (node) =>
         node.getType().getAliasSymbolOrThrow().getEscapedName(),
       );
 
       return {
-        isExternalLibraryImport: false,
+        isExternalModuleImport: false,
+        isLocalModuleImport: true,
         hash: moduleHash,
         importAt: moduleSourceFilePath,
         exportFrom: moduleSourceFilePath,
@@ -70,15 +71,16 @@ export function getResolvedInFileImportedModules({
             isPureType: true,
           },
         ],
-      } satisfies IResolvedImportModule;
+      };
     }),
-    matchAndExportedInterfaces.map((interfaceNode) => {
+    matchAndExportedInterfaces.map<IResolvedImportModule>((interfaceNode) => {
       const moduleName = getTypeSymbolText(interfaceNode.getType(), (node) =>
         node.getType().getSymbolOrThrow().getEscapedName(),
       );
 
       return {
-        isExternalLibraryImport: false,
+        isExternalModuleImport: false,
+        isLocalModuleImport: true,
         hash: moduleHash,
         importAt: moduleSourceFilePath,
         exportFrom: moduleSourceFilePath,
@@ -91,16 +93,17 @@ export function getResolvedInFileImportedModules({
             isPureType: true,
           },
         ],
-      } satisfies IResolvedImportModule;
+      };
     }),
 
-    matchAndExportedClasses.map((classNode) => {
+    matchAndExportedClasses.map<IResolvedImportModule>((classNode) => {
       const moduleName = getTypeSymbolText(classNode.getType(), (node) =>
         node.getType().getSymbolOrThrow().getEscapedName(),
       );
 
       return {
-        isExternalLibraryImport: false,
+        isExternalModuleImport: false,
+        isLocalModuleImport: true,
         hash: moduleHash,
         importAt: moduleSourceFilePath,
         exportFrom: moduleSourceFilePath,
@@ -113,7 +116,7 @@ export function getResolvedInFileImportedModules({
             isPureType: true,
           },
         ],
-      } satisfies IResolvedImportModule;
+      };
     }),
   ].flat();
 

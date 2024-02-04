@@ -1,17 +1,17 @@
 import type { TFastifyRouteHandler } from '#/compilers/interfaces/TFastifyRouteHandler';
-import { getArrowFunctionHandlerNode } from '#/compilers/routes/getArrowFunctionHandlerNode';
-import { getFunctionHandlerNode } from '#/compilers/routes/getFunctionHandlerNode';
+import { getArrowFunctionHandlerNode } from '#/compilers/navigate/getArrowFunctionHandlerNode';
+import { getFunctionHandlerNode } from '#/compilers/navigate/getFunctionHandlerNode';
 import { atOrThrow } from 'my-easy-fp';
 import * as tsm from 'ts-morph';
 
 export function getRouteNode(sourceFile: tsm.SourceFile): TFastifyRouteHandler | undefined {
   const declarationMap = sourceFile.getExportedDeclarations();
-  const handler = declarationMap.get('handler');
+  const declarations = declarationMap.get('handler');
 
-  if (handler != null) {
-    if (handler.some((handlerNode) => handlerNode.getKind() === tsm.SyntaxKind.VariableDeclaration)) {
-      const node = atOrThrow(handler, 0);
-      const variableDeclarationNode = node.asKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
+  if (declarations != null) {
+    if (declarations.some((handlerNode) => handlerNode.getKind() === tsm.SyntaxKind.VariableDeclaration)) {
+      const declaration = atOrThrow(declarations, 0);
+      const variableDeclarationNode = declaration.asKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
 
       const initialiezer = variableDeclarationNode.getInitializerOrThrow();
       const identifier = variableDeclarationNode.getNameNode().asKindOrThrow(tsm.SyntaxKind.Identifier);
@@ -19,8 +19,8 @@ export function getRouteNode(sourceFile: tsm.SourceFile): TFastifyRouteHandler |
       return getArrowFunctionHandlerNode([identifier, initialiezer]);
     }
 
-    if (handler.some((handlerNode) => handlerNode.getKind() === tsm.SyntaxKind.FunctionDeclaration)) {
-      return getFunctionHandlerNode(handler);
+    if (declarations.some((handlerNode) => handlerNode.getKind() === tsm.SyntaxKind.FunctionDeclaration)) {
+      return getFunctionHandlerNode(declarations);
     }
 
     return undefined;

@@ -1,5 +1,6 @@
 import { getRouteNode } from '#/compilers/routes/getRouteNode';
 import { getTypeReferences } from '#/compilers/type-tools/getTypeReferences';
+import { isExternalModule } from '#/compilers/type-tools/isExternalModule';
 import { randomUUID } from 'crypto';
 import { atOrThrow } from 'my-easy-fp';
 import path from 'path';
@@ -96,5 +97,35 @@ export function handler(req: FastifyRequest<{ Body: IAbility, Querystring: IAbil
     const r01 = getTypeReferences(parameter);
 
     expect(r01.length).toEqual(2);
+  });
+});
+
+describe('isExternalModule', () => {
+  it('external module', () => {
+    const uuid = randomUUID();
+    const filename01 = `${uuid}_0${(context.index += 1)}.ts`;
+    const sourceCode = `import { FastifyRequest } from 'fastify';`.trim();
+
+    const create = (name: string, code: string, overwrite: boolean) =>
+      project.createSourceFile(path.join('examples', name), code, { overwrite });
+    const sourceFile = create(filename01, sourceCode, true);
+
+    const importDeclaration = atOrThrow(sourceFile.getImportDeclarations(), 0);
+    const r01 = isExternalModule(importDeclaration);
+    expect(r01).toBeTruthy();
+  });
+
+  it('project module', () => {
+    const uuid = randomUUID();
+    const filename01 = `${uuid}_0${(context.index += 1)}.ts`;
+    const sourceCode = `import { ITestInfoType01 } from '#/ITestInfo';`.trim();
+
+    const create = (name: string, code: string, overwrite: boolean) =>
+      project.createSourceFile(path.join('examples', name), code, { overwrite });
+    const sourceFile = create(filename01, sourceCode, true);
+
+    const importDeclaration = atOrThrow(sourceFile.getImportDeclarations(), 0);
+    const r01 = isExternalModule(importDeclaration);
+    expect(r01).toBeFalsy();
   });
 });

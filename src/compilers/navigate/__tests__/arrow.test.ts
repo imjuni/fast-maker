@@ -1,20 +1,17 @@
-import getArrowFunctionWithModifier from '#/compilers/navigate/getArrowFunctionWithModifier';
-import JestContext from '#/tools/__tests__/tools/context';
-import * as env from '#/tools/__tests__/tools/env';
-import 'jest';
+import { getArrowFunctionHandlerNode } from '#/compilers/navigate/getArrowFunctionHandlerNode';
+import { posixJoin } from '#/tools/posixJoin';
 import { atOrThrow } from 'my-easy-fp';
-import { replaceSepToPosix } from 'my-node-fp';
 import path from 'path';
-import { Project, SyntaxKind } from 'ts-morph';
+import * as tsm from 'ts-morph';
+import { describe, expect, it } from 'vitest';
 
-const context = new JestContext();
-
-beforeAll(() => {
-  context.project = new Project();
-});
+const tsconfigDir = path.join(process.cwd(), 'examples');
+const tsconfigPath = path.join(tsconfigDir, 'tsconfig.example.json');
+const project = new tsm.Project({ tsConfigFilePath: tsconfigPath });
+// const context: { index: number } = { index: 0 };
 
 describe('getArrowFunctionModifier', () => {
-  test('anonymous function async', async () => {
+  it('anonymous async function', async () => {
     const sourceFileContent = `import { RouteShorthandOptions } from 'fastify';
     import TAbnormalPresident from '../../interface/TPresident';
     import schema from '../get/interface/JSC_IReqPokeHello';
@@ -26,34 +23,32 @@ describe('getArrowFunctionModifier', () => {
       },
     };
     
-    export default async (req: TAbnormalPresident) => {
+    export const handler =  async (req: TAbnormalPresident) => {
       console.debug(req.query);
       console.debug(req.body);
     
       return 'world';
     };`;
-    const sourcePath = replaceSepToPosix(path.join(env.examplePath, 'handlers\\delete\\world.ts'));
-    const source = context.project.createSourceFile(sourcePath, sourceFileContent, { overwrite: true });
+    const sourcePath = posixJoin(tsconfigDir, 'handlers', 'world', 'delete.ts');
+    const source = project.createSourceFile(sourcePath, sourceFileContent, { overwrite: true });
 
     const declarationMap = source.getExportedDeclarations();
-    const declarations = declarationMap.get('default') ?? [];
-    const handlerStatement = getArrowFunctionWithModifier(declarations);
+    const declarations = declarationMap.get('handler') ?? [];
+    const declaration = atOrThrow(declarations, 0);
+    const variableDeclarationNode = declaration.asKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
+    const initialiezer = variableDeclarationNode.getInitializerOrThrow();
+    const identifier = variableDeclarationNode.getNameNode().asKindOrThrow(tsm.SyntaxKind.Identifier);
+    const handlerNode = getArrowFunctionHandlerNode([initialiezer, identifier]);
 
-    if (handlerStatement == null) throw new Error('dont expect undefined');
-
-    // eslint-disable-next-line
-    const { node, ...processed } = handlerStatement;
-
-    const expectation = {
-      kind: 'handler',
-      type: 'async',
-      name: 'anonymous function',
-    };
-
-    expect(processed).toEqual(expectation);
+    expect(handlerNode).toMatchObject({
+      path: posixJoin(tsconfigDir, 'handlers', 'world', 'delete.ts'),
+      kind: 'async',
+      type: 'arrow',
+      name: 'handler',
+    });
   });
 
-  test('anonymous function sync', async () => {
+  it('anonymous sync function', async () => {
     const sourceFileContent = `import { RouteShorthandOptions } from 'fastify';
     import TAbnormalPresident from '../../interface/TPresident';
     import schema from '../get/interface/JSC_IReqPokeHello';
@@ -65,34 +60,33 @@ describe('getArrowFunctionModifier', () => {
       },
     };
     
-    export default (req: TAbnormalPresident) => {
+    export const handler = (req: TAbnormalPresident) => {
       console.debug(req.query);
       console.debug(req.body);
     
       return 'world';
     };`;
-    const sourcePath = replaceSepToPosix(path.join(env.examplePath, 'handlers\\delete\\world.ts'));
-    const source = context.project.createSourceFile(sourcePath, sourceFileContent, { overwrite: true });
+
+    const sourcePath = posixJoin(tsconfigDir, 'handlers', 'world', 'delete.ts');
+    const source = project.createSourceFile(sourcePath, sourceFileContent, { overwrite: true });
 
     const declarationMap = source.getExportedDeclarations();
-    const declarations = declarationMap.get('default') ?? [];
-    const handlerStatement = getArrowFunctionWithModifier(declarations);
+    const declarations = declarationMap.get('handler') ?? [];
+    const declaration = atOrThrow(declarations, 0);
+    const variableDeclarationNode = declaration.asKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
+    const initialiezer = variableDeclarationNode.getInitializerOrThrow();
+    const identifier = variableDeclarationNode.getNameNode().asKindOrThrow(tsm.SyntaxKind.Identifier);
+    const handlerNode = getArrowFunctionHandlerNode([initialiezer, identifier]);
 
-    if (handlerStatement == null) throw new Error('dont expect undefined');
-
-    const { node, ...processed } = handlerStatement;
-    const expectation = {
-      kind: 'handler',
-      type: 'sync',
-      name: 'anonymous function',
-    };
-
-    console.log(processed);
-
-    expect(processed).toEqual(expectation);
+    expect(handlerNode).toMatchObject({
+      path: posixJoin(tsconfigDir, 'handlers', 'world', 'delete.ts'),
+      kind: 'sync',
+      type: 'arrow',
+      name: 'handler',
+    });
   });
 
-  test('named arrow function async', async () => {
+  it('exist handler function, but not arrow function', async () => {
     const sourceFileContent = `import { RouteShorthandOptions } from 'fastify';
     import TAbnormalPresident from '../../interface/TPresident';
     import schema from '../get/interface/JSC_IReqPokeHello';
@@ -104,83 +98,19 @@ describe('getArrowFunctionModifier', () => {
       },
     };
     
-    const worldHandler = async (req: TAbnormalPresident) => {
-      console.debug(req.query);
-      console.debug(req.body);
-    
-      return 'world';
-    };
-    
-    export default worldHandler;`;
+    export const handler = 'hello'`;
 
-    const sourcePath = replaceSepToPosix(path.join(env.examplePath, 'handlers\\delete\\world2.ts'));
-    const source = context.project.createSourceFile(sourcePath, sourceFileContent, { overwrite: true });
+    const sourcePath = posixJoin(tsconfigDir, 'handlers', 'world', 'delete.ts');
+    const source = project.createSourceFile(sourcePath, sourceFileContent, { overwrite: true });
 
     const declarationMap = source.getExportedDeclarations();
-    const declarations = declarationMap.get('default') ?? [];
-    const variableDeclarationNode = atOrThrow(declarations, 0).asKindOrThrow(SyntaxKind.VariableDeclaration);
-
+    const declarations = declarationMap.get('handler') ?? [];
+    const declaration = atOrThrow(declarations, 0);
+    const variableDeclarationNode = declaration.asKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
     const initialiezer = variableDeclarationNode.getInitializerOrThrow();
-    const identifier = variableDeclarationNode.getNameNode().asKindOrThrow(SyntaxKind.Identifier);
-    const handlerStatement = getArrowFunctionWithModifier([identifier, initialiezer]);
+    const identifier = variableDeclarationNode.getNameNode().asKindOrThrow(tsm.SyntaxKind.Identifier);
+    const handlerNode = getArrowFunctionHandlerNode([initialiezer, identifier]);
 
-    if (handlerStatement == null) throw new Error('dont expect undefined');
-
-    const { node, ...processed } = handlerStatement;
-    const expectation = {
-      kind: 'handler',
-      type: 'async',
-      name: 'worldHandler',
-    };
-
-    console.log(processed);
-
-    expect(processed).toEqual(expectation);
-  });
-
-  test('named arrow function sync', async () => {
-    const sourceFileContent = `import { RouteShorthandOptions } from 'fastify';
-    import TAbnormalPresident from '../../interface/TPresident';
-    import schema from '../get/interface/JSC_IReqPokeHello';
-    
-    export const option: RouteShorthandOptions = {
-      schema: {
-        querystring: schema.properties?.Querystring,
-        body: schema.properties?.Body,
-      },
-    };
-    
-    const worldHandler = (req: TAbnormalPresident) => {
-      console.debug(req.query);
-      console.debug(req.body);
-    
-      return 'world';
-    };
-    
-    export default worldHandler;`;
-
-    const sourcePath = replaceSepToPosix(path.join(env.examplePath, 'handlers\\delete\\world2.ts'));
-    const source = context.project.createSourceFile(sourcePath, sourceFileContent, { overwrite: true });
-
-    const declarationMap = source.getExportedDeclarations();
-    const declarations = declarationMap.get('default') ?? [];
-    const variableDeclarationNode = atOrThrow(declarations, 0).asKindOrThrow(SyntaxKind.VariableDeclaration);
-
-    const initialiezer = variableDeclarationNode.getInitializerOrThrow();
-    const identifier = variableDeclarationNode.getNameNode().asKindOrThrow(SyntaxKind.Identifier);
-    const handlerStatement = getArrowFunctionWithModifier([identifier, initialiezer]);
-
-    if (handlerStatement == null) throw new Error('dont expect undefined');
-
-    const { node, ...processed } = handlerStatement;
-    const expectation = {
-      kind: 'handler',
-      type: 'sync',
-      name: 'worldHandler',
-    };
-
-    console.log(processed);
-
-    expect(processed).toEqual(expectation);
+    expect(handlerNode).toBeUndefined();
   });
 });

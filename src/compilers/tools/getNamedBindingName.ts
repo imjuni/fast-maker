@@ -1,7 +1,7 @@
 import type { ImportClause } from 'ts-morph';
 import { SyntaxKind } from 'ts-morph';
 
-export default function getNamedBindingName(bindings: ReturnType<ImportClause['getNamedBindings']>) {
+export function getNamedBindingName(bindings: ReturnType<ImportClause['getNamedBindings']>) {
   if (bindings == null) {
     return [];
   }

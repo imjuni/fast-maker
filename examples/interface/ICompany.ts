@@ -1,3 +1,4 @@
+/* eslint-disable import/no-default-export */
 import type { IAbility } from './IAbility';
 
 export default interface ICompany {
