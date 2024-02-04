@@ -1,15 +1,17 @@
-import { getGlobFiles } from '#/modules/file/getGlobFiles';
-import { IncludeContainer } from '#/modules/scope/IncludeContainer';
-import { defaultExclude } from '#/modules/scope/defaultExclude';
-import { describe, expect, it } from '@jest/globals';
+import { getGlobFiles } from '#/modules/files/getGlobFiles';
+import { IncludeContainer } from '#/modules/scopes/IncludeContainer';
 import { Glob } from 'glob';
 import path from 'node:path';
+import { describe, expect, it } from 'vitest';
+import { defaultExclude } from 'vitest/dist/config';
+
+const tsconfigDir = path.join(process.cwd(), 'examples');
 
 describe('IncludeContainer', () => {
   it('getter', () => {
     const container = new IncludeContainer({
-      config: { include: ['src/cli/**/*.ts', 'src/compilers/**/*.ts', 'examples/**/*.ts'] },
-      cwd: process.cwd(),
+      patterns: ['src/cli/**/*.ts', 'src/compilers/**/*.ts', 'examples/**/*.ts'],
+      options: { absolute: true, ignore: defaultExclude, cwd: tsconfigDir },
     });
 
     expect(container.globs).toBeDefined();
@@ -18,8 +20,8 @@ describe('IncludeContainer', () => {
 
   it('isInclude - no glob files', () => {
     const container = new IncludeContainer({
-      config: { include: [] },
-      cwd: process.cwd(),
+      patterns: [],
+      options: { absolute: true, ignore: defaultExclude, cwd: tsconfigDir },
     });
 
     const r01 = container.isInclude('src/files/IncludeContainer.ts');
@@ -28,8 +30,8 @@ describe('IncludeContainer', () => {
 
   it('isInclude', () => {
     const container = new IncludeContainer({
-      config: { include: ['src/cli/**/*.ts', 'src/compilers/**/*.ts', 'examples/**/*.ts'] },
-      cwd: process.cwd(),
+      patterns: ['src/cli/**/*.ts', 'src/compilers/**/*.ts', 'examples/**/*.ts'],
+      options: { absolute: true, ignore: defaultExclude, cwd: tsconfigDir },
     });
 
     const r01 = container.isInclude('src/files/IncludeContainer.ts');
@@ -45,15 +47,13 @@ describe('IncludeContainer', () => {
 
   it('with exclusive glob isInclude', () => {
     const container = new IncludeContainer({
-      config: {
-        include: [
-          'src/cli/**/*.ts',
-          'src/compilers/**/*.ts',
-          '!src/compilers/getTypeScriptProject.ts',
-          'examples/**/*.ts',
-        ],
-      },
-      cwd: process.cwd(),
+      patterns: [
+        'src/cli/**/*.ts',
+        'src/compilers/**/*.ts',
+        '!src/compilers/getTypeScriptProject.ts',
+        'examples/**/*.ts',
+      ],
+      options: { absolute: true, ignore: defaultExclude, cwd: tsconfigDir },
     });
 
     const r01 = container.isInclude('src/files/IncludeContainer.ts');
@@ -78,8 +78,8 @@ describe('IncludeContainer', () => {
       }),
     );
     const container = new IncludeContainer({
-      config: { include: ['example/type03/**/*.ts'] },
-      cwd: process.cwd(),
+      patterns: ['example/type03/**/*.ts'],
+      options: { absolute: true, ignore: defaultExclude, cwd: tsconfigDir },
     });
 
     const r01 = container.files();

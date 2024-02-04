@@ -60,7 +60,7 @@ export async function getRouteHandler(
         }
       : getRequestTypeParameter(parameter);
 
-  const routeConfiguration = {
+  const routeConfiguration: IRouteConfiguration = {
     methods: [routePathConfiguration.method, ...extraMethods],
     routePath: routePathConfiguration.routePath,
     hash,
@@ -68,7 +68,7 @@ export async function getRouteHandler(
     handlerName: `handler_${hash}`,
     typeArgument,
     sourceFilePath: sourceFile.getFilePath().toString(),
-  } satisfies IRouteConfiguration;
+  };
 
   const imports = [
     ...dedupeImportConfiguration(getImportConfigurationFromResolutions(importedModules)),

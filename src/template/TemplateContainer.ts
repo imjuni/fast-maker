@@ -15,7 +15,7 @@ export class TemplateContainer {
 
   static #it: TemplateContainer;
 
-  static async #load(options: Partial<Pick<TRouteOption['base'], 'templates'>>, globOptions: GlobOptions) {
+  static async #load(options: Partial<Pick<TRouteOption, 'templates'>>, globOptions: GlobOptions) {
     const resolvedTemplatePath = await getTemplatePath(options.templates);
     const globs = new Glob(path.posix.join(resolvedTemplatePath, `**`, '*.eta'), {
       ...globOptions,
@@ -52,7 +52,7 @@ export class TemplateContainer {
     return templates;
   }
 
-  static async bootstrap(options?: Partial<Pick<TRouteOption['base'], 'templates'>>): Promise<void> {
+  static async bootstrap(options?: Partial<Pick<TRouteOption, 'templates'>>): Promise<void> {
     try {
       if (TemplateContainer.#isBootstrap) {
         return;
