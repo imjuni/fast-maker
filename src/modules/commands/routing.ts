@@ -9,6 +9,7 @@ import { getResolvedPaths } from '#/configs/getResolvedPaths';
 import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
 import { appendFastifyInstance } from '#/generators/appendFastifyInstance';
 import { dedupeImportConfiguration } from '#/generators/dedupeImportConfiguration';
+import { ReasonContainer } from '#/modules/ReasonContainer';
 import { getExcludePatterns } from '#/modules/files/getExcludePatterns';
 import { getIncludePatterns } from '#/modules/files/getIncludePatterns';
 import { ExcludeContainer } from '#/modules/scopes/ExcludeContainer';
@@ -21,6 +22,10 @@ import type * as tsm from 'ts-morph';
 import type { AsyncReturnType } from 'type-fest';
 
 export async function routing(optionParams: TRouteOption, projectParams?: tsm.Project) {
+  Spinner.bootstrap();
+  Progress.bootstrap();
+  ReasonContainer.bootstrap();
+
   const project = projectParams ?? getTypeScriptProject(optionParams.project);
   if (optionParams.skipError === false && getDiagnostics({ options: optionParams, project }) === false) {
     throw new Error(`Error occur project compile: ${optionParams.project}`);
@@ -76,12 +81,14 @@ export async function routing(optionParams: TRouteOption, projectParams?: tsm.Pr
     )
   ).filter((route): route is NonNullable<AsyncReturnType<typeof getRouteHandler>> => route != null);
 
+  const validRoutings = routings.filter((routeConfiguration) => routeConfiguration.valid);
+
   Progress.it.stop();
 
   Spinner.it.start('route.ts code generation');
 
-  const importConfigurations = routings.map((route) => route.imports).flat();
-  const routeConfigurations = routings.map((route) => route.routes).flat();
+  const importConfigurations = validRoutings.map((route) => route.imports).flat();
+  const routeConfigurations = validRoutings.map((route) => route.routes).flat();
 
   const result = {
     imports: appendFastifyInstance(dedupeImportConfiguration(importConfigurations)),
