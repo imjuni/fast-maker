@@ -8,7 +8,7 @@ import Table from 'cli-table3';
 
 export function createTable(routes: IRouteConfiguration[]): Table.Table {
   const table = new Table({
-    head: [chalk.blueBright.bold('Method'), chalk.blueBright.bold('Route paths'), chalk.blueBright.bold('Count')],
+    head: [chalk.blueBright.bold('Method'), chalk.blueBright.bold('Route paths'), chalk.blueBright.bold('Total')],
     colWidths: [13, 68, 12], // 102
     wordWrap: true,
   });

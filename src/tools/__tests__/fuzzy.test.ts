@@ -1,35 +1,33 @@
-import validParamNames from '#/compilers/validators/validParamNames';
-import fuzzyWithCase from '#/tools/fuzzyWithCase';
+import { validParamNames } from '#/compilers/validators/validParamNames';
+import { fuzzyWithCase } from '#/tools/fuzzyWithCase';
 import { getNumber, getPercentNumber } from '#/tools/getNumber';
-import logger from '#/tools/logger';
-import 'jest';
-
-const log = logger();
+import log from 'consola';
+import { describe, expect, it } from 'vitest';
 
 describe('fuzzyWithCase', () => {
-  test('pass - number', () => {
+  it('pass - number', () => {
     const r = getNumber(0.13456123);
     expect(r).toEqual(0.134);
   });
 
-  test('pass - percent', () => {
+  it('pass - percent', () => {
     const r = getPercentNumber(0.13456123);
     expect(r).toEqual(86.543);
   });
 
-  test('pass - number undefined', () => {
+  it('pass - number undefined', () => {
     const r = getNumber();
     expect(r).toEqual(0);
   });
 
-  test('pass - percent undefined', () => {
+  it('pass - percent undefined', () => {
     const r = getPercentNumber();
     expect(r).toEqual(0);
   });
 });
 
 describe('fuzzyWithCase', () => {
-  test('pass', () => {
+  it('pass', () => {
     log.debug('fuzzy-test start');
 
     const examples = ['querystring', 'query-string', 'queryString', 'query_string', 'ironman'];
@@ -71,7 +69,7 @@ describe('fuzzyWithCase', () => {
     ]);
   });
 
-  test('pass', () => {
+  it('pass', () => {
     log.debug('fuzzy-test start');
 
     const example = 'Querystring';

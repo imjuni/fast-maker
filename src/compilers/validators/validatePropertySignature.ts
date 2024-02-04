@@ -1,14 +1,14 @@
-import validParamNames from '#/compilers/validators/validParamNames';
-import fuzzyWithCase, { type IFuzzyWithCaseReturn } from '#/tools/fuzzyWithCase';
+import { validParamNames } from '#/compilers/validators/validParamNames';
+import { fuzzyWithCase, type IFuzzyWithCaseReturn } from '#/tools/fuzzyWithCase';
 import { atOrUndefined } from 'my-easy-fp';
-import type { Symbol } from 'ts-morph';
+import type * as tsm from 'ts-morph';
 
 interface IValidatePropertySignatureParam {
-  propertySignatures: Symbol[];
+  propertySignatures: tsm.Symbol[];
   type: 'FastifyRequest' | 'ObjectType';
 }
 
-export default function validatePropertySignature({ propertySignatures, type }: IValidatePropertySignatureParam) {
+export function validatePropertySignature({ propertySignatures, type }: IValidatePropertySignatureParam) {
   const names = propertySignatures.map((propertySignature) => propertySignature.getEscapedName());
   const expectNames = type === 'FastifyRequest' ? validParamNames.fastify : validParamNames.custom;
 

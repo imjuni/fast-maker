@@ -1,0 +1,24 @@
+const routeMap = new Map<
+  string,
+  Map<string, { filePath: string; routePath: string; method: string }>
+>([
+<% Object.keys(it.routes).forEach((routePath) => { %>
+  [
+    '<%= routePath %>',
+    new Map<string, { filePath: string; routePath: string; method: string }>([
+    <% Object.keys(it.routes[routePath]).forEach((method) => { _%>
+      [
+        '<%= method %>',
+        {
+          method: '<%= method %>',
+          filePath: '<%= it.routes[routePath][method].filePath %>',
+          routePath: '<%= it.routes[routePath][method].routePath %>',
+        },
+      ],
+    <% }); _%>
+    ]),
+  ],
+<% }); %>
+]);
+
+export default routeMap;

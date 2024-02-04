@@ -27,6 +27,8 @@
     return '';
   }
 %>
+
+import { FastifyInstance } from 'fastify';
 <% it.imports.forEach((importStatement) => { %>
 import <%= getNonNamedBinding(importStatement) %><%= getNmaedBinding(importStatement.namedBindings) %> from '<%= importStatement.relativePath %>';
 <% }) %>

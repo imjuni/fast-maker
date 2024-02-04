@@ -15,7 +15,7 @@ function getBuffer(data: unknown) {
   return fastSafeStringify(data);
 }
 
-export default async function writeOutputFile<T = string>(filePath: string, data: T) {
+export async function writeOutputFile<T = string>(filePath: string, data: T) {
   if (await exists(filePath)) {
     await fs.promises.writeFile(filePath, fastSafeStringify(data));
   }
