@@ -7,14 +7,14 @@ const emptyMap = new Map<string, string>();
 
 describe('getRouteMap', () => {
   it('successfully load map', async () => {
-    const dirPath = path.join(process.cwd(), 'examples', 'handlers', 'avengers', 'heroes', '[id]', '$time');
+    const dirPath = path.join(process.cwd(), 'examples', 'handlers', 'avengers', 'heroes', '[id]', '[$time]');
     const filePath = path.join(dirPath, 'post.ts');
     const r01 = await getRouteMap(filePath);
     expect(r01).toMatchObject(map);
   });
 
   it('exception', async () => {
-    const dirPath = path.join(process.cwd(), 'examples', 'handlers', 'avengers', 'heroes', '[id]', '$time');
+    const dirPath = path.join(process.cwd(), 'examples', 'handlers', 'avengers', 'heroes', '[id]', '[$time]');
     const filePath = path.join(dirPath, 'post333.ts333');
     const r01 = await getRouteMap(filePath);
     expect(r01).toMatchObject(emptyMap);

@@ -20,6 +20,20 @@ export class ReasonContainer {
     ReasonContainer.#isBootstrap = true;
   }
 
+  static aggregate(reasons: IReason[]): IReason[] {
+    const aggregated = reasons.reduce<Record<IReason['type'], IReason[]>>(
+      (aggregation, reason) => {
+        return { ...aggregation, [reason.type]: [...aggregation[reason.type], reason] };
+      },
+      {
+        error: [],
+        warn: [],
+      },
+    );
+
+    return [...aggregated.warn, ...aggregated.error];
+  }
+
   #reasons: IReason[];
 
   constructor() {

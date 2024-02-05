@@ -1,5 +1,6 @@
 import type { IBaseOption } from '#/configs/interfaces/IBaseOption';
 import { getFileScope } from '#/modules/files/getFileScope';
+import { escape } from 'glob';
 import { isDescendant } from 'my-node-fp';
 import type * as tsm from 'ts-morph';
 
@@ -19,6 +20,7 @@ export function getIncludePatterns(
   }
 
   const filePaths = tsconfig.fileNames.filter((filePath) => isDescendant(projectDirPath, filePath));
+  const escaped = filePaths.map((filePath) => escape(filePath));
 
-  return filePaths;
+  return escaped;
 }
