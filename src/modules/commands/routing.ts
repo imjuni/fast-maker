@@ -1,5 +1,5 @@
-import { Progress } from '#/cli/display/progress2';
-import { Spinner } from '#/cli/display/spinner2';
+import { Progress } from '#/cli/display/Progress';
+import { Spinner } from '#/cli/display/Spinner';
 import { getInlineExcludedFiles } from '#/compilers/comments/getInlineExcludedFiles';
 import { getRouteHandler } from '#/compilers/routes/getRouteHandler';
 import { getTypeScriptConfig } from '#/compilers/tools/getTypeScriptConfig';

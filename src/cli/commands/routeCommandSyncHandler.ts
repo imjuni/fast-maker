@@ -1,6 +1,6 @@
-import { createTable } from '#/cli/display/createTable2';
+import { Spinner } from '#/cli/display/Spinner';
+import { createTable } from '#/cli/display/createTable';
 import { show } from '#/cli/display/show';
-import { Spinner } from '#/cli/display/spinner2';
 import { getTypeScriptProject } from '#/compilers/tools/getTypeScriptProject';
 import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
 import { prettierProcessing } from '#/generators/prettierProcessing';
