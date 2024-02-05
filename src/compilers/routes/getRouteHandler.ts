@@ -12,6 +12,7 @@ import { validatePropertySignature } from '#/compilers/validators/validateProper
 import { validateTypeReferences } from '#/compilers/validators/validateTypeReferences';
 import type { IBaseOption } from '#/configs/interfaces/IBaseOption';
 import { getImportConfigurationFromResolutions } from '#/generators/getImportConfigurationFromResolutions';
+import type { CE_ROUTE_METHOD } from '#/routes/const-enum/CE_ROUTE_METHOD';
 import { getExtraMethod } from '#/routes/extractors/getExtraMethod';
 import { getRouteMap } from '#/routes/extractors/getRouteMap';
 import type { IRouteConfiguration } from '#/routes/interfaces/IRouteConfiguration';
@@ -79,7 +80,7 @@ export async function getRouteHandler(
         );
 
   const routeConfiguration: IRouteConfiguration = {
-    methods: [routePathConfiguration.method, ...extraMethods],
+    methods: [routePathConfiguration.method, ...extraMethods].map((method) => method.toLowerCase() as CE_ROUTE_METHOD),
     routePath: routePathConfiguration.routePath,
     hash,
     hasOption: routeOptions.has.option,
