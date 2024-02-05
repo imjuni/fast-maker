@@ -1,4 +1,4 @@
-import { getRouteNode } from '#/compilers/routes/getRouteNode';
+import { getRouteFunction } from '#/compilers/routes/getRouteFunction';
 import { getTypeSymbolText } from '#/compilers/tools/getTypeSymbolText';
 import { atOrThrow } from 'my-easy-fp';
 import { randomUUID } from 'node:crypto';
@@ -27,7 +27,7 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01 }>) {
     const create = (name: string, code: string, overwrite?: boolean) =>
       project.createSourceFile(path.join('examples', name), code, { overwrite: overwrite ?? true });
     const sourceFile = create(filename01, sourcecode01);
-    const node = getRouteNode(sourceFile);
+    const node = getRouteFunction(sourceFile);
     const parameters = node?.node.getParameters() ?? [];
     const parameter = atOrThrow(parameters, 0);
     const typeArgument = atOrThrow(parameter.getType().getTypeArguments(), 0);
@@ -51,7 +51,7 @@ export function handler(req: FastifyRequest<TTypeParams>) {
     const create = (name: string, code: string, overwrite?: boolean) =>
       project.createSourceFile(path.join('examples', name), code, { overwrite: overwrite ?? true });
     const sourceFile = create(filename01, sourcecode01);
-    const node = getRouteNode(sourceFile);
+    const node = getRouteFunction(sourceFile);
     const parameters = node?.node.getParameters() ?? [];
     const parameter = atOrThrow(parameters, 0);
     const typeArgument = atOrThrow(parameter.getType().getTypeArguments(), 0);

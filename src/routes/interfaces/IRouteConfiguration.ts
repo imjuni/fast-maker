@@ -14,6 +14,8 @@ export interface IRouteConfiguration {
   /** this route path have option variable */
   hasOption: boolean;
 
+  optionKind?: 'variable' | 'sync-function' | 'async-function' | 'sync-arrow' | 'async-arrow';
+
   /**
    * name of handler with hash
    * @example handle_PDq0q2qANIHiZy5vU3VeCgIYyT8mERjU

@@ -53,8 +53,7 @@ describe('TemplateContainer', () => {
 
 export default function routing(fastify: FastifyInstance): void {
       fastify.route<{ Querystring: IReadSuperheroQuerystring; Params: IReadSuperheroParams }>({
-      ...option_zLRHkFp00cylJZ0CJlgEiLOpyIGY5Pwl(fastify),
-    method: ["get"],
+      method: ["get"],
     url: '/v1/superhero/:name',
     handler: handler_zLRHkFp00cylJZ0CJlgEiLOpyIGY5Pwl,
       });

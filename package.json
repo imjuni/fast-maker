@@ -63,7 +63,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "templates"
   ],
   "bugs": {
     "url": "https://github.com/imjuni/fast-maker/issues"

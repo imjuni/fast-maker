@@ -1,4 +1,4 @@
-import { getRouteNode } from '#/compilers/routes/getRouteNode';
+import { getRouteFunction } from '#/compilers/routes/getRouteFunction';
 import { posixJoin } from '#/tools/posixJoin';
 import { randomUUID } from 'node:crypto';
 import * as tsm from 'ts-morph';
@@ -47,7 +47,7 @@ export const option: RouteShorthandOptions = {
   },
 };`.trim();
 
-describe('getRouteOptions', () => {
+describe('getRouteFunction', () => {
   it('synchronous function', () => {
     const uuid = randomUUID();
 
@@ -62,7 +62,7 @@ export function handler(req: FastifyRequest<{ Body: IAbility }>) {
     project.createSourceFile(filename01, abilityInterfaceSourceCode.trim(), { overwrite: true });
     const sourceFile02 = project.createSourceFile(filename02, source02.trim(), { overwrite: true });
 
-    const r01 = getRouteNode(sourceFile02);
+    const r01 = getRouteFunction(sourceFile02);
 
     // @ts-expect-error
     delete r01?.node;
@@ -88,7 +88,7 @@ export async function handler(req: FastifyRequest<{ Body: IAbility }>) {
     project.createSourceFile(filename01, abilityInterfaceSourceCode.trim(), { overwrite: true });
     const sourceFile02 = project.createSourceFile(filename02, source02.trim(), { overwrite: true });
 
-    const r01 = getRouteNode(sourceFile02);
+    const r01 = getRouteFunction(sourceFile02);
 
     // @ts-expect-error
     delete r01?.node;
@@ -113,7 +113,7 @@ export const handler = (req: FastifyRequest<{ Body: IAbility }>) => {
 
     project.createSourceFile(filename01, abilityInterfaceSourceCode.trim(), { overwrite: true });
     const sourceFile02 = project.createSourceFile(filename02, source02.trim(), { overwrite: true });
-    const r01 = getRouteNode(sourceFile02);
+    const r01 = getRouteFunction(sourceFile02);
 
     // @ts-expect-error
     delete r01?.node;
@@ -138,7 +138,7 @@ export const handler = async (req: FastifyRequest<{ Body: IAbility }>) => {
 
     project.createSourceFile(filename01, abilityInterfaceSourceCode.trim(), { overwrite: true });
     const sourceFile02 = project.createSourceFile(filename02, source02.trim(), { overwrite: true });
-    const r01 = getRouteNode(sourceFile02);
+    const r01 = getRouteFunction(sourceFile02);
 
     // @ts-expect-error
     delete r01?.node;
@@ -161,7 +161,7 @@ export type handler = { a: number };`;
 
     project.createSourceFile(filename01, abilityInterfaceSourceCode.trim(), { overwrite: true });
     const sourceFile02 = project.createSourceFile(filename02, source02.trim(), { overwrite: true });
-    const r01 = getRouteNode(sourceFile02);
+    const r01 = getRouteFunction(sourceFile02);
 
     expect(r01).toBeUndefined();
   });
@@ -177,7 +177,7 @@ export const handler: number = 1;`;
 
     project.createSourceFile(filename01, abilityInterfaceSourceCode.trim(), { overwrite: true });
     const sourceFile02 = project.createSourceFile(filename02, source02.trim(), { overwrite: true });
-    const r01 = getRouteNode(sourceFile02);
+    const r01 = getRouteFunction(sourceFile02);
 
     expect(r01).toBeUndefined();
   });
@@ -193,7 +193,7 @@ export type hello = { a: number };`;
 
     project.createSourceFile(filename01, abilityInterfaceSourceCode.trim(), { overwrite: true });
     const sourceFile02 = project.createSourceFile(filename02, source02.trim(), { overwrite: true });
-    const r01 = getRouteNode(sourceFile02);
+    const r01 = getRouteFunction(sourceFile02);
 
     expect(r01).toBeUndefined();
   });

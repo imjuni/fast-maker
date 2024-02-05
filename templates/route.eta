@@ -1,9 +1,27 @@
+<%
+  function getRouteOption(routeOption) {
+    switch (routeOption.optionKind) {
+      case 'variable':
+        return `...option_${routeOption.hash},`
+      case 'sync-function':
+        return `...option_${routeOption.hash}(fastify),`
+      case 'async-function':
+        return `...(await option_${routeOption.hash}(fastify)),`
+      case 'sync-arrow':
+        return `...option_${routeOption.hash}(fastify),`
+      case 'async-arrow':
+        return `...(await option_${routeOption.hash}(fastify)),`
+      default:
+        return '';
+    }
+  }
+%>
 export default function routing(fastify: FastifyInstance): void {
   <% it.routes.forEach((route) => { %>
   <% if (route.typeArgument != null && route.typeArgument.text !== '' ) { %>
   fastify.route<<%= route.typeArgument.text %>>({
-    <% if (route.hasOption) { %>
-  ...option_<%= route.hash %>(fastify),
+    <% if (route.optionKind != null) { %>
+  <%= getRouteOption(route) %>
     method: <%= JSON.stringify(route.methods) %>,
     url: '<%= route.routePath %>',
     handler: <%= route.handlerName %>,
@@ -15,8 +33,8 @@ export default function routing(fastify: FastifyInstance): void {
   });
   <% } else { %>
   fastify.route({
-    <% if (route.hasOption) { %>
-  ...option_<%= route.hash %>(fastify),
+    <% if (route.optionKind != null) { %>
+  <%= getRouteOption(route) %>
     method: <%= JSON.stringify(route.methods) %>,
     url: '<%= route.routePath %>',
     handler: <%= route.handlerName %>,

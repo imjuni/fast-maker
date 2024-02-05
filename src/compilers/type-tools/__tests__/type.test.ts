@@ -1,4 +1,4 @@
-import { getRouteNode } from '#/compilers/routes/getRouteNode';
+import { getRouteFunction } from '#/compilers/routes/getRouteFunction';
 import { getTypeReferences } from '#/compilers/type-tools/getTypeReferences';
 import { isExternalModule } from '#/compilers/type-tools/isExternalModule';
 import { randomUUID } from 'crypto';
@@ -63,7 +63,7 @@ export function handler(req: FastifyRequest<{ Body: IAbility }>) {
 
     project.createSourceFile(filename01, abilityInterfaceSourceCode.trim(), { overwrite: true });
     const sourceFile02 = project.createSourceFile(filename02, source02.trim(), { overwrite: true });
-    const routeNode = getRouteNode(sourceFile02);
+    const routeNode = getRouteFunction(sourceFile02);
 
     if (routeNode == null) {
       throw new Error('invalid route node');
@@ -87,7 +87,7 @@ export function handler(req: FastifyRequest<{ Body: IAbility, Querystring: IAbil
 
     project.createSourceFile(filename01, abilityInterfaceSourceCode.trim(), { overwrite: true });
     const sourceFile02 = project.createSourceFile(filename02, source02.trim(), { overwrite: true });
-    const routeNode = getRouteNode(sourceFile02);
+    const routeNode = getRouteFunction(sourceFile02);
 
     if (routeNode == null) {
       throw new Error('invalid route node');

@@ -1,5 +1,5 @@
 import { getResolvedInFileImportedModules } from '#/compilers/navigate/getResolvedInFileImportedModules';
-import { getRouteNode } from '#/compilers/routes/getRouteNode';
+import { getRouteFunction } from '#/compilers/routes/getRouteFunction';
 import { getTypeReferences } from '#/compilers/type-tools/getTypeReferences';
 import { CE_EXT_KIND } from '#/configs/const-enum/CE_EXT_KIND';
 import { atOrThrow, orThrow } from 'my-easy-fp';
@@ -41,7 +41,7 @@ export function handler(req: FastifyRequest<{ Querystring: TQuerystring, Params:
       project.createSourceFile(path.join('examples', name), code, { overwrite });
 
     const sourceFile = create(filename01, source01, true);
-    const node = orThrow(getRouteNode(sourceFile));
+    const node = orThrow(getRouteFunction(sourceFile));
     const parameters = node.node.getParameters();
     const parameter = atOrThrow(parameters, 0);
     const types = getTypeReferences(parameter);
