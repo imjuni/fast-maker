@@ -15,6 +15,7 @@ import { getIncludePatterns } from '#/modules/files/getIncludePatterns';
 import { ExcludeContainer } from '#/modules/scopes/ExcludeContainer';
 import { IncludeContainer } from '#/modules/scopes/IncludeContainer';
 import { defaultExclude } from '#/modules/scopes/defaultExclude';
+import { sortRoutePath } from '#/routes/sort/sortRoutePath';
 import chalk from 'chalk';
 import consola from 'consola';
 import { isDescendant } from 'my-node-fp';
@@ -93,7 +94,7 @@ export async function routing(optionParams: TRouteOption, projectParams?: tsm.Pr
 
   const result = {
     imports: appendFastifyInstance(dedupeImportConfiguration(importConfigurations)),
-    routes: routeConfigurations,
+    routes: sortRoutePath(routeConfigurations),
     reasons,
   };
 
