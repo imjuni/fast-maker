@@ -100,6 +100,26 @@ describe('evaluateRoutePath', () => {
     ]);
   });
 
+  it('replace variable', () => {
+    const inp = '[$time]';
+    const r01 = getRouteVariables(inp);
+
+    expect(r01).toMatchObject([
+      { matched: '[$time]', kind: CE_ROUTE_PATH_KIND.REPLACE, nullable: false, variable: 'time' },
+    ]);
+  });
+
+  it('replace variables', () => {
+    const inp = '[$time]-[$name]';
+    const r01 = getRouteVariables(inp);
+
+    expect(r01).toMatchObject([
+      { matched: '[$time]', kind: 4, nullable: false, variable: 'time' },
+      { matched: '-', kind: 5, nullable: false, variable: '-' },
+      { matched: '[$name]', kind: 4, nullable: false, variable: 'name' },
+    ]);
+  });
+
   it('mixed multiple variable', () => {
     const inp = '[[kind]]-[[wildcard]]-[id]';
     const r01 = getRouteVariables(inp);

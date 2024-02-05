@@ -13,6 +13,7 @@ import { validateTypeReferences } from '#/compilers/validators/validateTypeRefer
 import type { IBaseOption } from '#/configs/interfaces/IBaseOption';
 import { getImportConfigurationFromResolutions } from '#/generators/getImportConfigurationFromResolutions';
 import { getExtraMethod } from '#/routes/extractors/getExtraMethod';
+import { getRouteMap } from '#/routes/extractors/getRouteMap';
 import type { IRouteConfiguration } from '#/routes/interfaces/IRouteConfiguration';
 import { getRoutePath } from '#/routes/paths/getRoutePath';
 import { appendPostfixHash } from '#/tools/appendPostfixHash';
@@ -41,7 +42,8 @@ export async function getRouteHandler(
   const typeReferenceNodes = parameter == null ? [] : getTypeReferences(parameter);
   const isValidTypeReference = validateTypeReferences(sourceFile, typeReferenceNodes);
   const extraMethods = await getExtraMethod(sourceFile.getFilePath().toString());
-  const routePathConfiguration = await getRoutePath(relativeFilePath);
+  const routePathMap = await getRouteMap(sourceFile.getFilePath().toString());
+  const routePathConfiguration = await getRoutePath(relativeFilePath, routePathMap);
   const routeOptions = getRouteOptions(sourceFile);
   const importedModules = [
     ...getResolvedImportedModules({
