@@ -1,5 +1,5 @@
 import { getSymbol } from '#/compilers/navigate/getSymbol';
-import { getRouteNode } from '#/compilers/routes/getRouteNode';
+import { getRouteFunction } from '#/compilers/routes/getRouteFunction';
 import { atOrThrow } from 'my-easy-fp';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
@@ -33,7 +33,7 @@ export function handler(param: { Querystring: IAbility }) {
 
     project.createSourceFile(filename01, abilityInterfaceSourceCode, { overwrite: true });
     const sourceFile02 = project.createSourceFile(filename02, source02.trim(), { overwrite: true });
-    const node = getRouteNode(sourceFile02);
+    const node = getRouteFunction(sourceFile02);
     const parameters = node?.node.getParameters() ?? [];
     const parameter = atOrThrow(parameters, 0);
     const r01 = getSymbol(parameter.getType());
@@ -56,7 +56,7 @@ export function handler(param: FastifyRequest<{ Querystring: IAbility }>) {
 
     project.createSourceFile(filename01, abilityInterfaceSourceCode, { overwrite: true });
     const sourceFile02 = project.createSourceFile(filename02, source02.trim(), { overwrite: true });
-    const node = getRouteNode(sourceFile02);
+    const node = getRouteFunction(sourceFile02);
     const parameters = node?.node.getParameters() ?? [];
     const parameter = atOrThrow(parameters, 0);
     const r01 = getSymbol(parameter.getType());
@@ -73,7 +73,7 @@ export function handler(param: FastifyRequest<{ Querystring: IAbility }>) {
     `.trim();
 
     const sourceFile02 = project.createSourceFile(filename02, source02.trim(), { overwrite: true });
-    const node = getRouteNode(sourceFile02);
+    const node = getRouteFunction(sourceFile02);
     const parameters = node?.node.getParameters() ?? [];
     const parameter = atOrThrow(parameters, 0);
     const r01 = getSymbol(parameter.getType());

@@ -1,4 +1,4 @@
-import { getRouteNodeOrThrow } from '#/compilers/routes/getRouteNodeOrThrow';
+import { getRouteFunctionOrThrow } from '#/compilers/routes/getRouteFunctionOrThrow';
 import { getTypeReferences } from '#/compilers/type-tools/getTypeReferences';
 import { validateTypeReferences } from '#/compilers/validators/validateTypeReferences';
 import { posixJoin } from '#/tools/posixJoin';
@@ -45,7 +45,7 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01; Body
     create(filename01, abilityInterfaceSourceCode, true);
 
     const sourceFile02 = create(filename02, source02.trim(), true);
-    const node = getRouteNodeOrThrow(sourceFile02);
+    const node = getRouteFunctionOrThrow(sourceFile02);
     const parameters = node.node.getParameters();
     const parameter = atOrThrow(parameters, 0);
     const typereferences = getTypeReferences(parameter);
@@ -82,7 +82,7 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01; Body
     create(filename01, abilityInterfaceSourceCode, true);
 
     const sourceFile02 = create(filename02, source02.trim(), true);
-    const node = getRouteNodeOrThrow(sourceFile02);
+    const node = getRouteFunctionOrThrow(sourceFile02);
     const parameters = node.node.getParameters();
     const parameter = atOrThrow(parameters, 0);
     const typereferences = getTypeReferences(parameter);
@@ -119,7 +119,7 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01; Body
     create(filename01, abilityInterfaceSourceCode, true);
 
     const sourceFile02 = create(filename02, source02.trim(), true);
-    const node = getRouteNodeOrThrow(sourceFile02);
+    const node = getRouteFunctionOrThrow(sourceFile02);
     const parameters = node.node.getParameters();
     const parameter = atOrThrow(parameters, 0);
     const typereferences = getTypeReferences(parameter);
@@ -160,7 +160,7 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01; Body
     create(filename01, abilityInterfaceSourceCode, true);
 
     const sourceFile02 = create(filename02, source02.trim(), true);
-    const node = getRouteNodeOrThrow(sourceFile02);
+    const node = getRouteFunctionOrThrow(sourceFile02);
     const parameters = node.node.getParameters();
     const parameter = atOrThrow(parameters, 0);
     const typereferences = getTypeReferences(parameter);
@@ -209,7 +209,7 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01; Body
     create(filename01, abilityInterfaceSourceCode, true);
 
     const sourceFile02 = create(filename02, source02.trim(), true);
-    const node = getRouteNodeOrThrow(sourceFile02);
+    const node = getRouteFunctionOrThrow(sourceFile02);
     const parameters = node.node.getParameters();
     const parameter = atOrThrow(parameters, 0);
     const typereferences = getTypeReferences(parameter);

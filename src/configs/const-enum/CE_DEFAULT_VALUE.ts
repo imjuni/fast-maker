@@ -3,6 +3,8 @@ export const CE_DEFAULT_VALUE = {
   TSCONFIG_FILE_NAME: 'tsconfig.json',
   WATCH_DEFAULT_GLOB: '**/*.ts',
   TEMPLATES_PATH: 'templates',
+  HANDLER_NAME: 'handler',
+  OPTION_NAME: 'option',
   DEFAULT_TASK_WAIT_SECOND: 30,
 } as const;
 

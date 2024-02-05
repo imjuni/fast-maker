@@ -1,4 +1,4 @@
-import { getRouteNodeOrThrow } from '#/compilers/routes/getRouteNodeOrThrow';
+import { getRouteFunctionOrThrow } from '#/compilers/routes/getRouteFunctionOrThrow';
 import { CE_REQUEST_KIND } from '#/compilers/type-tools/const-enum/CE_REQUEST_KIND';
 import { getFastifyRequestTypeArgument } from '#/compilers/type-tools/getFastifyRequestTypeArgument';
 import { getTypePropertySignature } from '#/compilers/type-tools/getTypePropertySignature';
@@ -72,7 +72,7 @@ describe('getRequestTypeArgument', () => {
       const sourceFile02 = project.createSourceFile(pathjoin(handlerDir, handlerMethod), source02.trim(), {
         overwrite: true,
       });
-      const node = getRouteNodeOrThrow(sourceFile02);
+      const node = getRouteFunctionOrThrow(sourceFile02);
       const parameter = atOrThrow(node.node.getParameters(), 0);
 
       const r01 = getFastifyRequestTypeArgument(parameter);
@@ -103,7 +103,7 @@ describe('getRequestTypeArgument', () => {
       const sourceFile02 = project.createSourceFile(pathjoin(handlerDir, handlerMethod), source02.trim(), {
         overwrite: true,
       });
-      const node = getRouteNodeOrThrow(sourceFile02);
+      const node = getRouteFunctionOrThrow(sourceFile02);
       const parameter = atOrThrow(node.node.getParameters(), 0);
 
       const r01 = getFastifyRequestTypeArgument(parameter);
@@ -139,7 +139,7 @@ describe('getRequestTypeArgument', () => {
       const sourceFile02 = project.createSourceFile(pathjoin(handlerDir, handlerMethod), source02.trim(), {
         overwrite: true,
       });
-      const node = getRouteNodeOrThrow(sourceFile02);
+      const node = getRouteFunctionOrThrow(sourceFile02);
       const parameter = atOrThrow(node.node.getParameters(), 0);
 
       const r01 = getFastifyRequestTypeArgument(parameter);
@@ -175,7 +175,7 @@ describe('getRequestTypeArgument', () => {
       const sourceFile02 = project.createSourceFile(pathjoin(handlerDir, handlerMethod), source02.trim(), {
         overwrite: true,
       });
-      const node = getRouteNodeOrThrow(sourceFile02);
+      const node = getRouteFunctionOrThrow(sourceFile02);
       const parameter = atOrThrow(node.node.getParameters(), 0);
 
       const r01 = getFastifyRequestTypeArgument(parameter);
@@ -211,7 +211,7 @@ describe('getRequestTypeArgument', () => {
       const sourceFile02 = project.createSourceFile(pathjoin(handlerDir, handlerMethod), source02.trim(), {
         overwrite: true,
       });
-      const node = getRouteNodeOrThrow(sourceFile02);
+      const node = getRouteFunctionOrThrow(sourceFile02);
       const parameter = atOrThrow(node.node.getParameters(), 0);
 
       const r01 = getFastifyRequestTypeArgument(parameter);
@@ -247,7 +247,7 @@ describe('getRequestTypeArgument', () => {
       const sourceFile02 = project.createSourceFile(pathjoin(handlerDir, handlerMethod), source02.trim(), {
         overwrite: true,
       });
-      const node = getRouteNodeOrThrow(sourceFile02);
+      const node = getRouteFunctionOrThrow(sourceFile02);
       const parameter = atOrThrow(node.node.getParameters(), 0);
 
       const r01 = getTypePropertySignature(parameter);
@@ -283,7 +283,7 @@ describe('getRequestTypeArgument', () => {
       const sourceFile02 = project.createSourceFile(pathjoin(handlerDir, handlerMethod), source02.trim(), {
         overwrite: true,
       });
-      const node = getRouteNodeOrThrow(sourceFile02);
+      const node = getRouteFunctionOrThrow(sourceFile02);
       const parameter = atOrThrow(node.node.getParameters(), 0);
 
       const r01 = getTypePropertySignature(parameter);
@@ -319,7 +319,7 @@ describe('getRequestTypeArgument', () => {
       const sourceFile02 = project.createSourceFile(pathjoin(handlerDir, handlerMethod), source02.trim(), {
         overwrite: true,
       });
-      const node = getRouteNodeOrThrow(sourceFile02);
+      const node = getRouteFunctionOrThrow(sourceFile02);
       const parameter = atOrThrow(node.node.getParameters(), 0);
 
       const r01 = getTypePropertySignature(parameter);
@@ -355,7 +355,7 @@ describe('getRequestTypeArgument', () => {
       const sourceFile02 = project.createSourceFile(pathjoin(handlerDir, handlerMethod), source02.trim(), {
         overwrite: true,
       });
-      const node = getRouteNodeOrThrow(sourceFile02);
+      const node = getRouteFunctionOrThrow(sourceFile02);
       const parameter = atOrThrow(node.node.getParameters(), 0);
 
       const r01 = getTypePropertySignature(parameter);

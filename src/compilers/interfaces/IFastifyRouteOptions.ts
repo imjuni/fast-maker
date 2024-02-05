@@ -1,3 +1,4 @@
+import type { TFastifyRouteOption } from '#/compilers/interfaces/TFastifyRouteOption';
 import type * as tsm from 'ts-morph';
 
 export interface IFastifyRouteOptions {
@@ -8,7 +9,7 @@ export interface IFastifyRouteOptions {
   };
 
   node: {
-    option?: tsm.Node;
+    option?: TFastifyRouteOption;
     methods?: tsm.Node;
     map?: tsm.Node;
   };

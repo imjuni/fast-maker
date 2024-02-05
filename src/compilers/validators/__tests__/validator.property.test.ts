@@ -1,5 +1,5 @@
 import { getPropertySignatures } from '#/compilers/navigate/getPropertySignatures';
-import { getRouteNodeOrThrow } from '#/compilers/routes/getRouteNodeOrThrow';
+import { getRouteFunctionOrThrow } from '#/compilers/routes/getRouteFunctionOrThrow';
 import { CE_REQUEST_KIND } from '#/compilers/type-tools/const-enum/CE_REQUEST_KIND';
 import { validatePropertySignature } from '#/compilers/validators/validatePropertySignature';
 import { posixJoin } from '#/tools/posixJoin';
@@ -45,7 +45,7 @@ export function handler(req: { Querystring: ITestInfoType01; bod: TBody }) {
 
     create(filename01, abilityInterfaceSourceCode, true);
     const sourceFile02 = create(filename02, source02.trim(), true);
-    const node = getRouteNodeOrThrow(sourceFile02);
+    const node = getRouteFunctionOrThrow(sourceFile02);
     const parameter = atOrThrow(node.node.getParameters(), 0);
     const propertySignatures = getPropertySignatures(parameter);
     const r01 = validatePropertySignature({ propertySignatures, kind: CE_REQUEST_KIND.PROPERTY_SIGNATURE });
@@ -87,7 +87,7 @@ export function handler(req: FastifyRequest<ITestInfoType01>) {
 
     create(filename01, abilityInterfaceSourceCode, true);
     const sourceFile02 = create(filename02, source02.trim(), true);
-    const node = getRouteNodeOrThrow(sourceFile02);
+    const node = getRouteFunctionOrThrow(sourceFile02);
     const parameter = atOrThrow(node.node.getParameters(), 0);
     const propertySignatures = getPropertySignatures(parameter);
     const r01 = validatePropertySignature({ propertySignatures, kind: CE_REQUEST_KIND.FASTIFY_REQUEST });
@@ -129,7 +129,7 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01; bod:
 
     create(filename01, abilityInterfaceSourceCode, true);
     const sourceFile02 = create(filename02, source02.trim(), true);
-    const node = getRouteNodeOrThrow(sourceFile02);
+    const node = getRouteFunctionOrThrow(sourceFile02);
     const parameter = atOrThrow(node.node.getParameters(), 0);
     const propertySignatures = getPropertySignatures(parameter);
     const r01 = validatePropertySignature({ propertySignatures, kind: CE_REQUEST_KIND.FASTIFY_REQUEST });
@@ -166,7 +166,7 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01 }>) {
 
     create(filename01, abilityInterfaceSourceCode, true);
     const sourceFile02 = create(filename02, source02.trim(), true);
-    const node = getRouteNodeOrThrow(sourceFile02);
+    const node = getRouteFunctionOrThrow(sourceFile02);
     const parameter = atOrThrow(node.node.getParameters(), 0);
     const propertySignatures = getPropertySignatures(parameter);
     const r01 = validatePropertySignature({ propertySignatures, kind: CE_REQUEST_KIND.FASTIFY_REQUEST });

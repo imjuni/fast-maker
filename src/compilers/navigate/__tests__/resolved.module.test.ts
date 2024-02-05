@@ -1,5 +1,5 @@
 import { getResolvedImportedModules } from '#/compilers/navigate/getResolvedImportedModules';
-import { getRouteNode } from '#/compilers/routes/getRouteNode';
+import { getRouteFunction } from '#/compilers/routes/getRouteFunction';
 import { getTypeReferences } from '#/compilers/type-tools/getTypeReferences';
 import { CE_EXT_KIND } from '#/configs/const-enum/CE_EXT_KIND';
 import { posixJoin } from '#/tools/posixJoin';
@@ -41,7 +41,7 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01 }>) {
     create(filename01, abilityInterfaceSourceCode, true);
     const sourceFile02 = create(filename02, source02.trim(), true);
 
-    const node = orThrow(getRouteNode(sourceFile02));
+    const node = orThrow(getRouteFunction(sourceFile02));
     const parameters = node.node.getParameters();
     const parameter = atOrThrow(parameters, 0);
     const types = getTypeReferences(parameter);
@@ -104,7 +104,7 @@ export function handler(req: FastifyRequest<{ Querystring: ICompany }>) {
     create(filename01, abilityInterfaceSourceCode, true);
     const sourceFile02 = create(filename02, source02.trim(), true);
 
-    const node = orThrow(getRouteNode(sourceFile02));
+    const node = orThrow(getRouteFunction(sourceFile02));
     const parameters = node.node.getParameters();
     const parameter = atOrThrow(parameters, 0);
     const types = getTypeReferences(parameter);
@@ -168,7 +168,7 @@ export function handler(req: FastifyRequest<{ Querystring: ICompany }, Server>) 
     create(filename01, abilityInterfaceSourceCode, true);
     const sourceFile02 = create(filename02, source02.trim(), true);
 
-    const node = orThrow(getRouteNode(sourceFile02));
+    const node = orThrow(getRouteFunction(sourceFile02));
     const parameters = node.node.getParameters();
     const parameter = atOrThrow(parameters, 0);
     const types = getTypeReferences(parameter);
@@ -250,7 +250,7 @@ export function handler(req: FastifyRequest<{ Querystring: ICompany }, Server>) 
     create(filename01, abilityInterfaceSourceCode, true);
     const sourceFile02 = create(filename02, source02.trim(), true);
 
-    const node = orThrow(getRouteNode(sourceFile02));
+    const node = orThrow(getRouteFunction(sourceFile02));
     const parameters = node.node.getParameters();
     const parameter = atOrThrow(parameters, 0);
     const types = getTypeReferences(parameter);

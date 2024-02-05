@@ -1,5 +1,5 @@
 import { getPropertySignatures } from '#/compilers/navigate/getPropertySignatures';
-import { getRouteNodeOrThrow } from '#/compilers/routes/getRouteNodeOrThrow';
+import { getRouteFunctionOrThrow } from '#/compilers/routes/getRouteFunctionOrThrow';
 import { atOrThrow } from 'my-easy-fp';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
@@ -29,7 +29,7 @@ export function handler(req: { Q: { name: string }; B: { age: number} }) {
       project.createSourceFile(path.join('examples', name), code, { overwrite });
 
     const sourceFile02 = create(filename01, source01.trim(), true);
-    const node = getRouteNodeOrThrow(sourceFile02);
+    const node = getRouteFunctionOrThrow(sourceFile02);
     const parameter = atOrThrow(node.node.getParameters(), 0);
 
     const r01 = getPropertySignatures(parameter);
@@ -49,7 +49,7 @@ export function handler(req: ITestInfoType01) {
       project.createSourceFile(path.join('examples', name), code, { overwrite });
 
     const sourceFile02 = create(filename01, source01.trim(), true);
-    const node = getRouteNodeOrThrow(sourceFile02);
+    const node = getRouteFunctionOrThrow(sourceFile02);
     const parameter = atOrThrow(node.node.getParameters(), 0);
 
     const r01 = getPropertySignatures(parameter);
@@ -69,7 +69,7 @@ export function handler(req: FastifyRequest<ITestInfoType01>) {
       project.createSourceFile(path.join('examples', name), code, { overwrite });
 
     const sourceFile02 = create(filename01, source01.trim(), true);
-    const node = getRouteNodeOrThrow(sourceFile02);
+    const node = getRouteFunctionOrThrow(sourceFile02);
     const parameter = atOrThrow(node.node.getParameters(), 0);
 
     const r01 = getPropertySignatures(parameter);
@@ -89,7 +89,7 @@ export function handler(req: FastifyRequest) {
       project.createSourceFile(path.join('examples', name), code, { overwrite });
 
     const sourceFile02 = create(filename01, source01.trim(), true);
-    const node = getRouteNodeOrThrow(sourceFile02);
+    const node = getRouteFunctionOrThrow(sourceFile02);
     const parameter = atOrThrow(node.node.getParameters(), 0);
 
     const r01 = getPropertySignatures(parameter);

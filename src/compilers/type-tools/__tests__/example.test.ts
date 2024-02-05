@@ -1,4 +1,4 @@
-import { getRouteNodeOrThrow } from '#/compilers/routes/getRouteNodeOrThrow';
+import { getRouteFunctionOrThrow } from '#/compilers/routes/getRouteFunctionOrThrow';
 import { getRequestTypeParameter } from '#/compilers/type-tools/getRequestTypeParameter';
 import { atOrThrow } from 'my-easy-fp';
 import path from 'node:path';
@@ -18,7 +18,7 @@ describe('getRequestTypeParameter', () => {
 
     console.log(sourceFile.getFilePath().toString());
 
-    const node = getRouteNodeOrThrow(sourceFile);
+    const node = getRouteFunctionOrThrow(sourceFile);
     const parameter = atOrThrow(node.node.getParameters(), 0);
 
     getRequestTypeParameter(parameter);

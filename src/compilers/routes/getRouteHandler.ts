@@ -2,7 +2,8 @@ import type { IImportConfiguration } from '#/compilers/interfaces/IImportConfigu
 import { getPropertySignatures } from '#/compilers/navigate/getPropertySignatures';
 import { getResolvedImportedModules } from '#/compilers/navigate/getResolvedImportedModules';
 import { getResolvedInFileImportedModules } from '#/compilers/navigate/getResolvedInFileImportedModules';
-import { getRouteNode } from '#/compilers/routes/getRouteNode';
+import { getRouteFunction } from '#/compilers/routes/getRouteFunction';
+import { getRouteOptionKind } from '#/compilers/routes/getRouteOptionKind';
 import { getRouteOptions } from '#/compilers/routes/getRouteOptions';
 import { CE_REQUEST_KIND } from '#/compilers/type-tools/const-enum/CE_REQUEST_KIND';
 import { getRequestTypeParameter } from '#/compilers/type-tools/getRequestTypeParameter';
@@ -28,7 +29,7 @@ export async function getRouteHandler(
   sourceFile: tsm.SourceFile,
   options: Pick<IBaseOption, 'output' | 'handler' | 'extKind'>,
 ) {
-  const node = getRouteNode(sourceFile);
+  const node = getRouteFunction(sourceFile);
 
   if (node == null) {
     return undefined;
@@ -82,6 +83,7 @@ export async function getRouteHandler(
   const routeConfiguration: IRouteConfiguration = {
     methods: [routePathConfiguration.method, ...extraMethods].map((method) => method.toLowerCase() as CE_ROUTE_METHOD),
     routePath: routePathConfiguration.routePath,
+    optionKind: routeOptions.node.option != null ? getRouteOptionKind(routeOptions.node.option) : undefined,
     hash,
     hasOption: routeOptions.has.option,
     handlerName: `handler_${hash}`,
