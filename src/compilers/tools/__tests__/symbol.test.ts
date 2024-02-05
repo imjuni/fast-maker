@@ -36,7 +36,7 @@ export function handler(req: FastifyRequest<{ Querystring: ITestInfoType01 }>) {
     expect(r01).toEqual('{ Querystring: ITestInfoType01 }');
   });
 
-  it.only('without callback, alias type symbol', () => {
+  it('without callback, alias type symbol', () => {
     const uuid = randomUUID();
     const filename01 = `${uuid}_0${(context.index += 1)}.ts`;
     const sourcecode01 = `

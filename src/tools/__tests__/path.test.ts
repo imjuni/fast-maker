@@ -43,7 +43,7 @@ describe('getNextExtName', () => {
   });
 });
 
-describe.only('getRelativeModulePath', () => {
+describe('getRelativeModulePath', () => {
   it('ext-kind none, module path start dot', () => {
     const r01 = getRelativeModulePath({
       output: '/a/b/c/d/handlers',
