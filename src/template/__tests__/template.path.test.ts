@@ -17,7 +17,7 @@ describe('getTemplatePath', () => {
     expect(r01).toEqual(path.join(process.cwd(), CE_DEFAULT_VALUE.TEMPLATES_PATH));
   });
 
-  it.only('template path build based on parameter path', async () => {
+  it('template path build based on parameter path', async () => {
     const r01 = await getTemplatePath(CE_DEFAULT_VALUE.TEMPLATES_PATH);
     expect(r01).toEqual(path.join(process.cwd(), CE_DEFAULT_VALUE.TEMPLATES_PATH));
   });

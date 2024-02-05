@@ -10,7 +10,7 @@ describe('getRelativeCwd', () => {
   });
 });
 
-describe.only('removeQuote', () => {
+describe('removeQuote', () => {
   it('single quote', () => {
     const r01 = removeQuote(`'hello'`);
     expect(r01).toEqual('hello');
