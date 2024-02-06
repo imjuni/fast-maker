@@ -13,7 +13,7 @@ export interface IBaseOption {
   /** path of the tsconfig file. Because fast-maker use typescript compiler api. */
   project: string;
 
-  /** path of the tsconfig file. Because fast-maker use typescript compiler api. */
+  /** path of the template files. */
   templates: string;
 
   /** module, route file extensions processing style in route.ts */
@@ -29,14 +29,16 @@ export interface IBaseOption {
   routeMap: boolean;
 
   /**
-   * index.ts 파일을 생성할 때 사용할 파일의 목록입니다. 만약 아무런 값을 설정하지 않는다면
-   * tsconfig.json 파일에 설정된 include 설정 값을 사용합니다
+   * A list of files to use when generating the index.ts file.
+   * If no value is set, the value of the include setting
+   * set in the tsconfig.json file will be used
    */
   include: string[];
 
   /**
-   * index.ts 파일을 생성할 때 제외할 파일의 목록입니다. 만약 아무런 값을 설정하지 않는다면
-   * tsconfig.json 파일에 설정된 exclude 설정 값을 사용합니다
+   * A list of files to exclude when generating the index.ts file.
+   * If no value is set, the Use the value of the exclude setting
+   * set in the tsconfig.json file
    */
   exclude: string[];
 

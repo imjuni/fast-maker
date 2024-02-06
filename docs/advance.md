@@ -47,8 +47,8 @@ Hash create by resolved full-directory. And hash use crypto.createHmac function.
 fast-maker support FastifyRequest type argument. see below.
 
 ```ts
-// get/poke/world.ts
-const world = async (
+// poke/world/get.ts
+export const handler = async (
   req: FastifyRequest<
     {
       Querystring: IReqPokeHello['Querystring'];
@@ -77,11 +77,9 @@ const world = async (
 };
 
 // generated code
-fastify.get<{
-  // if IReqPokeHello interface in your typescript project, fast-maker append postfix hash.
-  // Because error prevent raise by same name interface import
-  Querystring: IReqPokeHello_052A3A1D6C6D4FFC835C4EB7F39FE90E['Querystring'];
-  Body: IReqPokeHello_052A3A1D6C6D4FFC835C4EB7F39FE90E['Body'];
+fastify.route<{
+  Querystring: IReqPokeHello['Querystring'];
+  Body: IReqPokeHello['Body'];
   Headers: {
     'access-token': string;
     'refresh-token': string;
@@ -94,14 +92,18 @@ fastify.get<{
       };
     };
   };
-}>('/po-ke/world', option_nPZHxkE1fH4b3EascyCyIFc8UqLca2bc, world_nPZHxkE1fH4b3EascyCyIFc8UqLca2bc);
+}>({
+  ...option_nPZHxkE1fH4b3EascyCyIFc8UqLca2bc, 
+  url: '/po-ke/world',
+  handler: world_nPZHxkE1fH4b3EascyCyIFc8UqLca2bc,
+});
 ```
 
 Don't worry about request type arguments, detail type declare and error prevent!
 
 ## RouteShorthandOptions
 
-Named export `option` variable use to RouteShorthandOptions. I recommand using [simple-tjscli](https://www.npmjs.com/package/simple-tjscli). or [crate-ts-json-schema](https://github.com/imjuni/create-ts-json-schema). simple-tjscli, create-ts-json-schema can transfile TypeScript interface to JSONSchema. So you can pass like that.
+Named export `option` variable use to RouteShorthandOptions. I recommand using [simple-tjscli](https://www.npmjs.com/package/simple-tjscli). or [schema-nozzle](https://github.com/imjuni/schema-nozzle). simple-tjscli, schema-nozzle can transfile TypeScript interface to JSONSchema. So you can pass like that.
 
 ```ts
 // simple-tjscli
