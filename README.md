@@ -14,12 +14,13 @@
 
 Why `fast-maker`?
 
-fastify.js already have auto route mechanics using [fastify-autoload](https://github.com/fastify/fastify-autoload). But why you have to use `fast-maker`?
+fastify.js already have excellent auto route mechanics using [fastify-autoload](https://github.com/fastify/fastify-autoload). But why you have to use `fast-maker`?
 
+1. Zero cost in Run-Time.
 1. [Static analysis](https://en.wikipedia.org/wiki/Static_program_analysis): `fast-maker` generate TypeScript source code. Because it help to find error in compile-time, not runtime
-2. Complex Variable: You can use like that: `/person/[kind]-[id]/`. It help to get id and kind of id, for example serial-number and id or db-pk and id
-3. Next.js: `fast-maker` use the same mechanics as [Next.js](https://nextjs.org/docs/routing/introduction)
-4. `fast-maker` support a beautiful cli-interface
+1. Flexable Routing: You can use like that: `/person/[kind]-[id]/`. It help to get id and kind of id, for example serial-number and id or db-pk and id, even if you can use regular expression.
+1. Unifying how route paths are built: `fast-maker` use the same mechanics as [Next.js](https://nextjs.org/docs/routing/introduction). Route paths using file-system cannot be developer-specific
+1. `fast-maker` support a beautiful cli-interface
 
 ## Table of Contents <!-- omit in toc -->
 
@@ -88,9 +89,6 @@ npx fast-maker --help
 # display help for route commands
 npx fast-maker route --help
 
-# display help for watch commands
-npx fast-maker watch --help
-
 # display help for init commands
 npx fast-maker init --help
 ```
@@ -107,31 +105,50 @@ use file-system.
 
 ```text
 handlers/
-├─ get/
-│  ├─ hero/
-│  │  ├─ [name].ts
-├─ post/
-│  ├─ hero.ts
-├─ put/
-│  ├─ hero/
-│  │  ├─ [name].ts
-├─ delete/
-│  ├─ hero/
-│  │  ├─ [name].ts
+├─ superheros/
+│  ├─ [id]/
+│  │  ├─ powers/
+│  │  │  ├─ [id]/
+│  │  │  │  ├─ delete.ts
+│  │  │  │  ├─ get.ts
+│  │  │  │  ├─ put.ts
+│  │  │  ├─ post.ts
+│  │  ├─ delete.ts
+│  │  ├─ get.ts
+│  │  ├─ put.ts
+│  ├─ get.ts
+│  ├─ post.ts
 ```
 
-`get`, `post`, `put`, `delete` directory represent _HTTP Method_. Also you can use `options`, `patch`, `head`, `all` directory.
+`get`, `post`, `put`, `delete` filename represent _HTTP Method_. Also you can use `options`, `patch`, `head`, `all` filename.
 
 ### Route options
 
 You can pass `RouteShorthandOptions` option like that,
 
 ```ts
+// When not using a `fastify` instance, you can declare it as a variable like this
 export const option: RouteShorthandOptions = {
   schema: {
     querystring: schema.properties?.Querystring,
     body: schema.properties?.Body,
   },
+};
+```
+
+```ts
+// When using the `fastify` instance, you can declare it as a function like this
+export const option = (fastify: FastifyInstance): RouteShorthandOptions => {
+  return {
+    schema: {
+      querystring: schema.properties?.Querystring,
+      body: schema.properties?.Body,
+    },
+     preHandler: fastify.auth([
+      fastify.allowAnonymous,
+      fastify.verifyBearerAuth
+    ]),
+  };
 };
 ```
 
@@ -145,7 +162,7 @@ You can pass route handler function like that,
 import { FastifyRequest } from 'fastify';
 import type { IReqSearchPokemonQuerystring, IReqSearchPokemonParams } from '../../interface/IReqSearchPokemon';
 
-export default async function (
+export async function handler(
   req: FastifyRequest<{ Querystring: IReqSearchPokemonQuerystring; Params: IReqSearchPokemonParams }>,
 ) {
   console.debug(req.query);
@@ -155,7 +172,7 @@ export default async function (
 }
 ```
 
-You have to `non-named export` (aka default export). Also you can use arrow function and you can use any name under TypeScript function name rule, as well as type arguments perfectly applied on route configuration
+You have to `named export` and variable name must be a `handler`. Also you can use arrow function and you can use any name under TypeScript function name rule, as well as type arguments perfectly applied on route configuration
 
 ### Variable in Route Path
 
@@ -163,18 +180,19 @@ File or Directory name surrounded square bracket like that,
 
 ```text
 handlers/
-├─ get/
-│  ├─ hero/
-│  │  ├─ [name].ts
+├─ superheros/
+│  ├─ [id]/
+│  │  ├─ get.ts
+│  │  ├─ put.ts
 ```
 
-Complex variable, No problem.
+Multiple variable, No problem.
 
 ```text
 handlers/
-├─ get/
-│  ├─ hero/
-│  │  ├─ [affiliation]-[name].ts
+├─ superheros/
+│  ├─ [kind]-[id]/
+│  │  ├─ get.ts
 ```
 
 This route path access like that: `curl http://localhost:8080/hero/marvel-ironman`
@@ -192,10 +210,10 @@ A complete example of using `fast-maker` can be found at [Ma-eum](https://github
 
 ## Roadmaps
 
-- [ ] display each route path in cli-table
+- [x] display each route path in cli-table
 - [ ] add new option silent
 - [ ] documentation site
-- [ ] add more test
+- [x] add more test
 
 ## License
 
