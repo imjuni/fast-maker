@@ -45,28 +45,6 @@ const routeCmd: CommandModule<TRouteOption, TRouteOption> = {
   },
 };
 
-// const watchCmd: CommandModule<TWatchOption, TWatchOption> = {
-//   command: CE_COMMAND_LIST.WATCH,
-//   aliases: CE_COMMAND_LIST.WATCH_ALIAS,
-//   describe: 'watch for create route.ts file in your directory using by tsconfig.json',
-//   builder: (argv) => watchBuilder(builder(argv)),
-//   handler: async (argv) => {
-//     try {
-//       progress.isEnable = true;
-//       spinner.isEnable = true;
-
-//       if (process.env.SYNC_MODE === 'true') {
-//         await watchCommandSyncHandler(argv);
-//       } else {
-//         await watchCommandClusterHandler(argv);
-//       }
-//     } catch (caught) {
-//       const err = isError(caught, new Error('unknown error raised'));
-//       consola.error(err);
-//     }
-//   },
-// };
-
 const parser = yargs(process.argv.slice(2));
 
 parser

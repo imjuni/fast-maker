@@ -1,5 +1,6 @@
+<%= it.options.banner ? it.banner + '\n\n' : '' _%>
 <%~ include('import', { imports: it.imports }) %>
 
 
 
-<%~ include('route', { routes: it.routes }) %>
+<%~ include('route', { routes: it.routes, options: it.options }) %>

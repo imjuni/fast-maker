@@ -1,4 +1,4 @@
-import { CE_DEFAULT_VALUE } from '#/configs/const-enum/CE_DEFAULT_VALUE';
+import { CE_EXT_KIND } from '#/configs/const-enum/CE_EXT_KIND';
 import type { Argv } from 'yargs';
 
 export function builder(args: Argv): Argv {
@@ -41,15 +41,29 @@ export function builder(args: Argv): Argv {
       type: 'boolean',
       default: false,
     })
-    .option('max-workers', {
-      describe: 'max worker count',
-      type: 'number',
-      default: undefined,
+    .option('banner', {
+      describe: '생성된 파일에 배너와 시간을 추가합니다',
+      type: 'boolean',
+      default: false,
     })
-    .option('worker-timeout', {
-      describe: 'route code generation worker timeout: default 90 seconds',
-      type: 'number',
-      default: CE_DEFAULT_VALUE.DEFAULT_TASK_WAIT_SECOND * 3,
+    .option('templates', {
+      description: '템플릿 파일 경로를 결정합니다',
+      type: 'string',
+    })
+    .option('ext-kind', {
+      describe: 'import 구문의 확장자 처리 방법을 결정합니다',
+      type: 'string',
+      choices: [
+        CE_EXT_KIND.NONE,
+        CE_EXT_KIND.KEEP,
+        CE_EXT_KIND.JS,
+        CE_EXT_KIND.CJS,
+        CE_EXT_KIND.MJS,
+        CE_EXT_KIND.TS,
+        CE_EXT_KIND.CTS,
+        CE_EXT_KIND.MTS,
+      ],
+      default: CE_EXT_KIND.NONE,
     })
     .option('use-default-export', {
       description: 'route function in output file that use default export',

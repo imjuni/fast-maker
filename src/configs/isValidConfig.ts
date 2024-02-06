@@ -5,8 +5,6 @@ import { atOrUndefined } from 'my-easy-fp';
 const commands: string[] = [
   CE_COMMAND_LIST.ROUTE,
   CE_COMMAND_LIST.ROUTE_ALIAS,
-  CE_COMMAND_LIST.WATCH,
-  CE_COMMAND_LIST.WATCH_ALIAS,
   CE_COMMAND_LIST.INIT,
   CE_COMMAND_LIST.INIT_ALIAS,
 ];

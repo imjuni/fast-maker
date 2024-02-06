@@ -40,12 +40,6 @@ export interface IBaseOption {
    */
   exclude: string[];
 
-  /** max worker count */
-  maxWorkers?: number;
-
-  /** route code generation worker timeout: default 90 seconds */
-  workerTimeout: number;
-
   /**
    * route function in output file that use default export
    * @default true

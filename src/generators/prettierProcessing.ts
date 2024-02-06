@@ -17,8 +17,9 @@ export async function prettierProcessing({ code, optionPath }: IPrettierProcessi
           printWidth: 80,
           arrowParens: 'always',
           parser: 'typescript',
+          plugins: ['prettier-plugin-organize-imports'],
         }
-      : { ...userOption, parser: userOption.parser ?? 'typescript' };
+      : { ...userOption, parser: userOption.parser ?? 'typescript', plugins: ['prettier-plugin-organize-imports'] };
 
   const prettfied = prettier.format(code, option);
 

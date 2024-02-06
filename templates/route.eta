@@ -16,7 +16,7 @@
     }
   }
 %>
-export default function routing(fastify: FastifyInstance): void {
+export <%= it.options.useDefaultExport ? 'default ' : '' %>function <%= it.options.routeFunctionName %>(fastify: FastifyInstance): void {
   <% it.routes.forEach((route) => { %>
   <% if (route.typeArgument != null && route.typeArgument.text !== '' ) { %>
   fastify.route<<%= route.typeArgument.text %>>({
