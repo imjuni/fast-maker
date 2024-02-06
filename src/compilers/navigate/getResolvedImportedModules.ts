@@ -1,7 +1,6 @@
 import type { IResolvedImportModule } from '#/compilers/interfaces/IResolvedImportModule';
 import { getNamedBindingName } from '#/compilers/tools/getNamedBindingName';
 import { isExternalModule } from '#/compilers/type-tools/isExternalModule';
-import { CE_EXT_KIND } from '#/configs/const-enum/CE_EXT_KIND';
 import type { IBaseOption } from '#/configs/interfaces/IBaseOption';
 import { getHash } from '#/tools/getHash';
 import { getRelativeModulePath } from '#/tools/getRelativeModulePath';
@@ -88,7 +87,6 @@ export function getResolvedImportedModules({
       };
     }
 
-    // importStatement.importDeclaration.getModuleSpecifier().getText();
     const moduleSourceFilePath = moduleSourceFile.getFilePath();
     const declarationMap = moduleSourceFile.getExportedDeclarations();
     const relativePath = importStatement.isExternalModule
@@ -96,7 +94,7 @@ export function getResolvedImportedModules({
       : getRelativeModulePath({
           modulePath: moduleSourceFilePath,
           output: options.output,
-          extKind: CE_EXT_KIND.NONE,
+          extKind: options.extKind,
         });
     const moduleHash = getHash(relativePath);
 

@@ -1,6 +1,5 @@
 import { CE_DEFAULT_VALUE } from '#/configs/const-enum/CE_DEFAULT_VALUE';
 import type { TRouteOption } from '#/configs/interfaces/TRouteOption';
-import type { TWatchOption } from '#/configs/interfaces/TWatchOption';
 import { getConfigFilePath } from '#/configs/interfaces/getConfigFilePath';
 import consola from 'consola';
 import * as findUp from 'find-up';
@@ -20,7 +19,7 @@ export function preLoadConfig() {
     const configFilePath = getConfigFilePath(argv, tsconfigPath);
     const config =
       configFilePath != null
-        ? (parse(fs.readFileSync(configFilePath).toString()) as TRouteOption | TWatchOption)
+        ? (parse(fs.readFileSync(configFilePath).toString()) as TRouteOption)
         : { project: undefined };
 
     return {

@@ -15,6 +15,8 @@ describe('TemplateContainer', () => {
     const handlerMethod = 'get.ts';
 
     const r01 = await TemplateContainer.it.evaluate('routing', {
+      banner: 'test',
+      options: { banner: false, useDefaultExport: true, routeFunctionName: 'routing' },
       imports: [
         {
           hash: 'zLRHkFp00cylJZ0CJlgEiLOpyIGY5Pwl',
