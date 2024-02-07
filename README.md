@@ -10,17 +10,17 @@
 [![codecov](https://codecov.io/gh/imjuni/fast-maker/branch/master/graph/badge.svg?token=YrUlnfDbso&style=flat-square)](https://codecov.io/gh/imjuni/fast-maker)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-`fast-maker` generate fastify.js route configuration using by directory structure.
+`fast-maker` generate [fastify.js](https://github.com/fastify/fastify) route configuration using by directory structure.
 
 Why `fast-maker`?
 
-fastify.js already have excellent auto route mechanics using [fastify-autoload](https://github.com/fastify/fastify-autoload). But why you have to use `fast-maker`?
-
-1. Zero cost in Run-Time.
-1. [Static analysis](https://en.wikipedia.org/wiki/Static_program_analysis): `fast-maker` generate TypeScript source code. Because it help to find error in compile-time, not runtime
-1. Flexable Routing: You can use like that: `/person/[kind]-[id]/`. It help to get id and kind of id, for example serial-number and id or db-pk and id, even if you can use regular expression.
-1. Unifying how route paths are built: `fast-maker` use the same mechanics as [Next.js](https://nextjs.org/docs/routing/introduction). Route paths using file-system cannot be developer-specific
-1. `fast-maker` support a beautiful cli-interface
+1. Zeor cost for routing configuration at runtime
+2. [Static analysis](https://en.wikipedia.org/wiki/Static_program_analysis): `fast-maker` generates typescript source code, so many errors can be found at compile time
+3. flexible routing: supports various routing such as variable joining, regular expressions, etc. for example, `/student/[grade]-[id]`, `/hero/:id/power/:id?`
+4. single way: there is only one way to create one routing configuration, so there is no risk of creating routing configurations in different ways even when collaborating
+5. less code conflicts: by excluding auto-generated code from the VCS, there is less chance of code conflicts when people collaborate
+6. beautiful CLI interface
+7. generate a route-map.ts file that summarizes routing information. It can be used for a variety of purposes, including logging. The route-map.ts file is useful because it is generated before run-time
 
 ## Table of Contents <!-- omit in toc -->
 
@@ -28,11 +28,12 @@ fastify.js already have excellent auto route mechanics using [fastify-autoload](
 - [How it works?](#how-it-works)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Routing](#routing)
-  - [HTTP Method](#http-method)
+- [Url building](#url-building)
+  - [Parametric](#parametric)
+  - [Combined parameter](#combined-parameter)
+  - [Regular Expression, Wildcard](#regular-expression-wildcard)
   - [Route options](#route-options)
   - [Route handler](#route-handler)
-  - [Variable in Route Path](#variable-in-route-path)
 - [Example using fastify.js](#example-using-fastifyjs)
 - [Relate To](#relate-to)
 - [Roadmaps](#roadmaps)
@@ -95,32 +96,91 @@ npx fast-maker init --help
 
 Also you can see detail option [here](/docs/options.md).
 
-## Routing
+## Url building
 
-`fast-maker` has a file-system based route configuration. This concept borrowed from [Next.js routing system](https://nextjs.org/docs/routing/introduction). But one difference is that _HTTP Method_ is separated by file-system.
+![route-component-architecture.png](assets/route-component-architecture.png)
 
-### HTTP Method
+The figure above shows at a quick look how `fast-maker` generates a route configuration. Routing with a file-system is intuitive and easy to understand, and it also allows many people to collaborate . This concept borrows from [Next.js routing system](https://nextjs.org/docs/routing/introduction). However, I've improved it to determine the http method as the filename.
 
-use file-system.
+### Parametric
 
-```text
-handlers/
-├─ superheros/
-│  ├─ [id]/
-│  │  ├─ powers/
-│  │  │  ├─ [id]/
-│  │  │  │  ├─ delete.ts
-│  │  │  │  ├─ get.ts
-│  │  │  │  ├─ put.ts
-│  │  │  ├─ post.ts
-│  │  ├─ delete.ts
-│  │  ├─ get.ts
-│  │  ├─ put.ts
-│  ├─ get.ts
-│  ├─ post.ts
+file-system
+
+```bash
+/handlers/example/[userId]/get.ts
 ```
 
-`get`, `post`, `put`, `delete` filename represent _HTTP Method_. Also you can use `options`, `patch`, `head`, `all` filename.
+generated TypeScript code like that,
+
+```ts
+// parametric
+fastify.route({
+  method: ['get'],
+  url: '/example/:userId',
+  handler: function (request, reply) {
+    // curl ${app-url}/example/12345
+    // userId === '12345'
+    const { userId } = request.params;
+    // your code here
+  }
+});
+```
+
+### Combined parameter
+
+file-system
+
+```bash
+/handlers/[lat]-[lng]/radius/[[r]]/patch.ts
+```
+
+generated TypeScript code like that,
+
+```ts
+fastify.route({
+  method: ['patch'],
+  url: '/example/near/:lat-:lng/radius/:r?',
+  handler: function (request, reply) {
+    // curl ${app-url}/example/near/15°N-30°E/radius/20
+    // lat === "15°N"
+    // lng === "30°E"
+    // r ==="20"
+    const { lat, lng, r } = request.params;
+    // your code here
+  }
+});
+```
+
+### Regular Expression, Wildcard
+
+file-system
+
+```bash
+/handlers/example/at/[$time]/get.ts
+```
+
+replace map in `get.ts`
+
+```ts
+// replace map
+const map = new Map<string, string>(['$time', ':hour(^\\d{2})h:minute(^\\d{2})m'])
+```
+
+generated TypeScript code like that,
+
+```ts
+fastify.route({
+  method: ['get'],
+  url: '/example/at/:hour(^\\d{2})h:minute(^\\d{2})m',
+  handler: function (request, reply) {
+    // curl ${app-url}/example/at/08h24m
+    // hour === "08"
+    // minute === "24"
+    const { hour, minute } = request.params;
+    // your code here
+  }
+});
+```
 
 ### Route options
 
@@ -136,8 +196,11 @@ export const option: RouteShorthandOptions = {
 };
 ```
 
+When using the `fastify` instance, you can declare it as a function like this,
+
 ```ts
-// When using the `fastify` instance, you can declare it as a function like this
+// completly same, 
+// export function option(fastify: FastifyInstance): RouteShorthandOptions { ... }
 export const option = (fastify: FastifyInstance): RouteShorthandOptions => {
   return {
     schema: {
@@ -174,34 +237,9 @@ export async function handler(
 
 You have to `named export` and variable name must be a `handler`. Also you can use arrow function and you can use any name under TypeScript function name rule, as well as type arguments perfectly applied on route configuration
 
-### Variable in Route Path
-
-File or Directory name surrounded square bracket like that,
-
-```text
-handlers/
-├─ superheros/
-│  ├─ [id]/
-│  │  ├─ get.ts
-│  │  ├─ put.ts
-```
-
-Multiple variable, No problem.
-
-```text
-handlers/
-├─ superheros/
-│  ├─ [kind]-[id]/
-│  │  ├─ get.ts
-```
-
-This route path access like that: `curl http://localhost:8080/hero/marvel-ironman`
-
-That's it. `fast-maker` takes care of the rest.
-
 ## Example using fastify.js
 
-A complete example of using `fast-maker` can be found at [Ma-eum](https://github.com/maeumjs/maeum).
+A complete example of using `fast-maker` can be found at [Ma-eum](https://github.com/maeumjs/maeum-pet-store).
 
 ## Relate To
 
