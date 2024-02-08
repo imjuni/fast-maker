@@ -73,3 +73,4 @@ examples/handlers/route.ts
 examples/handlers/route-map.ts
 .eslintcache
 TODO.md
+git-short.sh

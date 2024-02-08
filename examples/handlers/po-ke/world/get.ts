@@ -1,3 +1,11 @@
+/**
+ * Example of the function option
+ *
+ * If you need access to the fastify instance to use various hooks, including the preHandler,
+ * you can use the function option to get the fastify instance passed to you.
+ *
+ * @see https://github.com/fastify/fastify-bearer-auth?tab=readme-ov-file#integration-with-fastifyauth
+ */
 import type { FastifyInstance, FastifyReply, FastifyRequest, RouteShorthandOptions } from 'fastify';
 import type { Server } from 'http';
 import type { IReqPokeHello } from '../../interfaces/IReqPokeHello';
@@ -8,6 +16,8 @@ export const option: (fastify: FastifyInstance) => RouteShorthandOptions = () =>
     querystring: schema.properties?.Querystring,
     body: schema.properties?.Body,
   },
+  // preHandler hook using fastify instance
+  preHandler: fastify.auth([fastify.allowAnonymous, fastify.verifyBearerAuth]),
 });
 
 export const handler = async (
