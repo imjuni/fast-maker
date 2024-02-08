@@ -35,6 +35,7 @@ Why `fast-maker`?
   - [Route options](#route-options)
   - [Route handler](#route-handler)
 - [Example using fastify.js](#example-using-fastifyjs)
+  - [Examples](#examples)
 - [Relate To](#relate-to)
 - [Roadmaps](#roadmaps)
 - [License](#license)
@@ -235,11 +236,19 @@ export async function handler(
 }
 ```
 
-You have to `named export` and variable name must be a `handler`. Also you can use arrow function and you can use any name under TypeScript function name rule, as well as type arguments perfectly applied on route configuration
+You have to `named export` and variable name must be a `handler`. Also you can use arrow function, as well as type arguments perfectly applied on route configuration.
 
 ## Example using fastify.js
 
-A complete example of using `fast-maker` can be found at [Ma-eum](https://github.com/maeumjs/maeum-pet-store).
+A complete example of using `fast-maker` can be found at [Ma-eum](https://github.com/maeumjs/maeum-pet-store) and [examples](https://github.com/imjuni/fast-maker/tree/master/examples)
+
+### Examples
+
+- [vanilla](examples/handlers/justice/%5Bdc-league%5D/hello/get.ts)
+- [variable map](examples/handlers/avengers/heroes/%5Bid%5D/%5B%24time%5D/post.ts)
+- [multiple methods](examples/handlers/avengers/heroes/get.ts)
+- [multiple variable](examples/handlers/justice/[kind]-[id]/get.ts)
+- [function option](examples/handlers/po-ke/world/get.ts)
 
 ## Relate To
 

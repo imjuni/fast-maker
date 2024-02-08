@@ -1,3 +1,8 @@
+/**
+ * Example of the multiple variable in single route path element
+ *
+ * justice/[kind]-[id] replace to `justice/:kind-:id`
+ */
 import type { FastifyInstance, FastifyReply, FastifyRequest, RouteShorthandOptions } from 'fastify';
 import type { Server } from 'http';
 import type { IReqPokeHelloMultiParam } from '../../interfaces/IReqPokeHelloMultiParam';
