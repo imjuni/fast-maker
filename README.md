@@ -15,10 +15,10 @@
 Why `fast-maker`?
 
 1. Zeor cost for routing configuration at runtime
-2. [Static analysis](https://en.wikipedia.org/wiki/Static_program_analysis): `fast-maker` generates typescript source code, so many errors can be found at compile time
-3. flexible routing: supports various routing such as variable joining, regular expressions, etc. for example, `/student/[grade]-[id]`, `/hero/:id/power/:id?`
-4. single way: there is only one way to create one routing configuration, so there is no risk of creating routing configurations in different ways even when collaborating
-5. less code conflicts: by excluding auto-generated code from the VCS, there is less chance of code conflicts when people collaborate
+2. [Static analysis](https://en.wikipedia.org/wiki/Static_program_analysis): The `fast-maker` generates the TypeScript source code. Because it does not generate the `route configuration` through dynamic analysis at runtime, it can find errors during the TypeScript compilation process
+3. flexible routing: supports various routing such as variable joining, regular expressions, etc. for example, `/student/:grade-:id` and `/hero/:id/power/:id?`, `/avengers/heroes/:id/:hour(^d{2})h:minute(^d{2})m`
+4. single way: there is only one way to generate one routing configuration, so there is no risk of generating routing configurations in different ways even when collaborating
+5. less code conflicts: by excluding auto-generated code from the VCS(eg. git), there is less chance of code conflicts when people collaborate
 6. beautiful CLI interface
 7. generate a route-map.ts file that summarizes routing information. It can be used for a variety of purposes, including logging. The route-map.ts file is useful because it is generated before run-time
 
@@ -95,7 +95,7 @@ npx fast-maker route --help
 npx fast-maker init --help
 ```
 
-Also you can see detail option [here](/docs/options.md).
+Also you can see detail option [here](docs/options.md).
 
 ## Url building
 

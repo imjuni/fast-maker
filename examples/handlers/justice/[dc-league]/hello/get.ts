@@ -5,8 +5,6 @@ import schema from '../../../interfaces/JSC_IReqPokeHello';
 
 export const map: string = 'test';
 
-export const methods: number = 1;
-
 export const option: RouteShorthandOptions = {
   schema: {
     querystring: schema.properties?.Querystring,
